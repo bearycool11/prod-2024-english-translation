@@ -1,0 +1,11 @@
+version: '1'
+
+services:
+  habit-tracker:
+    build:
+      dockerfile: Dockerfile
+      context: frontend
+    container_name: PROD-final-frontend
+    ports:
+      - "80:4173"
+    restart: always
