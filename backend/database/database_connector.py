@@ -15,6 +15,7 @@ def load_models():
     from database.models import DBOrganizationUser  # noqa: unused
     from database.models import DBOrganizationBot # noqa: unused
     from database.models import DBChannels # noqa: unused
+    from database.models import DBPost # noqa: unused
 
 
 def get_session():
