@@ -26,6 +26,7 @@ app = FastAPI(
     title='SMM app API',
     version='1.0',
     docs_url='/api/docs',
+    openapi_url="/api/v1/openapi.json",
 )
 
 router = APIRouter(prefix='/api')
