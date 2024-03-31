@@ -25,6 +25,7 @@ def get_password_hash(password):
 app = FastAPI(
     title='SMM app API',
     version='1.0',
+    docs_url='/api/docs',
 )
 
 router = APIRouter(prefix='/api')
