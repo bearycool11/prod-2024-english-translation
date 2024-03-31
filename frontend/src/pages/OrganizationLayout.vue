@@ -1,7 +1,16 @@
 <template>
+  <div
+    @click="toggleSidebar"
+    v-if="store.ui.isSideBarOpen"
+    class="top-0 left-0 h-screen w-screen bg-gray-900 fixed opacity-20"
+  ></div>
   <aside
     id="default-sidebar"
-    class="top-0 left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0 sm:block hidden"
+    class="top-0 left-0 z-40 w-64 h-screen transition-transform sm:static fixed md:translate-x-0"
+    :class="{
+      '-translate-x-full': !store.ui.isSideBarOpen,
+      'translate-x-0': store.ui.isSideBarOpen
+    }"
     aria-label="Sidebar"
   >
     <div class="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800">
@@ -42,7 +51,7 @@
               />
             </svg>
 
-            <span class="flex-1 ms-3 whitespace-nowrap"> Пользователи</span>
+            <span class="flex-1 ms-3 whitespace-nowrap">Пользователи</span>
             <!-- <span
               class="inline-flex items-center justify-center px-2 ms-3 text-sm font-medium text-gray-800 bg-gray-100 rounded-full dark:bg-gray-700 dark:text-gray-300"
               >Pro</span
@@ -134,3 +143,8 @@
     </div>
   </aside>
 </template>
+
+<script setup>
+import { store } from "@/store/index.js";
+import {toggleSidebar} from "@/store/toggleSidebar.js";
+</script>
