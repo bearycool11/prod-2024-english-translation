@@ -56,7 +56,7 @@ services:
       networks:
         - smm_ya
       volumes:
-        - ./nginx-conf.d:/etc/nginx/conf.d
+        - ./nginx:/etc/nginx/conf.d
       restart: always
 
 volumes:
