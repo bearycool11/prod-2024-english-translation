@@ -3,4 +3,4 @@ from .DBUser import DBUser
 from .DBPermission import DBPermission
 from .DBOrganizationUser import DBOrganizationUser
 from .DBOrganizationBot import DBOrganizationBot
-from .DBBotChannels import DBBotChannels
+from .DBChannels import DBChannels
