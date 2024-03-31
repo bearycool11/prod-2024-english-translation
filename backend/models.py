@@ -26,11 +26,19 @@ class AuthRegisterPostRequest(BaseModel):
 
 
 class UserProfile(BaseModel):
-    id: int = Field(primary_key=True)
+    id: int
     name: str = Field(max_length=50)
     login: str = Field(max_length=50)
     is_admin: bool
 
+
+class UserPublicProfile(BaseModel):
+    id: int
+    name: str = Field(max_length=50)
+
+
+class UserRights(BaseModel):
+    rights: list[str]
 
 class AuthRegisterPostResponse(BaseModel):
     profile: UserProfile
@@ -42,10 +50,18 @@ class OrganizationCreatePostRequest(BaseModel):
 
 
 class Organization(BaseModel):
-    id: int = Field(primary_key=True)
+    id: int
     name: str = Field(max_length=50)
     description: Optional[str] = Field(max_length=150)
 
 
 class OrganizationCreatePostResponse(BaseModel):
     organization: Organization
+
+
+class OrganizationUser(BaseModel):
+    user: UserPublicProfile
+    rights: UserRights
+
+class UserOrganizationsGetResponse(BaseModel):
+    organizations: list[Organization]

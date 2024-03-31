@@ -21,7 +21,7 @@ CredentialsException = HTTPException(
 )
 
 
-def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db_session: Session = Depends(get_session)):
+def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db_session: Session = Depends(get_session)) -> DBUser:
     try:
         payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
         login: str = payload.get("login")

@@ -7,9 +7,10 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import Response
 
 from database.database_connector import get_session
-from database.models import DBUser, DBOrganization
+from database.models import DBUser, DBOrganization, DBPermission
 from models import PingResponse, AuthSignInPostResponse, AuthSignInPostRequest, ErrorResponse, AuthRegisterPostResponse, \
-    AuthRegisterPostRequest, UserProfile, Organization, OrganizationCreatePostResponse, OrganizationCreatePostRequest
+    AuthRegisterPostRequest, UserProfile, Organization, OrganizationCreatePostResponse, OrganizationCreatePostRequest, \
+    UserOrganizationsGetResponse
 from tools.auth import create_access_token, get_current_user
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -21,6 +22,17 @@ def verify_password(plain_password, hashed_password):
 
 def get_password_hash(password):
     return pwd_context.hash(password)
+
+
+def get_uniq_orgs(orgs: list[DBOrganization]):
+    ids = []
+    uniq_orgs = []
+    for i in orgs:
+        if i.id in ids:
+            continue
+        ids.append(i.id)
+        uniq_orgs.append(Organization(**i.dict()))
+    return uniq_orgs
 
 
 app = FastAPI(
@@ -103,19 +115,39 @@ def auth_register(
 )
 def organization_create(
         response: Response, body: OrganizationCreatePostRequest, db_session=Depends(get_session),
-        user=Depends(get_current_user)
+        current_user=Depends(get_current_user)
 ) -> Union[OrganizationCreatePostResponse, ErrorResponse]:
-    db_model = DBOrganization(**body.dict())
-    db_session.add(db_model)
+    organization = DBOrganization(**body.dict())
+    db_session.add(organization)
+    db_session.add(DBPermission(name="owner", level=5, can_grant=True))
     try:
         db_session.commit()
     except:
         response.status_code = 409
         return ErrorResponse(reason="conflict")
     response.status_code = 201
-    return OrganizationCreatePostResponse(organization=Organization(**db_model.dict()))
+    return OrganizationCreatePostResponse(organization=Organization(**organization.dict()))
 
 
-# TODO: fetch user organizations
+@router.get(
+    '/organizations',
+    response_model=Union[UserOrganizationsGetResponse, ErrorResponse],
+    responses={
+        '200': {'model': UserOrganizationsGetResponse},
+        '401': {'model': ErrorResponse}
+    }
+)
+def get_user_ogranizations(
+        response: Response, db_session=Depends(get_session), current_user: DBUser = Depends(get_current_user)
+) -> Union[UserOrganizationsGetResponse, ErrorResponse]:
+    return UserOrganizationsGetResponse(
+        organizations=get_uniq_orgs([i.organization for i in current_user.organization_bindings]))
+
+
+# TODO: fetch organization users
+# @router.get(
+#    '/organizations/{organization_id}/users',
+#    response_model=Union[list[OrganizationUser], ErrorResponse]
+# )
 
 app.include_router(router)
