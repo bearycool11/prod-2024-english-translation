@@ -7,7 +7,7 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import Response
 
 from database.database_connector import get_session
-from database.models import DBUser, DBOrganization, DBPermission, DBOrganizationUser
+from database.models import DBUser, DBOrganization, DBOrganizationUser
 from models import PingResponse, AuthSignInPostResponse, AuthSignInPostRequest, ErrorResponse, AuthRegisterPostResponse, \
     AuthRegisterPostRequest, UserProfile, Organization, OrganizationCreatePostResponse, OrganizationCreatePostRequest, \
     UserOrganizationsGetResponse
@@ -56,6 +56,11 @@ router = APIRouter(prefix='/api')
 
 @router.get('/ping', response_model=PingResponse)
 def ping() -> PingResponse:
+    return PingResponse(status="ok")
+
+
+@router.get('/auth/check', response_model=PingResponse)
+def auth_check(current_user: DBUser = Depends(get_current_user)) -> PingResponse:  # noqa: unused
     return PingResponse(status="ok")
 
 
@@ -115,7 +120,7 @@ def auth_register(
 )
 def organization_create(
         response: Response, body: OrganizationCreatePostRequest, db_session=Depends(get_session),
-        current_user: DBUser =Depends(get_current_user)
+        current_user: DBUser = Depends(get_current_user)
 ) -> Union[OrganizationCreatePostResponse, ErrorResponse]:
     organization = DBOrganization(**body.dict())
     db_session.add(organization)
