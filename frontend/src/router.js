@@ -6,27 +6,29 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      children:[
+      component: () => import('./pages/MainLayout.vue'),
+      children: [
         {
           path: '/organization/:id',
           name: 'OrganizationPage',
+          component: () => import('./pages/OrganizationLayout.vue'),
           //redirect: {name: 'posts'},
           children: [
             {
               path: '/users',
-              name: 'users',
+              name: 'users'
             },
             {
               path: '/history',
-              name: 'posts history',
+              name: 'posts history'
             },
             {
               path: '/channels',
-              name: 'channels',
+              name: 'channels'
             },
             {
               path: '/social',
-              name: 'social networks',
+              name: 'social networks'
             }
           ]
         }
