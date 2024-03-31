@@ -9,7 +9,8 @@ session_maker = sessionmaker(engine, expire_on_commit=False)
 
 
 def load_models():
-    pass
+    from database.models import DBUser # noqa: unused
+    from database.models import DBOrganization # noqa: unused
 
 
 def get_session():
