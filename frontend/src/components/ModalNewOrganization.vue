@@ -3,10 +3,11 @@
     v-if="isShown"
     class="top-0 left-0 h-screen w-screen bg-gray-900 fixed opacity-20 z-40"
   ></div>
-  <div v-if="isShown"
+  <div
+    v-if="isShown"
     class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50"
   >
-    <div class="relative p-4 w-full max-w-md max-h-full  top-0 right-0 left-0 z-50">
+    <div class="relative p-4 w-full max-w-md max-h-full top-0 right-0 left-0 z-50">
       <!-- Modal content -->
       <div class="relative bg-white rounded-lg shadow dark:bg-gray-700 min-w-80">
         <!-- Modal header -->
@@ -14,7 +15,8 @@
           class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600"
         >
           <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Создай организацию</h3>
-          <button @click="closeModal"
+          <button
+            @click="closeModal"
             type="button"
             class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
             data-modal-toggle="crud-modal"
@@ -50,11 +52,11 @@
                 id="name"
                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                 placeholder="Название организации"
-                required=""
+                required
+                v-model="name"
               />
             </div>
-            
-            
+
             <div class="col-span-2">
               <label
                 for="description"
@@ -66,6 +68,7 @@
                 rows="4"
                 class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 placeholder="Описание организации"
+                v-model="description"
               ></textarea>
             </div>
           </div>
@@ -95,15 +98,35 @@
 </template>
 <script>
 import { defineComponent } from 'vue'
+import axios from 'axios'
 export default defineComponent({
   name: 'ModalNewOrganization',
   props: {
     isShown: Boolean,
     closeModal: Function
   },
+  data() {
+    return {
+      name: '',
+      description: ''
+    }
+  },
   methods: {
-    createOrganization() {
-        
+    async createOrganization() {
+      await axios.post(
+        `http://84.201.175.97/api/organizations`,
+        {
+          name: this.name,
+          description: this.description
+        },
+        {
+          headers: {
+            ContextType: 'application/json',
+            Authorization: `Bearer ${JSON.parse(localStorage.getItem('token')).token}`
+          }
+        }
+      ).then((response) => {console.log(response)})
+      this.$router.back()
     }
   }
 })
