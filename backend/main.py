@@ -3,6 +3,7 @@ from typing import Union
 from fastapi import FastAPI, APIRouter, Depends
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
+from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import Response
 
 from database.database_connector import get_session
@@ -27,6 +28,15 @@ app = FastAPI(
     version='1.0',
     docs_url='/api/docs',
     openapi_url="/api/v1/openapi.json",
+)
+
+origins = ['*']
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 router = APIRouter(prefix='/api')
@@ -104,6 +114,7 @@ def organization_create(
         return ErrorResponse(reason="conflict")
     response.status_code = 201
     return OrganizationCreatePostResponse(organization=Organization(**db_model.dict()))
+
 
 # TODO: fetch user organizations
 
