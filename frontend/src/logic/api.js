@@ -59,19 +59,20 @@ class Api {
   }
 
   createOrganization({ name, description }) {
-    return this.client.post(`${import.meta.env.VITE_BACKEND_URL}/organizations`, {
-      name, description
-    })
+    return this.client
+      .post(`${import.meta.env.VITE_BACKEND_URL}/organizations`, {
+        name,
+        description
+      })
       .then(({ data }) => {
-        return data.organizations;
+        return data.organizations
       })
   }
 
   getOrganizations() {
-    return this.client.get(`${import.meta.env.VITE_BACKEND_URL}/organizations`)
-      .then(({ data }) => {
-          return data.organizations;
-      })
+    return this.client.get(`${import.meta.env.VITE_BACKEND_URL}/organizations`).then(({ data }) => {
+      return data.organizations
+    })
   }
 
   async syncAuth() {

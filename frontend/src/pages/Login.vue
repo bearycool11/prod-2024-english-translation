@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, reactive } from 'vue'
+import { computed, reactive, watch } from 'vue'
 import { api } from '@/logic/api.js'
 import { store } from '@/store/index.js'
 import router from '@/router.js'
@@ -47,7 +47,7 @@ const onEnterClick = () => {
   }
 }
 
-onMounted(async () => {
+watch(store.auth, async () => {
   if (store.auth.isAuth && !store.auth.isLoading) {
     await router.push('/')
   }

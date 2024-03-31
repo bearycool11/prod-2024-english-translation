@@ -66,15 +66,14 @@
 import { toggleSidebar } from '@/store/toggleSidebar.js'
 import ModalNewOrganization from '../components/ModalNewOrganization.vue'
 import { defineComponent } from 'vue'
-import {api} from "@/logic/api.js";
+import { api } from '@/logic/api.js'
 
 export default defineComponent({
   components: { ModalNewOrganization },
   async beforeMount() {
-    api.getOrganizations()
-      .then((organizations) => {
-        this.organizations = organizations
-      });
+    api.getOrganizations().then((organizations) => {
+      this.organizations = organizations
+    })
   },
   data() {
     return {

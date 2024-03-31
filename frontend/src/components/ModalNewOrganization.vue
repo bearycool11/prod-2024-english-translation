@@ -98,7 +98,7 @@
 </template>
 <script>
 import { defineComponent } from 'vue'
-import {api} from "@/logic/api.js";
+import { api } from '@/logic/api.js'
 export default defineComponent({
   name: 'ModalNewOrganization',
   props: {
@@ -113,14 +113,17 @@ export default defineComponent({
   },
   methods: {
     async createOrganization() {
-      api.createOrganization({
-        name: this.name,
-        description: this.description
-      }).then((res) => {
-        console.log(res);
-      }).finally(() => {
-        this.closeModal();
-      })
+      api
+        .createOrganization({
+          name: this.name,
+          description: this.description
+        })
+        .then((res) => {
+          console.log(res)
+        })
+        .finally(() => {
+          this.closeModal()
+        })
     }
   }
 })
