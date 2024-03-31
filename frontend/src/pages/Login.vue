@@ -1,33 +1,24 @@
 <script setup>
-import { computed, reactive } from 'vue'
-import { ref } from 'vue'
-import { useAuthStore } from '../store/auth.js'
-import { useRouter } from 'vue-router'
-const authStore = useAuthStore()
-const router = useRouter()
+import {computed, onMounted, reactive} from 'vue'
+import { api } from '@/logic/api.js'
+import {store} from "@/store/index.js";
+import router from "@/router.js";
 
-const login = ref()
-const password = ref()
-
-const signin = async () => {
-  if (state.isAuth) {
-    await authStore.auth({ login: login.value, password: password.value }, 'sign-in')
-  } else {
-    await authStore.auth({ login: login.value, password: password.value, name: 'qwe' }, 'register')
-  }
-  router.push('/')
-}
 const state = reactive({
-  isAuth: false
+  isAuthForm: false
+})
+const enterDate = reactive({
+  login: '',
+  password: '',
+  name: ''
 })
 
 const toggleAuth = () => {
-  state.isAuth = !state.isAuth
+  state.isAuthForm = !state.isAuthForm
 }
 
-
 const text = computed(() => {
-  if (state.isAuth) {
+  if (state.isAuthForm) {
     return {
       header: 'Зайди в акканут',
       link: 'Регистрация',
@@ -41,6 +32,28 @@ const text = computed(() => {
     button: 'Зарегистрироваться'
   }
 })
+
+const onEnterClick = () => {
+  if (!state.isAuthForm) {
+    api.register(enterDate)
+      .then(() => {
+        store.auth.isAuth = true;
+        store.auth.isLoading = false;
+      });
+  } else {
+    api.login(enterDate)
+      .then(() => {
+        store.auth.isAuth = true;
+        store.auth.isLoading = false;
+      });
+  }
+}
+
+onMounted(async () => {
+  if (store.auth.isAuth && !store.auth.isLoading) {
+    await router.push('/');
+  }
+});
 </script>
 
 <template>
@@ -61,7 +74,24 @@ const text = computed(() => {
           >
             {{ text.header }}
           </h1>
-          <form class="space-y-4 md:space-y-6" action="#">
+          <form :onsubmit="(e) => e.preventDefault()" class="space-y-4 md:space-y-6" action="#">
+            <div v-if="!state.isAuthForm">
+              <label
+                for="email"
+                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Имя
+              </label>
+              <input
+                type="name"
+                name="name"
+                id="name"
+                class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                placeholder="Имя"
+                v-model="enterDate.name"
+                required
+              />
+            </div>
             <div>
               <label
                 for="email"
@@ -70,34 +100,35 @@ const text = computed(() => {
                 Твой email
               </label>
               <input
-                type="email"
-                name="email"
-                id="email"
-                v-model="login"
+                type="login"
+                name="login"
+                id="login"
                 class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                placeholder="name@company.com"
-                required=""
+                placeholder="Твой логин"
+                v-model="enterDate.login"
+                required
               />
             </div>
             <div>
               <label
                 for="password"
                 class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >Пароль</label
               >
+                Пароль
+              </label>
               <input
-                v-model="password"
                 type="password"
                 name="password"
                 id="password"
                 placeholder="••••••••"
                 class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                required=""
+                required
+                v-model="enterDate.password"
               />
             </div>
             <button
+              @click="onEnterClick"
               type="submit"
-              @click="signin"
               class="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
             >
               {{ text.button }}

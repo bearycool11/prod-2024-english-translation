@@ -1,10 +1,11 @@
-import {reactive} from "vue";
+import { reactive } from 'vue'
 
 export const store = reactive({
   auth: {
-    isAuth: false
+    isAuth: false,
+    isLoading: true,
   },
   ui: {
     isSideBarOpen: false
   }
-});
+})
