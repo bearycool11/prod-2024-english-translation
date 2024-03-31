@@ -33,6 +33,8 @@ services:
     build:
       dockerfile: Dockerfile
       context: backend
+    environment:
+      - POSTGRES_CONN=postgresql://root:root@smm_you_database:5432/smm_you_database
     container_name: SMM-you-backend
     ports:
       - "5437:5437"
