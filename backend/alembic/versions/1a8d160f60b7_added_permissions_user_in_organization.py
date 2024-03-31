@@ -33,7 +33,6 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['permission'], ['permissions.name'], ),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('user_id', 'organization_id', 'permission'),
-    sa.UniqueConstraint('user_id', 'organization_id', 'permission', name='_organization_users_uc')
     )
     # ### end Alembic commands ###
 
