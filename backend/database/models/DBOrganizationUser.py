@@ -1,5 +1,5 @@
 from typing import Optional
-from sqlmodel import SQLModel, Field, UniqueConstraint
+from sqlmodel import SQLModel, Field
 
 
 class DBOrganizationUser(SQLModel, table=True):
