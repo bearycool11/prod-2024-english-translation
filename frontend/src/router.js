@@ -9,16 +9,18 @@ const router = createRouter({
       children:[
         {
           path: '/organization/:id',
-          name: 'organization page',
+          name: 'OrganizationPage',
+          //redirect: {name: 'posts'},
           children: [
             {
               path: '/',
-              name: 'posts redirect',
-              redirect: '/posts'
+              name: 'postsr',
+              redirect: {name: 'posts'},
             },
             {
               path: '/posts',
               name: 'posts',
+              component: () => import("./pages/TestPage.vue")
             },
             {
               path: '/users',
