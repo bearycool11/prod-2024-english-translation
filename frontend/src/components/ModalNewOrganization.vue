@@ -40,7 +40,7 @@
           </button>
         </div>
         <!-- Modal body -->
-        <form class="p-4 md:p-5">
+        <form :onsubmit="(e) => e.preventDefault()" class="p-4 md:p-5">
           <div class="grid gap-4 mb-4 grid-cols-2">
             <div class="col-span-2">
               <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -98,7 +98,7 @@
 </template>
 <script>
 import { defineComponent } from 'vue'
-import axios from 'axios'
+import {api} from "@/logic/api.js";
 export default defineComponent({
   name: 'ModalNewOrganization',
   props: {
@@ -113,20 +113,14 @@ export default defineComponent({
   },
   methods: {
     async createOrganization() {
-      await axios.post(
-        `http://84.201.175.97/api/organizations`,
-        {
-          name: this.name,
-          description: this.description
-        },
-        {
-          headers: {
-            ContextType: 'application/json',
-            Authorization: `Bearer ${JSON.parse(localStorage.getItem('token')).token}`
-          }
-        }
-      ).then((response) => {console.log(response)})
-      this.$router.back()
+      api.createOrganization({
+        name: this.name,
+        description: this.description
+      }).then((res) => {
+        console.log(res);
+      }).finally(() => {
+        this.closeModal();
+      })
     }
   }
 })

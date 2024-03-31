@@ -1,8 +1,8 @@
 <script setup>
-import {computed, onMounted, reactive} from 'vue'
+import { computed, onMounted, reactive } from 'vue'
 import { api } from '@/logic/api.js'
-import {store} from "@/store/index.js";
-import router from "@/router.js";
+import { store } from '@/store/index.js'
+import router from '@/router.js'
 
 const state = reactive({
   isAuthForm: false
@@ -35,25 +35,23 @@ const text = computed(() => {
 
 const onEnterClick = () => {
   if (!state.isAuthForm) {
-    api.register(enterDate)
-      .then(() => {
-        store.auth.isAuth = true;
-        store.auth.isLoading = false;
-      });
+    api.register(enterDate).then(() => {
+      store.auth.isAuth = true
+      store.auth.isLoading = false
+    })
   } else {
-    api.login(enterDate)
-      .then(() => {
-        store.auth.isAuth = true;
-        store.auth.isLoading = false;
-      });
+    api.login(enterDate).then(() => {
+      store.auth.isAuth = true
+      store.auth.isLoading = false
+    })
   }
 }
 
 onMounted(async () => {
   if (store.auth.isAuth && !store.auth.isLoading) {
-    await router.push('/');
+    await router.push('/')
   }
-});
+})
 </script>
 
 <template>

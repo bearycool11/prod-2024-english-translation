@@ -25,14 +25,12 @@ class Api {
     this.client.interceptors.response.use(
       (r) => r,
       async (error) => {
-        if (
-          !localStorage.getItem('refreshToken') ||
-          error.response.status !== 401 ||
-          error.config.retry
-        ) {
-          store.auth.isAuth = false
+        if (error.response.status !== 401) {
           throw error
         }
+
+        store.auth.isAuth = false
+        throw error
       }
     )
   }
@@ -46,29 +44,38 @@ class Api {
     const { data } = await this.client.post(`${import.meta.env.VITE_BACKEND_URL}/auth/sign-in`, {
       login,
       password
-    });
+    })
 
     localStorage.setItem('token', data.token)
-    localStorage.setItem('refreshToken', data.refreshToken)
   }
 
   async login({ login, password }) {
     const { data } = await this.client.post(`${import.meta.env.VITE_BACKEND_URL}/auth/sign-in`, {
       login,
       password
-    });
+    })
 
     localStorage.setItem('token', data.token)
-    localStorage.setItem('refreshToken', data.refreshToken)
   }
 
-  syncAuth() {
+  createOrganization({ name, description }) {
+    return this.client.post(`${import.meta.env.VITE_BACKEND_URL}/organizations`, {
+      name, description
+    })
+      .then(({ data }) => {
+        return data.organizations;
+      })
+  }
+
+  getOrganizations() {
     return this.client.get(`${import.meta.env.VITE_BACKEND_URL}/organizations`)
+      .then(({ data }) => {
+          return data.organizations;
+      })
   }
 
-  logout() {
-    localStorage.removeItem('token')
-    localStorage.removeItem('refreshToken')
+  async syncAuth() {
+    return await this.client.get(`${import.meta.env.VITE_BACKEND_URL}/auth/check`)
   }
 }
 
