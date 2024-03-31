@@ -1,12 +1,10 @@
 <script setup>
-import {FwbRating} from 'flowbite-vue'
 </script>
 
 <template>
   <header>
-    header
+    header main (username+ add org)
   </header>
-  <fwb-rating :rating="4" />
   <RouterView />
 </template>
 
