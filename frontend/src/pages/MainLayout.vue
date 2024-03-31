@@ -42,7 +42,7 @@
     </nav>
   </div>
   <div class="flex justify-evenly mt-10 flex-wrap" v-if="organizations">
-    <a v-for="organization, index in organizations" :key="index"
+    <a v-for="(organization, index) in organizations" :key="index"
       :href="'/organization/'+organization.id"
       class="block max-w-sm mt-4 p-6 md:w-full w-52 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700"
     >
@@ -71,7 +71,7 @@ export default defineComponent({
       .get(`http://84.201.175.97/api/organizations`, {
         headers: {
           ContextType: 'application/json',
-          Authorization: `Bearer ${JSON.parse(localStorage.getItem('token')).token}`
+          Authorization: `Bearer ${JSON.parse(localStorage.getItem('token'))}`
         }
       })
       .then((response) => {
