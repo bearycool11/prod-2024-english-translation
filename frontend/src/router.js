@@ -6,15 +6,39 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-
-    },
-    {
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      
+      children:[
+        {
+          path: '/organization/:id',
+          name: 'organization page',
+          children: [
+            {
+              path: '/',
+              name: 'posts redirect',
+              redirect: '/posts'
+            },
+            {
+              path: '/posts',
+              name: 'posts',
+            },
+            {
+              path: '/users',
+              name: 'users',
+            },
+            {
+              path: '/history',
+              name: 'posts history',
+            },
+            {
+              path: '/channels',
+              name: 'channels',
+            },
+            {
+              path: '/social',
+              name: 'social networks',
+            }
+          ]
+        }
+      ]
     }
   ]
 })
