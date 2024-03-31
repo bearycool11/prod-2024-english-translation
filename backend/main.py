@@ -6,10 +6,10 @@ from sqlalchemy.orm import Session
 from starlette.responses import Response
 
 from database.database_connector import get_session
-from database.models import DBUser
+from database.models import DBUser, DBOrganization
 from models import PingResponse, AuthSignInPostResponse, AuthSignInPostRequest, ErrorResponse, AuthRegisterPostResponse, \
-    AuthRegisterPostRequest, UserProfile
-from tools.auth import create_access_token
+    AuthRegisterPostRequest, UserProfile, Organization, OrganizationCreatePostResponse, OrganizationCreatePostRequest
+from tools.auth import create_access_token, get_current_user
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -77,5 +77,32 @@ def auth_register(
     response.status_code = 201
     return AuthRegisterPostResponse(profile=UserProfile(**db_model.dict()))
 
+
+# add new orgs
+@router.post(
+    '/organizations',
+    response_model=Union[OrganizationCreatePostResponse, ErrorResponse],
+    responses={
+        '201': {'model': OrganizationCreatePostResponse},
+        '400': {'model': ErrorResponse},
+        '401': {'model': ErrorResponse},
+        '409': {'model': ErrorResponse}
+    }
+)
+def organization_create(
+        response: Response, body: OrganizationCreatePostRequest, db_session=Depends(get_session),
+        user=Depends(get_current_user)
+) -> Union[OrganizationCreatePostResponse, ErrorResponse]:
+    db_model = DBOrganization(**body.dict())
+    db_session.add(db_model)
+    try:
+        db_session.commit()
+    except:
+        response.status_code = 409
+        return ErrorResponse(reason="conflict")
+    response.status_code = 201
+    return OrganizationCreatePostResponse(organization=Organization(**db_model.dict()))
+
+# TODO: fetch user organizations
 
 app.include_router(router)
