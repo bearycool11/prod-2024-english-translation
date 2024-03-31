@@ -7,7 +7,7 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import Response
 
 from database.database_connector import get_session
-from database.models import DBUser, DBOrganization, DBPermission
+from database.models import DBUser, DBOrganization, DBPermission, DBOrganizationUser
 from models import PingResponse, AuthSignInPostResponse, AuthSignInPostRequest, ErrorResponse, AuthRegisterPostResponse, \
     AuthRegisterPostRequest, UserProfile, Organization, OrganizationCreatePostResponse, OrganizationCreatePostRequest, \
     UserOrganizationsGetResponse
@@ -115,17 +115,26 @@ def auth_register(
 )
 def organization_create(
         response: Response, body: OrganizationCreatePostRequest, db_session=Depends(get_session),
-        current_user=Depends(get_current_user)
+        current_user: DBUser =Depends(get_current_user)
 ) -> Union[OrganizationCreatePostResponse, ErrorResponse]:
     organization = DBOrganization(**body.dict())
     db_session.add(organization)
-    db_session.add(DBPermission(name="owner", level=5, can_grant=True))
     try:
         db_session.commit()
     except:
         response.status_code = 409
         return ErrorResponse(reason="conflict")
     response.status_code = 201
+    db_session.add(DBOrganizationUser(
+        user_id=current_user.id,
+        organization_id=organization.id,
+        permission="owner"
+    ))
+    try:
+        db_session.commit()
+    except:
+        response.status_code = 409
+        return ErrorResponse(reason="conflict when adding owner")
     return OrganizationCreatePostResponse(organization=Organization(**organization.dict()))
 
 
