@@ -1,12 +1,13 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, APIRouter
 from models import PingResponse
 
 app = FastAPI(
-    title='Pulse API',
+    title='SMM app API',
     version='1.0',
 )
 
+router = APIRouter(prefix='/api')
 
-@app.get('/ping', response_model=PingResponse)
+@router.get('/ping', response_model=PingResponse)
 def ping() -> PingResponse:
     return PingResponse(status="ok")
