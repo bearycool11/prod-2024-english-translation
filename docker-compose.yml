@@ -1,11 +1,53 @@
 version: '1'
 
 services:
-  habit-tracker:
+  smm_you_database:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_DB: "smm_you_database"
+      POSTGRES_USER: "root"
+      POSTGRES_PASSWORD: "root"
+    container_name: SMM-you-database
+    ports:
+      - "5433:5432"
+    volumes:
+      - database:/var/lib/postgresql/data
+    networks:
+      smm_you:
+        ipv4_address: 172.31.0.4
+
+  smm_you_frontend:
     build:
       dockerfile: Dockerfile
       context: frontend
-    container_name: PROD-final-frontend
+    container_name: SMM-you-frontend
     ports:
       - "80:4173"
     restart: always
+    networks:
+      smm_you:
+        ipv4_address: 172.31.0.2
+
+  smm_you_backend:
+    build:
+      dockerfile: Dockerfile
+      context: backend
+    container_name: SMM-you-backend
+    ports:
+      - "5437:5437"
+    restart: always
+    networks:
+      smm_you:
+        ipv4_address: 172.31.0.3
+
+volumes:
+  database:
+
+networks:
+  smm_you:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.31.0.0/24
+          gateway: 172.31.0.1
