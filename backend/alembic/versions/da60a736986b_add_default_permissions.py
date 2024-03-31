@@ -23,8 +23,8 @@ def upgrade() -> None:
     connection.execute(text("INSERT INTO permissions (name, level, can_grant) VALUES ('viewer', 1, False)"))
     connection.execute(text("INSERT INTO permissions (name, level, can_grant) VALUES ('editor', 2, False)"))
     connection.execute(text("INSERT INTO permissions (name, level, can_grant) VALUES ('reviewer', 3, False)"))
-    connection.execute(text("INSERT INTO permissions (name, level, can_grant) VALUES ('admin', 4, False)"))
-    connection.execute(text("INSERT INTO permissions (name, level, can_grant) VALUES ('owner', 5, False)"))
+    connection.execute(text("INSERT INTO permissions (name, level, can_grant) VALUES ('admin', 4, True)"))
+    connection.execute(text("INSERT INTO permissions (name, level, can_grant) VALUES ('owner', 5, True)"))
 
 def downgrade() -> None:
     pass
