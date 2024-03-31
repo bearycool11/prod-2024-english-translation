@@ -67,7 +67,7 @@ class DBOrganization(SQLModel, table=True):
 
     id: int = Field(default=None, primary_key=True)
     name: str = Field(default=None, unique=True, max_length=50)
-    description: Optional[str] = Field(default=None, unique=True, max_length=150)
+    description: Optional[str] = Field(default=None, max_length=150)
 
     user_bindings: DBOrganizationUser = Relationship(back_populates="organization")
 
