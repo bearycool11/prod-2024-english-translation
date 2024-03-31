@@ -11,3 +11,5 @@ router = APIRouter(prefix='/api')
 @router.get('/ping', response_model=PingResponse)
 def ping() -> PingResponse:
     return PingResponse(status="ok")
+
+app.include_router(router)
