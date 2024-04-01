@@ -25,6 +25,14 @@ const router = createRouter({
           },
           children: [
             {
+              path: '/',
+              alias: '/posts',
+            },
+            {
+              path: '/posts',
+              name: 'posts',
+            },
+            {
               path: '/users',
               name: 'users'
             },
