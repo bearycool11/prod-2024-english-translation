@@ -177,7 +177,6 @@ class EditPostRequest(BaseModel):
     content: Optional[str] = None
     is_approved: Optional[str] = None
     comment: Optional[str] = None
-    sent_status: Optional[str] = None
 
 
 class EditPostResponse(BaseModel):

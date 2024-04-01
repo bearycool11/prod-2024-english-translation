@@ -532,7 +532,7 @@ def edit_post(
             DBOrganizationUser.organization_id == organization_id).count() == 0:
         response.status_code = 403
         return ErrorResponse(reason="Don\'t have required permissions")
-    if db_session.query(DBPost).filter(DBPost.id == body.id, DBPost.organization_id == organization_id).count() == 0:
+    if db_session.query(DBPost).filter(DBPost.id == body.id, DBPost.organization_id == organization_id, DBPost.sent_status != SentStatus.SENT_OK, DBPost.sent_status != SentStatus.WAITING).count() == 0:
         response.status_code = 403
         return ErrorResponse(reason="Don\'t have required permissions")
     if (body.is_approved is not None) and current_user.organization_bindings.join(DBPermission).filter(
@@ -561,10 +561,6 @@ def edit_post(
     if body.comment is not None:
         db_model.update({
             DBPost.comment: body.comment
-        })
-    if body.sent_status is not None:
-        db_model.update({
-            DBPost.sent_status: body.sent_status
         })
     db_session.commit()
     return EditPostResponse(post=Post(**db_model.first().dict()))
