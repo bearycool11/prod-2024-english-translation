@@ -104,5 +104,17 @@ class AddUserPostResponse(BaseModel):
 class DeleteUserRequest(BaseModel):
     login: str
 
+
 class DeleteUserResponse(BaseModel):
     user: UserPublicProfile
+
+
+class AddChannelPostRequest(BaseModel):
+    id: int
+    bot_id: int
+
+
+class AddChannelPostResponse(BaseModel):
+    id: int
+    bot_id: int
+    name: str

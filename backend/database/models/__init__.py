@@ -1,7 +1,7 @@
 import datetime
 from typing import Optional
 
-from sqlalchemy import Column
+from sqlalchemy import Column, BigInteger
 from sqlalchemy.dialects.postgresql import JSON
 from sqlmodel import SQLModel, Field, Relationship
 import enum
@@ -49,11 +49,9 @@ class DBPermission(SQLModel, table=True):
 class DBChannels(SQLModel, table=True):
     __tablename__ = "channels"
 
-    id: int = Field(primary_key=True)
+    id: int = Field(sa_column=Column(BigInteger, primary_key=True))
     bot_id: int = Field(foreign_key="organization_bots.bot_id")
     name: str
-    image: str
-
 
 class DBOrganizationUser(SQLModel, table=True):
     __tablename__ = "organization_users"

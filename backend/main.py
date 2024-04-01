@@ -7,12 +7,12 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import Response
 
 from database.database_connector import get_session
-from database.models import DBUser, DBOrganization, DBOrganizationUser, DBPermission, DBOrganizationBot
+from database.models import DBUser, DBOrganization, DBOrganizationUser, DBPermission, DBOrganizationBot, DBChannels
 from models import PingResponse, AuthSignInPostResponse, AuthSignInPostRequest, ErrorResponse, ProfileResponse, \
     AuthRegisterPostRequest, UserProfile, Organization, OrganizationCreatePostResponse, OrganizationCreatePostRequest, \
     UserOrganizationsGetResponse, OrganizationUsersGetResponse, OrganizationUser, UserPublicProfile, UserRight, \
     AddBotPostResponse, AddBotPostRequest, ListBotGetResponse, Bot, AddUserPostRequest, AddUserPostResponse, \
-    DeleteUserResponse, DeleteUserRequest
+    DeleteUserResponse, DeleteUserRequest, AddChannelPostResponse, AddChannelPostRequest
 from tools.auth import create_access_token, get_current_user
 
 import requests as r
@@ -146,7 +146,6 @@ def auth_profile(
     return ProfileResponse(profile=UserProfile(**current_user.dict()))
 
 
-# add new orgs
 @router.post(
     '/organizations',
     response_model=Union[OrganizationCreatePostResponse, ErrorResponse],
@@ -368,6 +367,46 @@ def get_organization_info(
         response.status_code = 403
         return ErrorResponse(reason="Don\'t have required permissions")
     return Organization(**db_session.query(DBOrganization).filter_by(id=organization_id).all()[0].dict())
+
+
+@router.post(
+    '/organizations/{organization_id}/channels',
+    response_model=Union[AddChannelPostResponse, ErrorResponse],
+    responses={
+        '200': {'model': AddChannelPostResponse},
+        '401': {'model': ErrorResponse},
+        '403': {'model': ErrorResponse},
+        '404': {'model': ErrorResponse},
+        '409': {'model': ErrorResponse}
+    }
+)
+def add_channel_to_organization(
+        organization_id: int,
+        response: Response, body: AddChannelPostRequest, db_session: Session = Depends(get_session),
+        current_user=Depends(get_current_user)
+) -> Union[AddChannelPostResponse, ErrorResponse]:
+    if current_user.organization_bindings.join(DBPermission).filter(
+            DBOrganizationUser.organization_id == organization_id, DBPermission.level >= 4).count() == 0:
+        response.status_code = 403
+        return ErrorResponse(reason="Don\'t have required permissions")
+    if db_session.query(DBOrganizationBot).filter(DBOrganizationBot.bot_id == body.bot_id,
+                                                  DBOrganizationBot.organization_id == organization_id).count() == 0:
+        response.status_code = 403
+        return ErrorResponse(reason="Don\'t have required permissions")
+    if db_session.query(DBChannels).filter(DBChannels.id == body.id).count() != 0:
+        response.status_code = 409
+        return ErrorResponse(reason="Channel already exists")
+    db_model = DBChannels(**body.dict())
+    token = db_session.query(DBOrganizationBot).filter(DBOrganizationBot.bot_id == body.bot_id,
+                                                       DBOrganizationBot.organization_id == organization_id).first().bot_token
+    channel_info = r.get(f'https://api.telegram.org/bot{token}/getChat?chat_id={body.id}')
+    if channel_info.status_code != 200:
+        response.status_code = 404
+        return ErrorResponse(reason="Channel not found")
+    db_model.name = channel_info.json()['result']['title']
+    db_session.add(db_model)
+    db_session.commit()
+    return AddChannelPostResponse(**db_model.dict())
 
 
 app.include_router(router)
