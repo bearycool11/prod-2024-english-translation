@@ -1,5 +1,8 @@
 <template>
-  <div class="grid md:grid-cols-3 sm:grid-cols-2 gap-2 w-full p-2 mt-10 flex-wrap" v-if="store.data.organizations">
+  <div
+    class="grid md:grid-cols-3 sm:grid-cols-2 gap-2 w-full p-2 mt-10 flex-wrap"
+    v-if="store.data.organizations"
+  >
     <a
       v-for="(organization, index) in store.data.organizations"
       :key="index"

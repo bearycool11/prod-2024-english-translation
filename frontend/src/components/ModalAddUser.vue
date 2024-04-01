@@ -14,7 +14,11 @@
           class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600"
         >
           <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-            {{ !this.$props.initialUser.user?.name ? 'Добавить пользователя' : 'Редактировать пользоваетля' }}
+            {{
+              !this.$props.initialUser.user?.name
+                ? 'Добавить пользователя'
+                : 'Редактировать пользоваетля'
+            }}
           </h3>
           <button
             @click="closeModal"
@@ -45,7 +49,7 @@
           <div class="grid gap-4 mb-4 grid-cols-2">
             <div class="col-span-2">
               <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-              >Логин</label
+                >Логин</label
               >
               <input
                 :disabled="this.$props.initialUser?.user?.name"
@@ -59,28 +63,24 @@
               />
             </div>
           </div>
-          <div
-            v-for="(right) in rights"
-            class="flex items-center mb-4"
-          >
+          <div v-for="right in rights" class="flex items-center mb-4">
             <input
               :id="right"
               type="checkbox"
-              :onchange="(e) => {
-                if (e.target.checked) {
-                  this.permissions = [...permissions, right]
-                } else {
-                  this.permissions = permissions.filter((newRight) => newRight !== right)
+              :onchange="
+                (e) => {
+                  if (e.target.checked) {
+                    this.permissions = [...permissions, right]
+                  } else {
+                    this.permissions = permissions.filter((newRight) => newRight !== right)
+                  }
                 }
-              }"
+              "
               :disabled="right === 'viewer'"
               :checked="permissions.includes(right)"
               class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-            >
-            <label
-              :for="right"
-              class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-            >
+            />
+            <label :for="right" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
               {{ right }}
             </label>
           </div>
@@ -89,12 +89,18 @@
             :disabled="!login"
             class="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
           >
-            {{ !this.$props.initialUser.user?.name ? 'Добавить пользователя' : 'Редактировать пользоваетля' }}
+            {{
+              !this.$props.initialUser.user?.name
+                ? 'Добавить пользователя'
+                : 'Редактировать пользоваетля'
+            }}
           </button>
           <button
+            @click="deleteUser"
+            v-if="!!this.$props.initialUser.user?.name"
             class="text-white inline-flex items-center bg-red-500 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 mt-2 py-2.5"
           >
-            Удали пользователя
+            Выгони пользователя
           </button>
         </form>
       </div>
@@ -118,21 +124,27 @@ export default defineComponent({
     return {
       permissions: this.$props.initialUser?.permissions || ['viewer'],
       login: this.$props.initialUser?.user?.login,
-      rights: ['viewer', 'editor', 'reviewer', 'admin', 'owner']
+      rights: ['viewer', 'editor', 'reviewer', 'admin']
     }
   },
 
   methods: {
-    async addUser() {
+    async deleteUser() {
       api
-        .inviteUser(this.id, { login: this.login, permissions: this.permissions })
-        .then((user) => {
-          store.data.users = [...store.data.users, user];
+        .deleteUser(this.id, { login: this.login })
+        .then(() => {
+          store.data.users = [...store.data.users].filter(({ login }) => login !== this.login);
+        })
+        .finally(() => {
           this.closeModal()
         })
-        .catch((e) => {
-          this.text = ''
-          this.text = e
+    },
+    async addUser() {
+      api.inviteUser(this.id, { login: this.login, permissions: this.permissions }).then((user) => {
+        store.data.users = [...store.data.users, { ...user, rights: this.permissions }]
+      })
+        .finally(() => {
+          this.closeModal()
         })
     }
   }

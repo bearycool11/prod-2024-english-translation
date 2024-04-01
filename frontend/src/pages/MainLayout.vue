@@ -84,7 +84,11 @@
     </nav>
   </div>
   <RouterView class="flex mt-20" v-if="$route.name == 'AllOrganization'" />
-  <ModalNewOrganization :isShown="this.isShowModal" :closeModal="closeModal" />
+  <ModalNewOrganization
+    v-if="this.isShowModal"
+    :isShown="this.isShowModal"
+    :closeModal="closeModal"
+  />
   <ModalLogout :isShown="isShowModalLogout" :closeModal="closeLogout" />
 </template>
 
@@ -100,7 +104,7 @@ export default defineComponent({
   beforeMount() {
     api.getProfile().then((profile) => {
       store.auth.username = profile.name
-      store.auth.id = profile.id;
+      store.auth.id = profile.id
       this.profile = profile
     })
     api.getOrganizations().then((organizations) => {

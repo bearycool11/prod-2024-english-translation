@@ -1,46 +1,46 @@
 <template>
   <div class="flex flex-col px-4 mt-20 w-full">
-      <button
-        @click="toggleModal"
-        class="block mb-3 w-60 max-w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+    <button
+      @click="toggleModal"
+      class="block mb-3 w-60 max-w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+    >
+      Пригласить в организацию
+    </button>
+    <div class="grid md:grid-cols-3 sm:grid-cols-2 gap-2 w-full">
+      <div
+        v-for="(user, index) in store.data.users"
+        :key="index"
+        class="w-full p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700"
       >
-        Пригласить в организацию
-      </button>
-      <div class="grid md:grid-cols-3 sm:grid-cols-2 gap-2 w-full">
-        <div
-          v-for="(user, index) in store.data.users"
-          :key="index"
-          class="w-full p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700"
-        >
-          <div class="flex flex-col">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-              name: {{ user.user.name }}
-            </h3>
-            <h3 class="text-lg mb-2 font-semibold text-gray-900 dark:text-white">
-              id: {{ user.user.id }}
-            </h3>
-            <h3
-              v-for="(right, index) in user.rights"
-              class="text-lg font-semibold text-gray-900 dark:text-white"
-              :key="index"
-            >
-              role: {{ right.name }}
-            </h3>
-            <button
-              v-if="store.auth.id === user.user.id"
-              @click="() => toggleModal(user)"
-              class="block mt-2 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-            >
-              Редактировать
-            </button>
-            <div
-              class="text-lg mt-2 font-semibold text-blue-400 dark:text-white"
-              v-if="store.auth.id !== user.user.id"
-            >
-              Это вы!
-            </div>
+        <div class="flex flex-col">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+            name: {{ user.user.name }}
+          </h3>
+          <h3 class="text-lg mb-2 font-semibold text-gray-900 dark:text-white">
+            id: {{ user.user.id }}
+          </h3>
+          <h3
+            v-for="(right, index) in user.rights"
+            class="text-lg font-semibold text-gray-900 dark:text-white"
+            :key="index"
+          >
+            role: {{ right.name || right }}
+          </h3>
+          <button
+            v-if="store.auth.id !== user.user.id"
+            @click="() => toggleModal(user)"
+            class="block mt-2 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+          >
+            Редактировать
+          </button>
+          <div
+            class="text-lg mt-2 font-semibold text-blue-400 dark:text-white"
+            v-if="store.auth.id === user.user.id"
+          >
+            Это вы!
           </div>
         </div>
+      </div>
     </div>
   </div>
   <modal-add-user
@@ -52,10 +52,10 @@
   />
 </template>
 <script setup>
-import {onMounted, reactive, ref} from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import { api } from '@/logic/api.js'
 import { store } from '@/store/index.js'
-import ModalAddUser from "@/components/ModalAddUser.vue";
+import ModalAddUser from '@/components/ModalAddUser.vue'
 
 const isShowModal = ref()
 
@@ -69,7 +69,7 @@ function toggleModal(user) {
     isShowModal.value = false
   } else {
     if (user) {
-      state.targetUser = user;
+      state.targetUser = user
     }
     isShowModal.value = true
   }
@@ -88,7 +88,7 @@ const props = defineProps({
 
 onMounted(() => {
   api.getUsers(props.id).then((data) => {
-    store.data.users = data.users;
+    store.data.users = data.users
     if (store.data.users?.length === 0) {
       store.data.canAddBots = true
     }
