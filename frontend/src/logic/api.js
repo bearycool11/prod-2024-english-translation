@@ -151,7 +151,9 @@ class Api {
 
   updateUser(id, user) {
     return this.client
-      .update(`${import.meta.env.VITE_BACKEND_URL}/organizations/${id}/users`, { user })
+      .patch(`${import.meta.env.VITE_BACKEND_URL}/organizations/${id}/users`, {
+        ...user
+      })
       .then(({ data }) => {
         return data
       })
@@ -183,7 +185,6 @@ class Api {
   }
 
   addChannels(id, ch_id, bot_id) {
-    console.log(bot_id)
     return this.client
       .post(`${import.meta.env.VITE_BACKEND_URL}/organizations/${id}/channels`, {
         id: ch_id,

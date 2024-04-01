@@ -122,7 +122,7 @@ export default defineComponent({
   },
   data() {
     return {
-      permissions: this.$props.initialUser?.permissions || ['viewer'],
+      permissions: this.$props.initialUser?.rights || ['viewer'],
       login: this.$props.initialUser?.user?.login,
       rights: ['viewer', 'editor', 'reviewer', 'admin']
     }
@@ -140,10 +140,25 @@ export default defineComponent({
         })
     },
     async addUser() {
+      if (!!this.$props.initialUser?.user?.login) {
+        await api
+          .updateUser(this.id, {
+            login: this.login,
+            permissions: this.permissions
+          })
+          .then((user) => {
+            store.data.users = [{ ...user, rights: this.permissions }, ...[...store.data.users].filter(({ user }) => user.login !== this.login)]
+          })
+          .finally(() => {
+            this.closeModal()
+          })
+        return;
+      }
+
       api
         .inviteUser(this.id, { login: this.login, permissions: this.permissions })
         .then((user) => {
-          store.data.users = [...store.data.users, { ...user, rights: this.permissions }]
+          store.data.users = [{ ...user, rights: this.permissions }, ...store.data.users]
         })
         .finally(() => {
           this.closeModal()
