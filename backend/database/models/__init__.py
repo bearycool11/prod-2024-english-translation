@@ -41,7 +41,7 @@ class DBPost(SQLModel, table=True):
     organization_id: int = Field(foreign_key="organizations.id")
     created_by: int = Field(foreign_key="users.id")
     content: str
-    revision_id: int = Field(default=1)
+    revision_id: int = Field(default=1, primary_key=True)
     is_approved: Status = Field(default=Status.OPEN)
     comment: str
     planned_time: Optional[datetime.datetime]
