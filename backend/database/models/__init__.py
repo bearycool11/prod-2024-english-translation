@@ -51,7 +51,7 @@ class DBPost(SQLModel, table=True):
     channels: list["DBChannel"] = Relationship(sa_relationship_kwargs={"secondary": "post_channel_bindings",
                                                                        "primaryjoin": "DBPost.id==post_channel_bindings.c.post_id",
                                                                        "secondaryjoin": "DBChannel.id==post_channel_bindings.c.channel_id",
-                                                                       "backref": "posts",
+                                                                       "back_populates": "posts",
                                                                        "lazy": "dynamic"})
 
 
@@ -73,7 +73,7 @@ class DBChannel(SQLModel, table=True):
     posts: list[DBPost] = Relationship(sa_relationship_kwargs={"secondary": "post_channel_bindings",
                                                                "primaryjoin": "DBChannel.id==post_channel_bindings.c.channel_id",
                                                                "secondaryjoin": "DBPost.id==post_channel_bindings.c.post_id",
-                                                               "backref": "channels",
+                                                               "back_populates": "channels",
                                                                "lazy": "dynamic"})
 
 
