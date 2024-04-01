@@ -42,7 +42,7 @@
         </li>
         <li>
           <router-link
-            v-if="store.auth.permissions.some(obj => obj.name === 'admin')"
+            v-if="store.auth.permissions.some(obj => obj.name === 'admin' || 'owner')"
             :to="`/organization/${id}/users`"
             class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
           >
