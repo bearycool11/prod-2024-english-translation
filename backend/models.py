@@ -175,7 +175,7 @@ class AddNewPostResponse(BaseModel):
 class EditPostRequest(BaseModel):
     id: int
     content: Optional[str] = None
-    is_approved: Optional[str] = None
+    is_approved: Optional[Status] = None
     comment: Optional[str] = None
 
 
