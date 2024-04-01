@@ -288,14 +288,14 @@ def change_user_permissions(
         return ErrorResponse(reason="User not found")
     db_session.query(DBOrganizationUser).filter(DBOrganizationUser.user_id == user.user.id).delete()
     for permission in body.permissions:
-        db_model = DBOrganizationUser(user_id=user.id, organization_id=organization_id, permission=permission)
+        db_model = DBOrganizationUser(user_id=user.user.id, organization_id=organization_id, permission=permission)
         db_session.add(db_model)
     try:
         db_session.commit()
     except:
         response.status_code = 409
         return ErrorResponse(reason="conflict")
-    return UserPostResponse(user=UserPublicProfile(**user.dict()))
+    return UserPostResponse(user=UserPublicProfile(**user.user.dict()))
 
 
 @router.delete(
