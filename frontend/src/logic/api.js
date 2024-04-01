@@ -121,6 +121,27 @@ class Api {
       })
   }
 
+  getUsers(id) {
+    return this.client.get(`${import.meta.env.VITE_BACKEND_URL}/organizations/${id}/users`).then(({ data }) => {
+      return data
+    })
+  }
+
+  deleteUser(id, login) {
+    return this.client.delete(`${import.meta.env.VITE_BACKEND_URL}/organizations/${id}/users`).then(({ data }) => {
+      return data
+    })
+  }
+
+  inviteUser(id, { permissions, login }) {
+    return this.client.post(
+      `${import.meta.env.VITE_BACKEND_URL}/organizations/${id}/users`,
+      { permissions, login }
+    ).then(({ data }) => {
+      return data
+    })
+  }
+
   createOrganizationBots(id, token) {
     return this.client
       .post(`${import.meta.env.VITE_BACKEND_URL}/organizations/${id}/bots`, { token: token })

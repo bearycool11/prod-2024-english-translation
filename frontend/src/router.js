@@ -28,7 +28,8 @@ const router = createRouter({
             },
             {
               path: 'users',
-              name: 'users'
+              name: 'users',
+              component: () => import('./pages/Users.vue')
             },
             {
               path: 'history',
@@ -45,7 +46,12 @@ const router = createRouter({
               name: 'social networks',
               props: true,
               component: () => import('./pages/SocialNetworks.vue')
-            }
+            },
+            {
+              path: 'posts',
+              name: 'posts',
+              component: () => import('./pages/Posts.vue')
+            },
           ]
         },
         {

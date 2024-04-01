@@ -11,6 +11,8 @@ export const store = reactive({
     isSideBarOpen: false
   },
   data: {
+    users: [],
+    userModal: {},
     organizations: [],
     bots: [],
     canAddBots: false,
