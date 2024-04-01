@@ -14,7 +14,7 @@
     }"
     aria-label="Sidebar"
   >
-    <div class="h-full top-0 left-0  sticky px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800">
+    <div class="h-full top-0 left-0  sticky px-3 py-4 pt-16 overflow-y-auto bg-gray-50 dark:bg-gray-800">
       <ul class="space-y-2 font-medium">
         <li>
           <h5 class="mb-2 text-lg font-bold truncate">{{ name }}</h5>

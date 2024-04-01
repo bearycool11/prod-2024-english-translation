@@ -1,6 +1,6 @@
 <template>
   <div class="flex px-4 mt-20">
-    <div class="">
+    <div class="w-full">
       <!-- <button
           v-if="store.data.canAddBots === false"
           @click="toggleModal"
@@ -15,48 +15,59 @@
 
       <div class="flex justify-evenly flex-wrap">
         <div
-          v-for="(channel, index) in store.data.posts"
+          v-for="(post, index) in store.data.posts"
           :key="index"
-          class="mt-4 p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700"
+          @click="toggleModal(index)"
+          class="mt-4 p-6 bg-white border cursor-pointer border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 max-w-md"
         >
           <div class="flex items-center">
             <h5
-              class="mb-2 text-2xl font-bold truncate tracking-tight text-gray-900 dark:text-white"
+              class="mb-2 text-xl font-bold truncate tracking-tight text-gray-900 dark:text-white"
             >
-              {{ channel.name }}
+              {{ post.content }}
             </h5>
-            <button
-              @click="deleteChannel(channel.id)"
-              class="ml-4 mb-2 p-1 text-red-600 bg-red-100 hover:bg-red-200 rounded-md font-medium flex"
-            >
-              Удалить
-            </button>
+            <div class="p-2 bg-blue-100 rounded-md mb-2">{{ post.is_approved }}</div>
           </div>
-          <p class="truncate max-w-60 w-auto">{{ channel.id }}</p>
+          <div class="flex justify-between items-center">
+            <div class="flex">
+              <p class="mr-2">Запланирован в</p>
+              <p class="truncate max-w-60 w-auto">{{ post.planned_time }} 00:00:00</p>
+            </div>
+            <div class="p-2 bg-blue-100 rounded-md">{{ post.sent_status }}</div>
+          </div>
+          <ModalPost
+            :isShown="isShowModal[index]"
+            :closeModal="closeModal[index]"
+            :content="post.content"
+          />
         </div>
       </div>
     </div>
   </div>
-  <ModalPost
-    :isShown="isShowModal"
-    :closeModal="closeModal"
-    :id="props.id"
-    :botId="store.auth.bot_id"
-  />
 </template>
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, reactive } from 'vue'
 import { api } from '@/logic/api.js'
 import ModalPost from '@/components/ModalPost.vue'
 import { store } from '@/store/index.js'
+const isShowModal = reactive([])
 
-const isShowModal = ref()
-
+function toggleModal(index) {
+  if (isShowModal[index]) {
+    isShowModal[index] = false
+  } else {
+    isShowModal[index] = true
+  }
+}
 onMounted(() => {
   api.getPosts(props.id).then((data) => {
     store.data.posts = data
   })
 })
+
+function closeModal(index) {
+  isShowModal[index] = false
+}
 
 const props = defineProps({
   id: {

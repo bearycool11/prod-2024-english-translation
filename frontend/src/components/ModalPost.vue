@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="isShown"
-    @click="closeModal"
+    
     class="top-0 left-0 h-screen w-screen bg-gray-900 fixed opacity-20 z-40"
   ></div>
   <div
@@ -13,7 +13,7 @@
         <div
           class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600"
         >
-          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Добавить канал</h3>
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Пост</h3>
           <button
             @click="closeModal"
             type="button"
@@ -43,19 +43,20 @@
           <div class="grid gap-4 mb-4 grid-cols-2">
             <div class="col-span-2">
               <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >ID канала в телеграм</label
+                >Содержание</label
               >
-              <input
+              <textarea
                 type="text"
                 name="name"
                 id="name"
                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                 placeholder="ID телеграм канала"
                 required
-                v-model="ch_id"
+                :value="content"
+                @input="event => areaContent = event.target.value"
+               
               />
             </div>
-            {{ text }}
           </div>
           <button
             @click="addChannel"
@@ -87,16 +88,27 @@ import { defineComponent } from 'vue'
 //   import { store } from '@/store/index.js'
 
 export default defineComponent({
+  name: 'ModalPost',
   props: {
     isShown: Boolean,
-    closeModal: Function
+    closeModal: Function,
+    organization_id: Number,
+    created_by: Number,
+    content: String,
+    revision_id:Number,
+    is_approved: String,
+    comment: String,
+    planned_time: String,
+    sent_status: String,
   },
   data() {
     return {
-      text: ''
+      text: '',
+      areaContent: ''
     }
   },
-
-  methods: {}
+  beforeMount() {
+    console.log(this.closeModal)
+  }
 })
 </script>
