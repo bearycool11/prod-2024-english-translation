@@ -615,7 +615,7 @@ def get_my_permissions(
         response.status_code = 403
         return ErrorResponse(reason="Don\'t have required permissions")
     user_data = db_session.query(DBOrganizationUser).filter(DBOrganizationUser.organization_id == organization_id,
-                                                            DBOrganizationUser.user_id == current_user).first()
+                                                            DBOrganizationUser.user_id == current_user.id).first()
     if user_data is None:
         response.status_code = 404
         return ErrorResponse(reason="Not found")
