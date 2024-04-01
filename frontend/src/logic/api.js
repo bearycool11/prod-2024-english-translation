@@ -67,7 +67,7 @@ class Api {
         description
       })
       .then(({ data }) => {
-        return data.organizations
+        return data.organization
       })
   }
 

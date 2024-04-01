@@ -1,7 +1,7 @@
 <template>
-  <div class="flex justify-evenly mt-10 flex-wrap" v-if="organizations">
+  <div class="flex justify-evenly mt-10 flex-wrap" v-if="store.data.organizations">
     <a
-      v-for="(organization, index) in organizations"
+      v-for="(organization, index) in store.data.organizations"
       :key="index"
       :href="'/organization/' + organization.id"
       class="block max-w-sm mt-4 p-6 md:w-full w-52 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700"
@@ -19,21 +19,15 @@
   </div>
 </template>
 
-<script>
-import { defineComponent } from 'vue'
+<script setup>
+import { onMounted } from 'vue'
 import { api } from '@/logic/api.js'
+import { store } from '@/store/index.js'
 
-export default defineComponent({
-  name: 'AllOrganizations',
-  async beforeMount() {
-    api.getOrganizations().then((organizations) => {
-      this.organizations = organizations
-    })
-  },
-  data() {
-    return {
-      organizations: []
-    }
-  }
+onMounted(() => {
+  api.getOrganizations().then((organizations) => {
+    console.log(organizations)
+    store.data.organizations = organizations
+  })
 })
 </script>

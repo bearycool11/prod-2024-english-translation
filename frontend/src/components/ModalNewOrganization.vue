@@ -1,6 +1,7 @@
 <template>
   <div
     v-if="isShown"
+    @click="closeModal"
     class="top-0 left-0 h-screen w-screen bg-gray-900 fixed opacity-20 z-40"
   ></div>
   <div
@@ -8,9 +9,7 @@
     class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50"
   >
     <div class="relative p-4 w-full max-w-md max-h-full top-0 right-0 left-0 z-50">
-      <!-- Modal content -->
       <div class="relative bg-white rounded-lg shadow dark:bg-gray-700 min-w-80">
-        <!-- Modal header -->
         <div
           class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600"
         >
@@ -99,6 +98,8 @@
 <script>
 import { defineComponent } from 'vue'
 import { api } from '@/logic/api.js'
+import { store } from '@/store/index.js'
+
 export default defineComponent({
   name: 'ModalNewOrganization',
   props: {
@@ -119,7 +120,7 @@ export default defineComponent({
           description: this.description
         })
         .then((res) => {
-          console.log(res)
+          store.data.organizations = [...store.data.organizations, res]
         })
         .finally(() => {
           this.closeModal()

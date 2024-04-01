@@ -7,5 +7,8 @@ export const store = reactive({
   },
   ui: {
     isSideBarOpen: false
+  },
+  data: {
+    organizations: []
   }
 })

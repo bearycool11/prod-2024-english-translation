@@ -65,7 +65,7 @@
 </template>
 
 <script>
-import { toggleSidebar } from '@/store/toggleSidebar.js'
+import { store, toggleSidebar } from '@/store/toggleSidebar.js'
 import ModalNewOrganization from '../components/ModalNewOrganization.vue'
 import ModalLogout from '../components/ModalLogout.vue'
 import { defineComponent } from 'vue'
@@ -75,7 +75,7 @@ export default defineComponent({
   components: { ModalNewOrganization, ModalLogout },
   async beforeMount() {
     api.getOrganizations().then((organizations) => {
-      this.organizations = organizations
+      store.data.organizations = organizations
     })
   },
   data() {
