@@ -4,6 +4,7 @@ from fastapi import FastAPI, APIRouter, Depends
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 from starlette.middleware.cors import CORSMiddleware
+from starlette.requests import Request
 from starlette.responses import Response
 
 from database.database_connector import get_session
@@ -427,6 +428,13 @@ def add_channel_to_organization(
     db_session.add(db_model)
     db_session.commit()
     return AddChannelPostResponse(**db_model.dict())
+
+
+@router.get(
+    "/private/set_post_sent_state"
+)
+def set_post_sent_state(request: Request):
+    return PingResponse(status=request.client.host)
 
 
 app.include_router(router)

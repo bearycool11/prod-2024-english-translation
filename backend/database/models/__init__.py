@@ -14,6 +14,14 @@ class Status(enum.Enum):
     APPROVED = "APPROVED"
 
 
+class SentStatus(enum.Enum):
+    NOT_READY = "NOT_READY"
+    TIME_NOT_ENTERED = "TIME_NOT_ENTERED"
+    WAITING = "WAITING"
+    SENT_OK = "SENT_OK"
+    SENT_ERROR = "SENT_ERROR"
+
+
 class DBUser(SQLModel, table=True):
     __tablename__ = "users"
 
@@ -36,6 +44,8 @@ class DBPost(SQLModel, table=True):
     revision_id: int = Field(default=1)
     is_approved: Status = Field(default=Status.OPEN)
     comment: str
+    planned_time: Optional[datetime.datetime]
+    sent_status: SentStatus = Field(default=SentStatus.NOT_READY)
 
 
 class DBPermission(SQLModel, table=True):
