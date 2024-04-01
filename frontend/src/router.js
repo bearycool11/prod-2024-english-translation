@@ -47,7 +47,7 @@ const router = createRouter({
               name: 'social networks',
               props: true,
               component: () => import('./pages/SocialNetworks.vue')
-            },
+            }
           ]
         },
         {

@@ -131,18 +131,20 @@ export default defineComponent({
   methods: {
     async deleteUser() {
       api
-        .deleteUser(this.id, { login: this.login })
+        .deleteUser(this.id, this.login)
         .then(() => {
-          store.data.users = [...store.data.users].filter(({ login }) => login !== this.login);
+          store.data.users = [...store.data.users].filter(({ user }) => user.login !== this.login)
         })
         .finally(() => {
           this.closeModal()
         })
     },
     async addUser() {
-      api.inviteUser(this.id, { login: this.login, permissions: this.permissions }).then((user) => {
-        store.data.users = [...store.data.users, { ...user, rights: this.permissions }]
-      })
+      api
+        .inviteUser(this.id, { login: this.login, permissions: this.permissions })
+        .then((user) => {
+          store.data.users = [...store.data.users, { ...user, rights: this.permissions }]
+        })
         .finally(() => {
           this.closeModal()
         })

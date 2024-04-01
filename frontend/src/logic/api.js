@@ -129,14 +129,6 @@ class Api {
       })
   }
 
-  deleteUser(id, login) {
-    return this.client
-      .delete(`${import.meta.env.VITE_BACKEND_URL}/organizations/${id}/users`)
-      .then(({ data }) => {
-        return data
-      })
-  }
-
   inviteUser(id, { permissions, login }) {
     return this.client
       .post(`${import.meta.env.VITE_BACKEND_URL}/organizations/${id}/users`, { permissions, login })
@@ -147,13 +139,17 @@ class Api {
 
   deleteUser(id, login) {
     return this.client
-      .delete(`${import.meta.env.VITE_BACKEND_URL}/organizations/${id}/users`, { login })
+      .delete(`${import.meta.env.VITE_BACKEND_URL}/organizations/${id}/users`, {
+        data: {
+          login
+        }
+      })
       .then(({ data }) => {
         return data
       })
   }
 
-  async updateUser(id, user) {
+  updateUser(id, user) {
     return this.client
       .update(`${import.meta.env.VITE_BACKEND_URL}/organizations/${id}/users`, { user })
       .then(({ data }) => {
