@@ -590,9 +590,9 @@ def get_inactive_posts(
 
 @router.get(
     '/organizations/{organization_id}/mypermissions',
-    response_model=Union[OrganizationUsersGetResponse, ErrorResponse],
+    response_model=Union[OrganizationUser, ErrorResponse],
     responses={
-        '200': {'model': OrganizationUsersGetResponse},
+        '200': {'model': OrganizationUser},
         '401': {'model': ErrorResponse},
         '403': {'model': ErrorResponse}
     }
@@ -600,12 +600,12 @@ def get_inactive_posts(
 def get_my_permissions(
         organization_id: int,
         response: Response, current_user=Depends(get_current_user)
-) -> Union[OrganizationUsersGetResponse, ErrorResponse]:
+) -> Union[OrganizationUser, ErrorResponse]:
     if current_user.organization_bindings.join(DBPermission).filter(
             DBOrganizationUser.organization_id == organization_id).count() == 0:
         response.status_code = 403
         return ErrorResponse(reason="Don\'t have required permissions")
-    return OrganizationUsersGetResponse(users=[current_user])
+    return OrganizationUser(**current_user.to_dict())
 
 
 @router.post(
