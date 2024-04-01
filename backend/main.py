@@ -4,7 +4,6 @@ from fastapi import FastAPI, APIRouter, Depends
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 from starlette.middleware.cors import CORSMiddleware
-from starlette.requests import Request
 from starlette.responses import Response
 
 from database.database_connector import get_session
@@ -13,7 +12,8 @@ from models import PingResponse, AuthSignInPostResponse, AuthSignInPostRequest, 
     AuthRegisterPostRequest, UserProfile, Organization, OrganizationCreatePostResponse, OrganizationCreatePostRequest, \
     UserOrganizationsGetResponse, OrganizationUsersGetResponse, OrganizationUser, UserPublicProfile, UserRight, \
     AddBotPostResponse, AddBotPostRequest, ListBotGetResponse, Bot, AddUserPostRequest, AddUserPostResponse, \
-    DeleteUserResponse, DeleteUserRequest, AddChannelPostResponse, AddChannelPostRequest, GetChannelsResponse, Channel
+    DeleteUserResponse, DeleteUserRequest, AddChannelPostResponse, AddChannelPostRequest, GetChannelsResponse, Channel, \
+    DeleteChannelRequest, DeleteChannelResponse
 from tools.auth import create_access_token, get_current_user
 
 import requests as r
@@ -381,13 +381,16 @@ def get_organization_info(
 )
 def get_organization_channels(
         organization_id: int,
-        response: Response, db_session: Session =Depends(get_session), current_user=Depends(get_current_user)
+        response: Response, db_session: Session = Depends(get_session), current_user=Depends(get_current_user)
 ) -> Union[GetChannelsResponse, ErrorResponse]:
     if current_user.organization_bindings.filter(
             DBOrganizationUser.organization_id == organization_id).count() == 0:
         response.status_code = 403
         return ErrorResponse(reason="Don\'t have required permissions")
-    return GetChannelsResponse(channels=[Channel(**i.dict()) for i in db_session.query(DBChannels).join(DBOrganizationBot).filter(DBOrganizationBot.organization_id == organization_id, DBOrganizationBot.bot_id == DBChannels.bot_id).all()])
+    return GetChannelsResponse(channels=[Channel(**i.dict()) for i in
+                                         db_session.query(DBChannels).join(DBOrganizationBot).filter(
+                                             DBOrganizationBot.organization_id == organization_id,
+                                             DBOrganizationBot.bot_id == DBChannels.bot_id).all()])
 
 
 @router.post(
@@ -430,11 +433,32 @@ def add_channel_to_organization(
     return AddChannelPostResponse(**db_model.dict())
 
 
-@router.get(
-    "/private/set_post_sent_state"
+@router.delete(
+    '/organizations/{organization_id}/channels',
+    response_model=Union[DeleteChannelResponse, ErrorResponse],
+    responses={
+        '200': {'model': DeleteChannelResponse},
+        '401': {'model': ErrorResponse},
+        '403': {'model': ErrorResponse},
+        '404': {'model': ErrorResponse}
+    }
 )
-def set_post_sent_state(request: Request):
-    return PingResponse(status=request.client.host)
+def detete_channel_from_organization(
+        organization_id: int,
+        response: Response, body: DeleteChannelRequest, db_session: Session = Depends(get_session),
+        current_user=Depends(get_current_user)
+) -> Union[DeleteChannelResponse, ErrorResponse]:
+    if current_user.organization_bindings.join(DBPermission).filter(
+            DBOrganizationUser.organization_id == organization_id, DBPermission.level >= 4).count() == 0:
+        response.status_code = 403
+        return ErrorResponse(reason="Don\'t have required permissions")
+    if db_session.query(DBChannels).join(DBOrganizationBot).filter(DBChannels.id == body.id,
+                                                                   DBOrganizationBot.organization_id == organization_id).count() == 0:
+        response.status_code = 404
+        return ErrorResponse(reason="No such channel")
+    db_session.query(DBChannels).filter(DBChannels.id == body.id).delete()
+    db_session.commit()
+    return DeleteChannelResponse(id=body.id)
 
 
 app.include_router(router)
