@@ -12,40 +12,39 @@ const router = createRouter({
       },
       children: [
         {
-          path: '/',
+          path: '',
           name: 'AllOrganization',
           component: () => import('./pages/AllOrganizations.vue')
         },
         {
-          path: '/organization/:id',
+          path: 'organization/:id',
           name: 'OrganizationPage',
           component: () => import('./pages/OrganizationLayout.vue'),
+          props: true,
           meta: {
             auth: true
           },
           children: [
+            // {
+            //   path: '',
+            //   name: 'posts',
+            //   component: () => import('./components/ModalLogout.vue'),
+            // },
             {
-              path: '/',
-              alias: '/posts',
+              path: 'users',
+              name: 'users',
+              component: () => import('./components/ModalLogout.vue'),
             },
             {
-              path: '/posts',
-              name: 'posts',
-            },
-            {
-              path: '/users',
-              name: 'users'
-            },
-            {
-              path: '/history',
+              path: 'history',
               name: 'posts history'
             },
             {
-              path: '/channels',
+              path: 'channels',
               name: 'channels'
             },
             {
-              path: '/social',
+              path: 'social',
               name: 'social networks'
             }
           ]

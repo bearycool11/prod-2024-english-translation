@@ -75,7 +75,7 @@
                 d="M5 12h14m-7 7V5"
               />
             </svg>
-            <p>Организация</p>
+            <p class="md:flex hidden">Организация</p>
           </button>
         </div>
         <div class="flex items-center lg:order-2" v-if="$route.name == 'OrganizationPage'">

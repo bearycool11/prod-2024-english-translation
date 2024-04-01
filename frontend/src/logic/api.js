@@ -86,6 +86,17 @@ class Api {
       return data.profile
     })
   }
+
+  getOrganizationUsers(id) {
+    return this.client
+      .get(`${import.meta.env.VITE_BACKEND_URL}/organizations/${id}/users`)
+      .then(({ data }) => {
+        if(data.reason) {
+          return null
+        }
+        return data.users
+      })
+  }
 }
 
 export const api = new Api()

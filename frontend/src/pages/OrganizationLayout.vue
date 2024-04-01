@@ -36,7 +36,8 @@
         </li>
         <li>
           <a
-            href="#"
+          v-if="users"
+            :href="$route.fullPath + '/users'"
             class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
           >
             <svg
@@ -145,4 +146,21 @@
 <script setup>
 import { store } from '@/store/index.js'
 import { toggleSidebar } from '@/store/toggleSidebar.js'
+import { onMounted, ref } from 'vue'
+import { api } from '@/logic/api.js'
+const users = ref()
+// const id = router.params.
+const props = defineProps({
+  id: {
+    type: String,
+    default: '1'
+  }
+})
+onMounted(() => {
+  
+  api.getOrganizationUsers(props.id).then((data) => {
+    users.value = data
+  })
+})
+
 </script>

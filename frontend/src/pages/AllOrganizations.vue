@@ -26,7 +26,6 @@ import { store } from '@/store/index.js'
 
 onMounted(() => {
   api.getOrganizations().then((organizations) => {
-    console.log(organizations)
     store.data.organizations = organizations
   })
 })
