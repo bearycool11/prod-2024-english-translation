@@ -1,6 +1,6 @@
 <template>
   <div class="flex">
-    <RouterView class="flex" v-if=" $route.name == 'OrganizationPage'"/>
+    <RouterView class="flex" v-if="$route.name == 'OrganizationPage'" />
     <nav class="bg-white border-gray-200 lg:px-6 sm:px-8 px-2 py-2.5 dark:bg-gray-800 w-full">
       <div class="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl">
         <div class="flex items-center">
@@ -28,7 +28,24 @@
               />
             </svg>
           </button>
-          <a class="flex items-center font-medium text-xl"> Username </a>
+          <button class="cursor-pointer flex items-center font-medium text-xl">Username</button>
+          <button class="ml-3 bg-red-100 p-[2px] hover:bg-red-200 rounded" @click="toggleLogout">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+            >
+              <path
+                d="M16 12L4 12M16 12L12 16M16 12L12 8M15 4H17C18.6569 4 20 5.34315 20 7V17C20 18.6569 18.6569 20 17 20H15"
+                stroke="#FF4A4A"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </button>
         </div>
         <div class="flex items-center lg:order-2">
           <button
@@ -42,18 +59,20 @@
       </div>
     </nav>
   </div>
-  <RouterView class="flex" v-if=" $route.name == 'AllOrganization'"/>
+  <RouterView class="flex" v-if="$route.name == 'AllOrganization'" />
   <ModalNewOrganization :isShown="this.isShowModal" :closeModal="closeModal" />
+  <ModalLogout :isShown="isShowModalLogout" :closeModal="closeLogout" />>
 </template>
 
 <script>
 import { toggleSidebar } from '@/store/toggleSidebar.js'
 import ModalNewOrganization from '../components/ModalNewOrganization.vue'
+import ModalLogout from '../components/ModalLogout.vue'
 import { defineComponent } from 'vue'
 import { api } from '@/logic/api.js'
 
 export default defineComponent({
-  components: { ModalNewOrganization },
+  components: { ModalNewOrganization, ModalLogout },
   async beforeMount() {
     api.getOrganizations().then((organizations) => {
       this.organizations = organizations
@@ -62,6 +81,7 @@ export default defineComponent({
   data() {
     return {
       isShowModal: false,
+      isShowModalLogout: false,
       organizations: []
     }
   },
@@ -74,8 +94,18 @@ export default defineComponent({
         this.isShowModal = true
       }
     },
+    toggleLogout() {
+      if (this.isShowModalLogout) {
+        this.isShowModalLogout = false
+      } else {
+        this.isShowModalLogout = true
+      }
+    },
     closeModal() {
       this.isShowModal = false
+    },
+    closeLogout() {
+      this.isShowModalLogout = false
     }
   }
 })
