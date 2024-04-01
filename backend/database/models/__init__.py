@@ -76,7 +76,8 @@ class DBChannel(SQLModel, table=True):
                                                                "secondaryjoin": "DBPost.id==post_channel_bindings.c.post_id",
                                                                "back_populates": "channels",
                                                                "lazy": "dynamic"})
-    bot: "DBOrganizationBot" = Relationship()
+    bot: "DBOrganizationBot" = Relationship(
+        sa_relationship_kwargs={"primaryjoin": "DBOrganizationBot.id==DBChannel.bot)id"})
 
 
 class DBOrganizationUser(SQLModel, table=True):
