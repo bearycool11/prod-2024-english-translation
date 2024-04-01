@@ -230,6 +230,16 @@ class Api {
         return data.posts
       })
   }
+  getMyPermissions(id) {
+    return this.client
+      .get(`${import.meta.env.VITE_BACKEND_URL}/organizations/${id}/mypermissions`)
+      .then(({ data }) => {
+        if (data.reason) {
+          return null
+        }
+        return data.rights
+      })
+  }
 }
 
 export const api = new Api()

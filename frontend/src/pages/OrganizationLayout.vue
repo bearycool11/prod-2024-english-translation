@@ -42,7 +42,7 @@
         </li>
         <li>
           <router-link
-            v-if="users"
+            v-if="store.auth.permissions.some(obj => obj.name === 'admin')"
             :to="`/organization/${id}/users`"
             class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
           >
@@ -178,6 +178,9 @@ onMounted(() => {
   })
   api.getOrganizationUsers(props.id).then((data) => {
     users.value = data
+  })
+  api.getMyPermissions(props.id).then((data) => {
+    store.auth.permissions = data
   })
 })
 </script>

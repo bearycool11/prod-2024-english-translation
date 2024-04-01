@@ -5,7 +5,8 @@ export const store = reactive({
     isAuth: false,
     isLoading: true,
     username: '',
-    bot_id: 0
+    bot_id: 0,
+    permissions: {}
   },
   ui: {
     isSideBarOpen: false
