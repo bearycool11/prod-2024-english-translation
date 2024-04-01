@@ -259,4 +259,24 @@ def get_organization_bots(
     return ListBotGetResponse(bots=[Bot(**i.dict()) for i in result])
 
 
+@router.get(
+    '/organizations/{organization_id}',
+    response_model=Union[Organization, ErrorResponse],
+    responses={
+        '200': {'model': Organization},
+        '401': {'model': ErrorResponse},
+        '403': {'model': ErrorResponse}
+    }
+)
+def get_organization_info(
+        organization_id: int,
+        response: Response, db_session=Depends(get_session), current_user=Depends(get_current_user)
+) -> Union[Organization, ErrorResponse]:
+    if current_user.organization_bindings.filter(
+            DBOrganizationUser.organization_id == organization_id).count() == 0:
+        response.status_code = 403
+        return ErrorResponse(reason="Don\'t have required permissions")
+    return Organization(**db_session.query(DBOrganization).filter_by(id=organization_id).all()[0].dict())
+
+
 app.include_router(router)
