@@ -6,7 +6,7 @@
   ></div>
   <aside
     id="default-sidebar"
-    class="top-0 left-0 z-40 w-64 h-screen transition-transform sm:static fixed md:translate-x-0"
+    class="top-0 left-0 z-40 w-64 h-screen transition-transform sm:static fixed md:translate-x-0 pt-12"
     :class="{
       '-translate-x-full': !store.ui.isSideBarOpen,
       'translate-x-0': store.ui.isSideBarOpen
@@ -116,7 +116,7 @@
         </li>
         <li>
           <a
-            href="#"
+            :href="`/organization/${id}/social`"
             class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
           >
             <svg
@@ -140,7 +140,7 @@
       </ul>
     </div>
   </aside>
-  <RouterView />
+  <RouterView class="mt-20 w-full"/>
 </template>
 
 <script setup>

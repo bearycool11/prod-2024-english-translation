@@ -1,7 +1,7 @@
 <template>
   <div class="flex">
     <RouterView class="flex" v-if="$route.name != 'AllOrganization'" />
-    <nav class="bg-white border-gray-200 lg:px-6 sm:px-8 px-2 py-2.5 dark:bg-gray-800 w-full">
+    <nav class="bg-white border-gray-200 lg:px-6 sm:px-8 px-2 py-2.5 dark:bg-gray-800 w-full absolute z-50">
       <div class="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl">
         <div class="flex items-center">
           <button
