@@ -7,7 +7,7 @@
   <aside
     v-if="name"
     id="default-sidebar"
-    class="top-0 left-0 z-40 w-64 h-screen transition-transform fixed z-40"
+    class="top-0 left-0 z-40 w-64 h-screen transition-transform fixed"
     :class="{
       '-translate-x-full': !store.ui.isSideBarOpen,
       'translate-x-0': store.ui.isSideBarOpen
@@ -21,7 +21,7 @@
         </li>
         <li>
           <router-link
-            :to="`/organization/${id}/posts`"
+            :to="`/organization/${id}`"
             class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
           >
             <svg

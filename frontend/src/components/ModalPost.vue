@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="isShown"
-    
+    @click="closeModal"
     class="top-0 left-0 h-screen w-screen bg-gray-900 fixed opacity-20 z-40"
   ></div>
   <div
@@ -18,7 +18,7 @@
             @click="closeModal"
             type="button"
             class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
-            data-modal-toggle="crud-modal"
+            
           >
             <svg
               class="w-3 h-3"
@@ -95,11 +95,12 @@ export default defineComponent({
     organization_id: Number,
     created_by: Number,
     content: String,
-    revision_id:Number,
+    revision_id: Number,
     is_approved: String,
     comment: String,
     planned_time: String,
     sent_status: String,
+    index: Number
   },
   data() {
     return {
@@ -108,7 +109,7 @@ export default defineComponent({
     }
   },
   beforeMount() {
-    console.log(this.closeModal)
+    console.log(this.isShown, 1)
   }
 })
 </script>
