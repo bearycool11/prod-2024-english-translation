@@ -38,10 +38,6 @@ class UserPublicProfile(BaseModel):
     name: str = Field(max_length=50)
 
 
-class UserRights(BaseModel):
-    rights: list[str]
-
-
 class ProfileResponse(BaseModel):
     profile: UserProfile
 
@@ -57,14 +53,23 @@ class Organization(BaseModel):
     description: Optional[str] = Field(max_length=150)
 
 
+class UserRight(BaseModel):
+    name: str
+    can_grant: bool
+
+
 class OrganizationCreatePostResponse(BaseModel):
     organization: Organization
 
 
 class OrganizationUser(BaseModel):
     user: UserPublicProfile
-    rights: UserRights
+    rights: list[UserRight]
 
 
 class UserOrganizationsGetResponse(BaseModel):
     organizations: list[Organization]
+
+
+class OrganizationUsersGetResponse(BaseModel):
+    users: list[OrganizationUser]

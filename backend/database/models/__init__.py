@@ -19,7 +19,7 @@ class DBUser(SQLModel, table=True):
     name: str = Field(max_length=50)
     is_admin: bool = Field(default=False)
 
-    organization_bindings: list["DBOrganizationUser"] = Relationship(back_populates="user")
+    organization_bindings: list["DBOrganizationUser"] = Relationship(back_populates="user", sa_relationship_kwargs={"lazy": "dynamic"})
 
 
 class DBPost(SQLModel, table=True):
@@ -59,6 +59,7 @@ class DBOrganizationUser(SQLModel, table=True):
     permission: str = Field(foreign_key="permissions.name", primary_key=True)
 
     user: DBUser = Relationship(back_populates="organization_bindings")
+    permission_data: DBPermission = Relationship()
     organization: "DBOrganization" = Relationship(back_populates="user_bindings")
 
 

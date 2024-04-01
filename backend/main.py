@@ -7,10 +7,10 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import Response
 
 from database.database_connector import get_session
-from database.models import DBUser, DBOrganization, DBOrganizationUser
+from database.models import DBUser, DBOrganization, DBOrganizationUser, DBPermission
 from models import PingResponse, AuthSignInPostResponse, AuthSignInPostRequest, ErrorResponse, ProfileResponse, \
     AuthRegisterPostRequest, UserProfile, Organization, OrganizationCreatePostResponse, OrganizationCreatePostRequest, \
-    UserOrganizationsGetResponse
+    UserOrganizationsGetResponse, OrganizationUsersGetResponse, OrganizationUser, UserPublicProfile, UserRight
 from tools.auth import create_access_token, get_current_user
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -33,6 +33,20 @@ def get_uniq_orgs(orgs: list[DBOrganization]):
         ids.append(i.id)
         uniq_orgs.append(Organization(**i.dict()))
     return uniq_orgs
+
+
+def get_uniq_users(users: list[DBOrganizationUser]):
+    ids = []
+    uniq_users = []
+    for i in users:
+        if i.user_id in ids:
+            uniq_users[ids.index(i.user_id)].rights.append(UserRight(**i.permission_data.dict()))
+        else:
+            ids.append(i.user_id)
+            uniq_users.append(
+                OrganizationUser(user=UserPublicProfile(**i.user.dict()),
+                                 rights=[UserRight(**i.permission_data.dict())]))
+    return uniq_users
 
 
 app = FastAPI(
@@ -161,16 +175,31 @@ def organization_create(
     }
 )
 def get_user_ogranizations(
-        response: Response, db_session=Depends(get_session), current_user: DBUser = Depends(get_current_user)
+        current_user: DBUser = Depends(get_current_user)
 ) -> Union[UserOrganizationsGetResponse, ErrorResponse]:
     return UserOrganizationsGetResponse(
         organizations=get_uniq_orgs([i.organization for i in current_user.organization_bindings]))
 
 
-# TODO: fetch organization users
-# @router.get(
-#    '/organizations/{organization_id}/users',
-#    response_model=Union[list[OrganizationUser], ErrorResponse]
-# )
+@router.get(
+    '/organizations/{organization_id}/users',
+    response_model=Union[OrganizationUsersGetResponse, ErrorResponse],
+    responses={
+        '200': {'model': OrganizationUsersGetResponse},
+        '401': {'model': ErrorResponse},
+        '403': {'model': ErrorResponse}
+    }
+)
+def get_organization_users(
+        organization_id: int, response: Response, db_session=Depends(get_session),
+        current_user: DBUser = Depends(get_current_user)
+) -> Union[OrganizationUsersGetResponse, ErrorResponse]:
+    if current_user.organization_bindings.join(DBPermission).filter(
+            DBOrganizationUser.organization_id == organization_id, DBPermission.level >= 4).count() == 0:
+        response.status_code = 403
+        return ErrorResponse(reason="Don\'t have required permissions")
+    result = db_session.query(DBOrganizationUser).filter(DBOrganizationUser.organization_id == organization_id).all()
+    return OrganizationUsersGetResponse(users=get_uniq_users(result))
+
 
 app.include_router(router)
