@@ -108,6 +108,16 @@ class Api {
         return data.bots
       })
   }
+  deleteOrganizationBots(id, ch_id) {
+    return this.client
+      .delete(`${import.meta.env.VITE_BACKEND_URL}/organizations/${id}/channels`,{data: {id: ch_id}})
+      .then(({ data }) => {
+        if (data.reason) {
+          return null
+        }
+        return data.channels
+      })
+  }
 
   createOrganizationBots(id, token) {
     return this.client

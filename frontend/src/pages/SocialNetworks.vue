@@ -21,6 +21,7 @@
               Телеграм бот {{ bot.bot_id }}
             </h5>
             <button
+            @click="deleteBot"
               class="ml-4 mb-2 p-1 text-red-600 bg-red-100 hover:bg-red-200 rounded-md font-medium flex"
             >
               Удалить
@@ -74,7 +75,9 @@ const props = defineProps({
   }
 })
 
-// const canAdd = ref(false)
+function deleteBot() {
+    return
+}
 onMounted(() => {
   api.getOrganizationBots(props.id).then((data) => {
     store.data.bots = data

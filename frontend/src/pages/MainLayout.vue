@@ -4,8 +4,8 @@
     <nav
       class="bg-white border-gray-200 lg:px-6 sm:px-8 px-2 py-2.5 dark:bg-gray-800 w-full absolute z-50 shadow-md"
     >
-      <div class="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl">
-        <div class="flex items-center">
+      <div class="flex flex-wrap md:justify-start justify-between items-center max-w-screen-xl">
+        <div class="flex items-center  mr-10">
           <button
             @click="toggleSidebar"
             v-if="$route.name != 'AllOrganization'"
@@ -30,7 +30,7 @@
               />
             </svg>
           </button>
-          <a class="cursor-pointer flex items-center font-medium text-xl" href="/">
+          <a class="cursor-pointer flex items-center font-medium text-xl max-w-80" href="/">
             {{ profile.name }}
           </a>
           <button
