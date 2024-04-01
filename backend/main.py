@@ -550,7 +550,7 @@ def get_active_posts(
         return ErrorResponse(reason="Don\'t have required permissions")
     posts: list[DBPost] = db_session.query(DBPost).filter(DBPost.sent_status != SentStatus.SENT_OK,
                                                           DBPost.organization_id == organization_id).all()
-    return GetPostsResponse(posts=[Post(**i.dict(), created_by_username=i.user.login) for i in posts])
+    return GetPostsResponse(posts=[Post(**i.dict(), created_by_name=i.user.name) for i in posts])
 
 
 @router.patch(
@@ -605,7 +605,7 @@ def edit_post(
             DBPost.comment: body.comment
         })
     db_session.commit()
-    return EditPostResponse(post=Post(**db_model.first().dict(), created_by_username=db_model.first().user.login))
+    return EditPostResponse(post=Post(**db_model.first().dict(), created_by_name=db_model.first().user.name))
 
 
 @router.get(

@@ -151,7 +151,7 @@ class Post(BaseModel):
     id: Optional[int]
     organization_id: int
     created_by: int
-    created_by_username: str
+    created_by_name: str
     content: str
     revision_id: int
     is_approved: Status
