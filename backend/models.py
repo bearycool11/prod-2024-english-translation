@@ -118,3 +118,11 @@ class AddChannelPostResponse(BaseModel):
     id: int
     bot_id: int
     name: str
+
+class Channel(BaseModel):
+    id: int
+    bot_id: int
+    name: str
+
+class GetChannelsResponse(BaseModel):
+    channels: list[Channel]

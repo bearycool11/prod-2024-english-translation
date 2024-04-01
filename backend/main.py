@@ -12,7 +12,7 @@ from models import PingResponse, AuthSignInPostResponse, AuthSignInPostRequest, 
     AuthRegisterPostRequest, UserProfile, Organization, OrganizationCreatePostResponse, OrganizationCreatePostRequest, \
     UserOrganizationsGetResponse, OrganizationUsersGetResponse, OrganizationUser, UserPublicProfile, UserRight, \
     AddBotPostResponse, AddBotPostRequest, ListBotGetResponse, Bot, AddUserPostRequest, AddUserPostResponse, \
-    DeleteUserResponse, DeleteUserRequest, AddChannelPostResponse, AddChannelPostRequest
+    DeleteUserResponse, DeleteUserRequest, AddChannelPostResponse, AddChannelPostRequest, GetChannelsResponse, Channel
 from tools.auth import create_access_token, get_current_user
 
 import requests as r
@@ -367,6 +367,26 @@ def get_organization_info(
         response.status_code = 403
         return ErrorResponse(reason="Don\'t have required permissions")
     return Organization(**db_session.query(DBOrganization).filter_by(id=organization_id).all()[0].dict())
+
+
+@router.get(
+    '/organizations/{organization_id}/channels',
+    response_model=Union[GetChannelsResponse, ErrorResponse],
+    responses={
+        '200': {'model': GetChannelsResponse},
+        '401': {'model': ErrorResponse},
+        '403': {'model': ErrorResponse}
+    }
+)
+def get_organization_channels(
+        organization_id: int,
+        response: Response, db_session: Session =Depends(get_session), current_user=Depends(get_current_user)
+) -> Union[GetChannelsResponse, ErrorResponse]:
+    if current_user.organization_bindings.filter(
+            DBOrganizationUser.organization_id == organization_id).count() == 0:
+        response.status_code = 403
+        return ErrorResponse(reason="Don\'t have required permissions")
+    return GetChannelsResponse(channels=[Channel(**i.dict()) for i in db_session.query(DBChannels).join(DBOrganizationBot).filter(DBOrganizationBot.organization_id == organization_id, DBOrganizationBot.bot_id == DBChannels.bot_id).all()])
 
 
 @router.post(
