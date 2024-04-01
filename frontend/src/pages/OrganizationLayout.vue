@@ -4,7 +4,8 @@
     v-if="store.ui.isSideBarOpen"
     class="top-0 left-0 h-screen w-screen bg-gray-900 fixed opacity-20"
   ></div>
-  <aside v-if="name"
+  <aside
+    v-if="name"
     id="default-sidebar"
     class="top-0 left-0 z-40 w-64 h-screen transition-transform sm:static fixed md:translate-x-0 pt-12"
     :class="{
@@ -14,10 +15,9 @@
     aria-label="Sidebar"
   >
     <div class="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800">
-      
       <ul class="space-y-2 font-medium">
         <li>
-          <h5 class="mb-2 text-lg font-bold truncate ">{{ name }}</h5>
+          <h5 class="mb-2 text-lg font-bold truncate">{{ name }}</h5>
         </li>
         <li>
           <a
@@ -95,7 +95,7 @@
         </li>
         <li>
           <a
-            href="#"
+            :href="`/organization/${id}/channels`"
             class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
           >
             <svg
@@ -138,7 +138,7 @@
                 clip-rule="evenodd"
               />
             </svg>
-            <span class="flex-1 ms-3 whitespace-nowrap">Соц. сети</span>
+            <span class="flex-1 ms-3 whitespace-nowrap">Боты</span>
           </a>
         </li>
       </ul>
@@ -193,7 +193,7 @@ const props = defineProps({
   }
 })
 onMounted(() => {
-  api.getOrganizationInfo(props.id).then(data => {
+  api.getOrganizationInfo(props.id).then((data) => {
     name.value = data.name
   })
   api.getOrganizationUsers(props.id).then((data) => {

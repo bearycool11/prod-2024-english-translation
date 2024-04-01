@@ -35,7 +35,9 @@ const router = createRouter({
             },
             {
               path: 'channels',
-              name: 'channels'
+              name: 'channels',
+              props: true,
+              component: () => import('./pages/ChannelsPage.vue')
             },
             {
               path: 'social',

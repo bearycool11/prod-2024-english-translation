@@ -4,7 +4,8 @@ export const store = reactive({
   auth: {
     isAuth: false,
     isLoading: true,
-    username: ''
+    username: '',
+    bot_id: 0
   },
   ui: {
     isSideBarOpen: false
@@ -12,6 +13,7 @@ export const store = reactive({
   data: {
     organizations: [],
     bots: [],
-    canAddBots: false
+    canAddBots: false,
+    channels: []
   }
 })

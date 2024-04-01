@@ -133,6 +133,39 @@ class Api {
         return data
       })
   }
+
+  addChannels(id, ch_id, bot_id) {
+    console.log(bot_id)
+    return this.client
+      .post(`${import.meta.env.VITE_BACKEND_URL}/organizations/${id}/channels`, {id: ch_id, bot_id: bot_id})
+      .then(({ data }) => {
+      
+        return data
+      }) .catch(() => {
+        throw 'Канал не найден или уже используется'
+      })
+  }
+  getChannels(id) {
+    return this.client
+      .get(`${import.meta.env.VITE_BACKEND_URL}/organizations/${id}/channels`)
+      .then(({ data }) => {
+        if (data.reason) {
+          return null
+        }
+        return data.channels
+      })
+  }
+
+  deleteChannels(id, ch_id) {
+    return this.client
+      .delete(`${import.meta.env.VITE_BACKEND_URL}/organizations/${id}/channels`,{data: {id: ch_id}})
+      .then(({ data }) => {
+        if (data.reason) {
+          return null
+        }
+        return data.channels
+      })
+  }
 }
 
 export const api = new Api()
