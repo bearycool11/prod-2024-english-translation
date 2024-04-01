@@ -12,11 +12,6 @@ const router = createRouter({
       },
       children: [
         {
-          path: '',
-          name: 'AllOrganization',
-          component: () => import('./pages/AllOrganizations.vue')
-        },
-        {
           path: 'organization/:id',
           name: 'OrganizationPage',
           component: () => import('./pages/OrganizationLayout.vue'),
@@ -25,15 +20,15 @@ const router = createRouter({
             auth: true
           },
           children: [
-            // {
-            //   path: '',
-            //   name: 'posts',
-            //   component: () => import('./components/ModalLogout.vue'),
-            // },
+            {
+              path: '',
+              name: 'posts',
+              component: () => import('./components/ModalLogout.vue'),
+            },
             {
               path: 'users',
               name: 'users',
-              component: () => import('./components/ModalLogout.vue'),
+            
             },
             {
               path: 'history',
@@ -48,7 +43,13 @@ const router = createRouter({
               name: 'social networks'
             }
           ]
-        }
+        },
+        {
+          path: '',
+          name: 'AllOrganization',
+          component: () => import('./pages/AllOrganizations.vue')
+        },
+        
       ]
     },
     {
