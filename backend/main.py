@@ -1,24 +1,23 @@
 from typing import Union
 
+import requests as r
 from fastapi import FastAPI, APIRouter, Depends
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 from starlette.middleware.cors import CORSMiddleware
+from starlette.requests import Request
 from starlette.responses import Response
 
 from database.database_connector import get_session
-from database.models import DBUser, DBOrganization, DBOrganizationUser, DBPermission, DBOrganizationBot, DBChannels
-from models import PingResponse, AuthSignInPostResponse, AuthSignInPostRequest, ErrorResponse, ProfileResponse, \
+from database.models import DBUser, DBOrganization, DBOrganizationUser, DBPermission, DBOrganizationBot, DBChannels, \
+    DBPost
+from models import StatusResponse, AuthSignInPostResponse, AuthSignInPostRequest, ErrorResponse, ProfileResponse, \
     AuthRegisterPostRequest, UserProfile, Organization, OrganizationCreatePostResponse, OrganizationCreatePostRequest, \
     UserOrganizationsGetResponse, OrganizationUsersGetResponse, OrganizationUser, UserPublicProfile, UserRight, \
     AddBotPostResponse, AddBotPostRequest, ListBotGetResponse, Bot, AddUserPostRequest, AddUserPostResponse, \
     DeleteUserResponse, DeleteUserRequest, AddChannelPostResponse, AddChannelPostRequest, GetChannelsResponse, Channel, \
-    DeleteChannelRequest, DeleteChannelResponse
+    DeleteChannelRequest, DeleteChannelResponse, PrivateSetPostStatusRequest
 from tools.auth import create_access_token, get_current_user
-
-import requests as r
-
-import uvicorn
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -85,14 +84,14 @@ app.add_middleware(
 router = APIRouter(prefix='/api')
 
 
-@router.get('/ping', response_model=PingResponse)
-def ping() -> PingResponse:
-    return PingResponse(status="ok")
+@router.get('/ping', response_model=StatusResponse)
+def ping() -> StatusResponse:
+    return StatusResponse(status="ok")
 
 
-@router.get('/auth/check', response_model=PingResponse)
-def auth_check(current_user: DBUser = Depends(get_current_user)) -> PingResponse:  # noqa: unused
-    return PingResponse(status="ok")
+@router.get('/auth/check', response_model=StatusResponse)
+def auth_check(current_user: DBUser = Depends(get_current_user)) -> StatusResponse:  # noqa: unused
+    return StatusResponse(status="ok")
 
 
 @router.post(
@@ -461,5 +460,34 @@ def delete_channel_from_organization(
     return DeleteChannelResponse(id=body.id)
 
 
+@router.get(
+    "/private/set_post_sent_state",
+    response_model=Union[StatusResponse, ErrorResponse],
+    responses={
+        '200': {'model': StatusResponse},
+        '400': {'model': ErrorResponse},
+        '403': {'model': ErrorResponse},
+        '404': {'model': ErrorResponse},
+    },
+    include_in_schema=False,
+)
+def set_post_sent_state(request: Request, response: Response, body: PrivateSetPostStatusRequest,
+                        db_session=Depends(get_session)):
+    if not request.client.host.startswith("172.31."):
+        response.status_code = 403
+        return ErrorResponse(reason="access denied")
+    post = db_session.query(DBPost).filter(DBPost.id == body.post_id).first()
+    if post is None:
+        response.status_code = 404
+        return ErrorResponse(reason="not found")
+    post.sent_status = body.post_status
+    db_session.add(post)
+    try:
+        db_session.commit()
+    except:
+        response.status_code = 400
+        return ErrorResponse(reason="bad request")
+    return StatusResponse(status="ok")
+
+
 app.include_router(router)
-# uvicorn.run(app, host='0.0.0.0', port=5437, log_level="debug")

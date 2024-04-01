@@ -3,7 +3,7 @@ from typing import Optional
 from pydantic import BaseModel, Field
 
 
-class PingResponse(BaseModel):
+class StatusResponse(BaseModel):
     status: str
 
 
@@ -136,3 +136,8 @@ class DeleteChannelRequest(BaseModel):
 
 class DeleteChannelResponse(BaseModel):
     id: int
+
+
+class PrivateSetPostStatusRequest(BaseModel):
+    post_id: int
+    post_status: str
