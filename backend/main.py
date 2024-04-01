@@ -56,11 +56,6 @@ def get_uniq_users(users: list[DBOrganizationUser]):
     return uniq_users
 
 
-def get_user(user: DBOrganizationUser):
-    return OrganizationUser(user=UserPublicProfile(**user.user.dict()),
-                            rights=[UserRight(**user.permission_data.dict())])
-
-
 def check_if_all_permissions_in_db(permissions: list[str], session: Session):
     permissions_from_db = [i.name for i in session.query(DBPermission).all()]
     for i in range(len(permissions)):
@@ -653,11 +648,11 @@ def get_my_permissions(
         response.status_code = 403
         return ErrorResponse(reason="Don\'t have required permissions")
     user_data = db_session.query(DBOrganizationUser).filter(DBOrganizationUser.organization_id == organization_id,
-                                                            DBOrganizationUser.user_id == current_user.id).first()
-    if user_data is None:
+                                                            DBOrganizationUser.user_id == current_user.id).all()
+    if not user_data:
         response.status_code = 404
         return ErrorResponse(reason="Not found")
-    return get_user(user_data)
+    return get_uniq_users(user_data)[0]
 
 
 @router.post(
