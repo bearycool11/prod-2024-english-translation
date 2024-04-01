@@ -13,7 +13,9 @@
         <div
           class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600"
         >
-          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Добавить бота</h3>
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+            {{ !this.$props.initialUser.user?.name ? 'Добавить пользователя' : 'Редактировать пользоваетля' }}
+          </h3>
           <button
             @click="closeModal"
             type="button"
@@ -43,38 +45,56 @@
           <div class="grid gap-4 mb-4 grid-cols-2">
             <div class="col-span-2">
               <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-              >Токен</label
+              >Логин</label
               >
               <input
+                :disabled="this.$props.initialUser?.user?.name"
                 type="text"
                 name="name"
                 id="name"
+                v-model="login"
                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                placeholder="Токен телеграм бота"
+                placeholder="Логин пользователя"
                 required
-                v-model="token"
               />
             </div>
-            {{ text }}
+          </div>
+          <div
+            v-for="(right) in rights"
+            class="flex items-center mb-4"
+          >
+            <input
+              :id="right"
+              type="checkbox"
+              :onchange="(e) => {
+                if (e.target.checked) {
+                  this.permissions = [...permissions, right]
+                } else {
+                  this.permissions = permissions.filter((newRight) => newRight !== right)
+                }
+              }"
+              :disabled="right === 'viewer'"
+              :checked="permissions.includes(right)"
+              class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+            >
+            <label
+              :for="right"
+              class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+            >
+              {{ right }}
+            </label>
           </div>
           <button
-            @click="addBot"
-            type="submit"
+            @click="addUser"
+            :disabled="!login"
             class="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
           >
-            <svg
-              class="me-1 -ms-1 w-5 h-5"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                fill-rule="evenodd"
-                d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
-                clip-rule="evenodd"
-              ></path>
-            </svg>
-            Добавить бота
+            {{ !this.$props.initialUser.user?.name ? 'Добавить пользователя' : 'Редактировать пользоваетля' }}
+          </button>
+          <button
+            class="text-white inline-flex items-center bg-red-500 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 mt-2 py-2.5"
+          >
+            Удали пользователя
           </button>
         </form>
       </div>
@@ -91,25 +111,23 @@ export default defineComponent({
   props: {
     isShown: Boolean,
     closeModal: Function,
-    id: String
+    id: String,
+    initialUser: Object
   },
   data() {
     return {
-      permissions: '',
-      login: ''
+      permissions: this.$props.initialUser?.permissions || ['viewer'],
+      login: this.$props.initialUser?.user?.login,
+      rights: ['viewer', 'editor', 'reviewer', 'admin', 'owner']
     }
   },
 
   methods: {
-    async addBot() {
+    async addUser() {
       api
-        .getUsers(this.id, { login: this.login, permissions: this.permissions })
-        .then((data) => {
-          console.log(data)
-          api.getOrganizationBots(this.id).then((bots) => {
-            store.data.bots = bots
-          })
-          store.data.canAddBots = false
+        .inviteUser(this.id, { login: this.login, permissions: this.permissions })
+        .then((user) => {
+          store.data.users = [...store.data.users, user];
           this.closeModal()
         })
         .catch((e) => {

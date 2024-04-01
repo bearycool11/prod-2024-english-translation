@@ -100,6 +100,7 @@ export default defineComponent({
   beforeMount() {
     api.getProfile().then((profile) => {
       store.auth.username = profile.name
+      store.auth.id = profile.id;
       this.profile = profile
     })
     api.getOrganizations().then((organizations) => {

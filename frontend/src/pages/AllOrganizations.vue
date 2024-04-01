@@ -1,10 +1,10 @@
 <template>
-  <div class="flex justify-evenly mt-10 flex-wrap" v-if="store.data.organizations">
+  <div class="grid md:grid-cols-3 sm:grid-cols-2 gap-2 w-full p-2 mt-10 flex-wrap" v-if="store.data.organizations">
     <a
       v-for="(organization, index) in store.data.organizations"
       :key="index"
       :href="'/organization/' + organization.id"
-      class="block max-w-sm mt-4 p-6 md:w-full w-52 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700"
+      class="block overflow-hidden w-full p-6 md:w-full bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700"
     >
       <h5 class="mb-2 text-2xl font-bold truncate tracking-tight text-gray-900 dark:text-white">
         {{ organization.name }}
