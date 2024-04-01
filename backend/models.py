@@ -71,5 +71,21 @@ class UserOrganizationsGetResponse(BaseModel):
     organizations: list[Organization]
 
 
+class Bot(BaseModel):
+    bot_id: int
+    bot_token: str
+
 class OrganizationUsersGetResponse(BaseModel):
     users: list[OrganizationUser]
+
+
+class AddBotPostRequest(BaseModel):
+    token: str = Field(pattern=r'[0-9]+:[a-zA-Z\-_]+')
+
+
+class AddBotPostResponse(BaseModel):
+    id: int
+
+
+class ListBotGetResponse(BaseModel):
+    bots: list[Bot]

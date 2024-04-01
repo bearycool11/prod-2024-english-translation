@@ -7,11 +7,14 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import Response
 
 from database.database_connector import get_session
-from database.models import DBUser, DBOrganization, DBOrganizationUser, DBPermission
+from database.models import DBUser, DBOrganization, DBOrganizationUser, DBPermission, DBOrganizationBot
 from models import PingResponse, AuthSignInPostResponse, AuthSignInPostRequest, ErrorResponse, ProfileResponse, \
     AuthRegisterPostRequest, UserProfile, Organization, OrganizationCreatePostResponse, OrganizationCreatePostRequest, \
-    UserOrganizationsGetResponse, OrganizationUsersGetResponse, OrganizationUser, UserPublicProfile, UserRight
+    UserOrganizationsGetResponse, OrganizationUsersGetResponse, OrganizationUser, UserPublicProfile, UserRight, \
+    AddBotPostResponse, AddBotPostRequest, ListBotGetResponse, Bot
 from tools.auth import create_access_token, get_current_user
+
+import requests as r
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -200,6 +203,60 @@ def get_organization_users(
         return ErrorResponse(reason="Don\'t have required permissions")
     result = db_session.query(DBOrganizationUser).filter(DBOrganizationUser.organization_id == organization_id).all()
     return OrganizationUsersGetResponse(users=get_uniq_users(result))
+
+
+@router.post(
+    '/organizations/{organization_id}/bots',
+    response_model=Union[AddBotPostResponse, ErrorResponse],
+    responses={
+        '200': {'model': AddBotPostResponse},
+        '400': {'model': ErrorResponse},
+        '401': {'model': ErrorResponse},
+        '403': {'model': ErrorResponse},
+        '409': {'model': ErrorResponse}
+    }
+)
+def add_organization_bot(
+        organization_id: int,
+        response: Response, body: AddBotPostRequest, db_session=Depends(get_session),
+        current_user: DBUser = Depends(get_current_user)
+) -> Union[AddBotPostResponse, ErrorResponse]:
+    if current_user.organization_bindings.join(DBPermission).filter(
+            DBOrganizationUser.organization_id == organization_id, DBPermission.level >= 4).count() == 0:
+        response.status_code = 403
+        return ErrorResponse(reason="Don\'t have required permissions")
+    req = r.get(f'https://api.telegram.org/bot{body.token}/getMe')
+    if req.status_code != 200:
+        return ErrorResponse(reason="Invalid token")
+    db_model = DBOrganizationBot(organization_id=organization_id, bot_token=body.token)
+    db_session.add(db_model)
+    try:
+        db_session.commit()
+    except:
+        response.status_code = 409
+        return ErrorResponse(reason="conflict")
+    return AddBotPostResponse(id=db_model.bot_id)
+
+
+@router.get(
+    '/organizations/{organization_id}/bots',
+    response_model=Union[ListBotGetResponse, ErrorResponse],
+    responses={
+        '200': {'model': ListBotGetResponse},
+        '401': {'model': ErrorResponse},
+        '403': {'model': ErrorResponse}
+    }
+)
+def get_organization_bots(
+        organization_id: int,
+        response=Response, db_session=Depends(get_session), current_user=Depends(get_current_user)
+) -> Union[ListBotGetResponse, ErrorResponse]:
+    if current_user.organization_bindings.join(DBPermission).filter(
+            DBOrganizationUser.organization_id == organization_id, DBPermission.level >= 4).count() == 0:
+        response.status_code = 403
+        return ErrorResponse(reason="Don\'t have required permissions")
+    result = db_session.query(DBOrganizationBot).filter(DBOrganizationBot.organization_id == organization_id).all()
+    return ListBotGetResponse(bots=[Bot(**i.dict()) for i in result])
 
 
 app.include_router(router)
