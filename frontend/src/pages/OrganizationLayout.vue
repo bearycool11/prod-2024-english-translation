@@ -163,7 +163,7 @@ import { store } from '@/store/index.js'
 import { toggleSidebar } from '@/store/toggleSidebar.js'
 import { onMounted, ref } from 'vue'
 import { api } from '@/logic/api.js'
-const users = ref()
+
 const name = ref()
 // const id = router.params.
 const props = defineProps({
@@ -176,9 +176,7 @@ onMounted(() => {
   api.getOrganizationInfo(props.id).then((data) => {
     name.value = data.name
   })
-  api.getOrganizationUsers(props.id).then((data) => {
-    users.value = data
-  })
+
   api.getMyPermissions(props.id).then((data) => {
     store.auth.permissions = data
   })

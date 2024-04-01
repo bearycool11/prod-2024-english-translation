@@ -6,7 +6,7 @@ export const store = reactive({
     isLoading: true,
     username: '',
     bot_id: 0,
-    permissions: {}
+    permissions: []
   },
   ui: {
     isSideBarOpen: false
