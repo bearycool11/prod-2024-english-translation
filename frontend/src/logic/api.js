@@ -1,6 +1,8 @@
 import axios from 'axios'
 import { store } from '@/store/index.js'
 
+import.meta.env.VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL ?? '/api'
+
 class Api {
   constructor() {
     this.client = axios.create()

@@ -23,6 +23,8 @@ services:
     ports:
       - "4173:4173"
     restart: always
+    environment:
+      - VITE_BACKEND_URL=/
     networks:
       smm_ya:
         ipv4_address: 172.31.0.2
