@@ -10,13 +10,13 @@ from starlette.responses import Response
 
 from database.database_connector import get_session
 from database.models import DBUser, DBOrganization, DBOrganizationUser, DBPermission, DBOrganizationBot, DBChannels, \
-    DBPost
+    DBPost, SentStatus
 from models import StatusResponse, AuthSignInPostResponse, AuthSignInPostRequest, ErrorResponse, ProfileResponse, \
     AuthRegisterPostRequest, UserProfile, Organization, OrganizationCreatePostResponse, OrganizationCreatePostRequest, \
     UserOrganizationsGetResponse, OrganizationUsersGetResponse, OrganizationUser, UserPublicProfile, UserRight, \
     AddBotPostResponse, AddBotPostRequest, ListBotGetResponse, Bot, AddUserPostRequest, AddUserPostResponse, \
     DeleteUserResponse, DeleteUserRequest, AddChannelPostResponse, AddChannelPostRequest, GetChannelsResponse, Channel, \
-    DeleteChannelRequest, DeleteChannelResponse, PrivateSetPostStatusRequest
+    DeleteChannelRequest, DeleteChannelResponse, GetActivePostsResponse, PrivateSetPostStatusRequest, Post
 from tools.auth import create_access_token, get_current_user
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -458,6 +458,27 @@ def delete_channel_from_organization(
     db_session.query(DBChannels).filter(DBChannels.id == body.id).delete()
     db_session.commit()
     return DeleteChannelResponse(id=body.id)
+
+
+@router.get(
+    '/organizations/{organization_id}/posts',
+    response_model=Union[GetActivePostsResponse, ErrorResponse],
+    responses={
+        '200': {'model': GetActivePostsResponse},
+        '401': {'model': ErrorResponse},
+        '403': {'model': ErrorResponse}
+    }
+)
+def get_active_posts(
+        organization_id: int,
+        response: Response, db_session: Session = Depends(get_session), current_user=Depends(get_current_user)
+) -> Union[GetActivePostsResponse, ErrorResponse]:
+    if current_user.organization_bindings.join(DBPermission).filter(
+            DBOrganizationUser.organization_id == organization_id).count() == 0:
+        response.status_code = 403
+        return ErrorResponse(reason="Don\'t have required permissions")
+    posts = db_session.query(DBPost).filter(DBPost.sent_status != SentStatus.SENT_OK).all()
+    return GetActivePostsResponse(posts=[Post(**i.dict()) for i in posts])
 
 
 @router.get(

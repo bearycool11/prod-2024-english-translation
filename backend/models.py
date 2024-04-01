@@ -1,6 +1,9 @@
+import datetime
 from typing import Optional
 
 from pydantic import BaseModel, Field
+
+from database.models import SentStatus, Status
 
 
 class StatusResponse(BaseModel):
@@ -141,3 +144,19 @@ class DeleteChannelResponse(BaseModel):
 class PrivateSetPostStatusRequest(BaseModel):
     post_id: int
     post_status: str
+
+
+class Post(BaseModel):
+    id: int
+    organization_id: int
+    created_by: int
+    content: str
+    revision_id: int
+    is_approved: Status
+    comment: str
+    planned_time: Optional[datetime.datetime]
+    sent_status: SentStatus
+
+
+class GetActivePostsResponse(BaseModel):
+    posts: list[Post]
