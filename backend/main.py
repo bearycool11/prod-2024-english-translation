@@ -9,7 +9,7 @@ from starlette.requests import Request
 from starlette.responses import Response
 
 from database.database_connector import get_session
-from database.models import DBUser, DBOrganization, DBOrganizationUser, DBPermission, DBOrganizationBot, DBChannels, \
+from database.models import DBUser, DBOrganization, DBOrganizationUser, DBPermission, DBOrganizationBot, DBChannel, \
     DBPost, SentStatus
 from models import StatusResponse, AuthSignInPostResponse, AuthSignInPostRequest, ErrorResponse, ProfileResponse, \
     AuthRegisterPostRequest, UserProfile, Organization, OrganizationCreatePostResponse, OrganizationCreatePostRequest, \
@@ -387,9 +387,9 @@ def get_organization_channels(
         response.status_code = 403
         return ErrorResponse(reason="Don\'t have required permissions")
     return GetChannelsResponse(channels=[Channel(**i.dict()) for i in
-                                         db_session.query(DBChannels).join(DBOrganizationBot).filter(
+                                         db_session.query(DBChannel).join(DBOrganizationBot).filter(
                                              DBOrganizationBot.organization_id == organization_id,
-                                             DBOrganizationBot.bot_id == DBChannels.bot_id).all()])
+                                             DBOrganizationBot.bot_id == DBChannel.bot_id).all()])
 
 
 @router.post(
@@ -416,10 +416,10 @@ def add_channel_to_organization(
                                                   DBOrganizationBot.organization_id == organization_id).count() == 0:
         response.status_code = 403
         return ErrorResponse(reason="Don\'t have required permissions")
-    if db_session.query(DBChannels).filter(DBChannels.id == body.id).count() != 0:
+    if db_session.query(DBChannel).filter(DBChannel.id == body.id).count() != 0:
         response.status_code = 409
         return ErrorResponse(reason="Channel already exists")
-    db_model = DBChannels(**body.dict())
+    db_model = DBChannel(**body.dict())
     token = db_session.query(DBOrganizationBot).filter(DBOrganizationBot.bot_id == body.bot_id,
                                                        DBOrganizationBot.organization_id == organization_id).first().bot_token
     channel_info = r.get(f'https://api.telegram.org/bot{token}/getChat?chat_id={body.id}')
@@ -451,11 +451,11 @@ def delete_channel_from_organization(
             DBOrganizationUser.organization_id == organization_id, DBPermission.level >= 4).count() == 0:
         response.status_code = 403
         return ErrorResponse(reason="Don\'t have required permissions")
-    if db_session.query(DBChannels).join(DBOrganizationBot).filter(DBChannels.id == body.id,
-                                                                   DBOrganizationBot.organization_id == organization_id).count() == 0:
+    if db_session.query(DBChannel).join(DBOrganizationBot).filter(DBChannel.id == body.id,
+                                                                  DBOrganizationBot.organization_id == organization_id).count() == 0:
         response.status_code = 404
         return ErrorResponse(reason="No such channel")
-    db_session.query(DBChannels).filter(DBChannels.id == body.id).delete()
+    db_session.query(DBChannel).filter(DBChannel.id == body.id).delete()
     db_session.commit()
     return DeleteChannelResponse(id=body.id)
 

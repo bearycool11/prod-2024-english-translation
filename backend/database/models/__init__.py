@@ -1,10 +1,10 @@
 import datetime
+import enum
 from typing import Optional
 
-from sqlalchemy import Column, BigInteger
+from sqlalchemy import Column, BigInteger, Table, ForeignKey, Integer, UniqueConstraint
 from sqlalchemy.dialects.postgresql import JSON
 from sqlmodel import SQLModel, Field, Relationship
-import enum
 
 
 class Status(enum.Enum):
@@ -31,7 +31,8 @@ class DBUser(SQLModel, table=True):
     name: str = Field(max_length=50)
     is_admin: bool = Field(default=False)
 
-    organization_bindings: list["DBOrganizationUser"] = Relationship(back_populates="user", sa_relationship_kwargs={"lazy": "dynamic"})
+    organization_bindings: list["DBOrganizationUser"] = Relationship(back_populates="user",
+                                                                     sa_relationship_kwargs={"lazy": "dynamic"})
 
 
 class DBPost(SQLModel, table=True):
@@ -43,9 +44,15 @@ class DBPost(SQLModel, table=True):
     content: str
     revision_id: int = Field(default=1, primary_key=True)
     is_approved: Status = Field(default=Status.OPEN)
-    comment: str
+    comment: Optional[str]
     planned_time: Optional[datetime.datetime]
     sent_status: SentStatus = Field(default=SentStatus.NOT_READY)
+
+    channels: list["DBChannel"] = Relationship(sa_relationship_kwargs={"secondary": "post_channel_bindings",
+                                                                       "primaryjoin": "DBPost.id==post_channel_bindings.c.post_id",
+                                                                       "secondaryjoin": "DBChannel.id==post_channel_bindings.c.channel_id",
+                                                                       "backref": "posts",
+                                                                       "lazy": "dynamic"})
 
 
 class DBPermission(SQLModel, table=True):
@@ -56,12 +63,19 @@ class DBPermission(SQLModel, table=True):
     can_grant: bool = Field(default=False)
 
 
-class DBChannels(SQLModel, table=True):
+class DBChannel(SQLModel, table=True):
     __tablename__ = "channels"
 
-    id: int = Field(sa_column=Column(BigInteger, primary_key=True))
+    id: int = Field(sa_column=Column(BigInteger, primary_key=True, unique=True))
     bot_id: int = Field(foreign_key="organization_bots.bot_id")
     name: str
+
+    posts: list[DBPost] = Relationship(sa_relationship_kwargs={"secondary": "post_channel_bindings",
+                                                               "primaryjoin": "DBChannel.id==post_channel_bindings.c.channel_id",
+                                                               "secondaryjoin": "DBPost.id==post_channel_bindings.c.post_id",
+                                                               "backref": "channels",
+                                                               "lazy": "dynamic"})
+
 
 class DBOrganizationUser(SQLModel, table=True):
     __tablename__ = "organization_users"
@@ -100,3 +114,12 @@ class DBTask(SQLModel, table=True):
     handler: str
     arguments: dict = Field(default_factory=dict, sa_column=Column(JSON))
     planned_time: datetime.datetime
+
+
+post_channel_bindings = Table(
+    "post_channel_bindings",
+    SQLModel.metadata,
+    Column("post_id", Integer, ForeignKey("posts.id"), primary_key=True),
+    Column("channel_id", Integer, ForeignKey("channels.id"), primary_key=True),
+    UniqueConstraint('post_id', 'channel_id', name='_post_channel_bindings_uc'),
+)
