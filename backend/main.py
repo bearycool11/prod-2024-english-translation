@@ -443,7 +443,7 @@ def add_channel_to_organization(
         '404': {'model': ErrorResponse}
     }
 )
-def detete_channel_from_organization(
+def delete_channel_from_organization(
         organization_id: int,
         response: Response, body: DeleteChannelRequest, db_session: Session = Depends(get_session),
         current_user=Depends(get_current_user)
