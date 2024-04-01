@@ -286,7 +286,7 @@ def change_user_permissions(
     if user is None:
         response.status_code = 404
         return ErrorResponse(reason="User not found")
-    db_session.query(DBOrganizationUser).filter(DBOrganizationUser.user_id == user.id).delete()
+    db_session.query(DBOrganizationUser).filter(DBOrganizationUser.user_id == user.user.id).delete()
     for permission in body.permissions:
         db_model = DBOrganizationUser(user_id=user.id, organization_id=organization_id, permission=permission)
         db_session.add(db_model)
