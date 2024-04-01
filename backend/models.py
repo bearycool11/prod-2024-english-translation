@@ -151,11 +151,11 @@ class Post(BaseModel):
     id: Optional[int]
     organization_id: int
     created_by: int
-    created_by_name: str
+    created_by_name: Optional[str]
     content: str
     revision_id: int
     is_approved: Status
-    comment: str
+    comment: Optional[str]
     planned_time: Optional[datetime.datetime] = None
     sent_status: SentStatus
 
