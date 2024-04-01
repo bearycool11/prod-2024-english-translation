@@ -10,14 +10,14 @@ from starlette.responses import Response
 
 from database.database_connector import get_session
 from database.models import DBUser, DBOrganization, DBOrganizationUser, DBPermission, DBOrganizationBot, DBChannel, \
-    DBPost, SentStatus
+    DBPost, SentStatus, Status, DBTask
 from models import StatusResponse, AuthSignInPostResponse, AuthSignInPostRequest, ErrorResponse, ProfileResponse, \
     AuthRegisterPostRequest, UserProfile, Organization, OrganizationCreatePostResponse, OrganizationCreatePostRequest, \
     UserOrganizationsGetResponse, OrganizationUsersGetResponse, OrganizationUser, UserPublicProfile, UserRight, \
     AddBotPostResponse, AddBotPostRequest, ListBotGetResponse, Bot, AddUserPostRequest, AddUserPostResponse, \
     DeleteUserResponse, DeleteUserRequest, AddChannelPostResponse, AddChannelPostRequest, GetChannelsResponse, Channel, \
     DeleteChannelRequest, DeleteChannelResponse, GetActivePostsResponse, PrivateSetPostStatusRequest, Post, \
-    AddNewPostRequest, AddNewPostResponse
+    AddNewPostRequest, AddNewPostResponse, ScheduleTimeRequest, PostIdResponse
 from tools.auth import create_access_token, get_current_user
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -512,6 +512,48 @@ def get_active_posts(
         return ErrorResponse(reason="Don\'t have required permissions")
     posts = db_session.query(DBPost).filter(DBPost.sent_status != SentStatus.SENT_OK).all()
     return GetActivePostsResponse(posts=[Post(**i.dict()) for i in posts])
+
+
+@router.post(
+    '/organizations/{organization_id}/posts/{post_id}/schedule',
+    response_model=Union[PostIdResponse, ErrorResponse],
+    responses={
+        '200': {'model': PostIdResponse},
+        '400': {'model': ErrorResponse},
+        '401': {'model': ErrorResponse},
+        '403': {'model': ErrorResponse},
+        '404': {'model': ErrorResponse},
+    }
+)
+def schedule_post(organization_id: int, post_id: int, response: Response, body: ScheduleTimeRequest,
+                  db_session: Session = Depends(get_session),
+                  current_user=Depends(get_current_user)) -> Union[PostIdResponse, ErrorResponse]:
+    if current_user.organization_bindings.join(DBPermission).filter(
+            DBOrganizationUser.organization_id == organization_id, DBPermission.level in [2, 4, 5]).count() == 0:
+        response.status_code = 403
+        return ErrorResponse(reason="Don\'t have required permissions")
+    post_model = db_session.query(DBPost).join(DBOrganization).filter(DBPost.id == post_id,
+                                                                      DBOrganization.id == organization_id).order_by(
+        DBPost.revision_id.desc()).first()
+    if post_model is None:
+        response.status_code = 404
+        return ErrorResponse(reason="Not found")
+    if post_model.is_approved != Status.APPROVED or post_model.sent_status != SentStatus.NOT_READY:
+        response.status_code = 400
+        return ErrorResponse(reason="Post must be approved")
+    if post_model.organization.bots.count() == 0:
+        response.status_code = 400
+        return ErrorResponse(reason="Organization has not any bots")
+    post_model.planned_time = body.time
+    post_model.sent_status = SentStatus.WAITING
+    db_session.add(post_model)
+    for channel in post_model.channels:
+        task = DBTask(handler="send_message", arguments={"bot_token": channel.bot.bot_token, "channel_id": channel.id,
+                                                         "message_text": post_model.content, "post_id": post_model.id},
+                      planned_time=body.time)
+        db_session.add(task)
+    db_session.commit()
+    return PostIdResponse(**post_model.dict())
 
 
 @router.get(

@@ -53,6 +53,7 @@ class DBPost(SQLModel, table=True):
                                                                        "secondaryjoin": "DBChannel.id==post_channel_bindings.c.channel_id",
                                                                        "back_populates": "posts",
                                                                        "lazy": "dynamic"})
+    organization: "DBOrganization" = Relationship()
 
 
 class DBPermission(SQLModel, table=True):
@@ -75,6 +76,7 @@ class DBChannel(SQLModel, table=True):
                                                                "secondaryjoin": "DBPost.id==post_channel_bindings.c.post_id",
                                                                "back_populates": "channels",
                                                                "lazy": "dynamic"})
+    bot: "DBOrganizationBot" = Relationship()
 
 
 class DBOrganizationUser(SQLModel, table=True):
@@ -97,6 +99,7 @@ class DBOrganization(SQLModel, table=True):
     description: Optional[str] = Field(default=None, max_length=150)
 
     user_bindings: DBOrganizationUser = Relationship(back_populates="organization")
+    bots: list["DBOrganization"] = Relationship(back_populates="organization")
 
 
 class DBOrganizationBot(SQLModel, table=True):
@@ -105,6 +108,8 @@ class DBOrganizationBot(SQLModel, table=True):
     organization_id: int = Field(foreign_key="organizations.id")
     bot_id: int = Field(primary_key=True)
     bot_token: str
+
+    organization: DBOrganization = Relationship(back_populates="bots")
 
 
 class DBTask(SQLModel, table=True):

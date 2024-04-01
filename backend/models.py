@@ -165,5 +165,14 @@ class GetActivePostsResponse(BaseModel):
 class AddNewPostRequest(BaseModel):
     content: str
 
+
 class AddNewPostResponse(BaseModel):
     post: Post
+
+
+class ScheduleTimeRequest(BaseModel):
+    time: datetime.datetime
+
+
+class PostIdResponse(BaseModel):
+    id: int
