@@ -6,7 +6,7 @@
         <div class="flex items-center">
           <button
             @click="toggleSidebar"
-            v-if="$route.name === 'OrganizationPage'"
+            v-if="$route.name != 'AllOrganization'"
             type="button"
             class="text-gray-400 sm:hidden bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
             data-modal-toggle="crud-modal"
@@ -78,7 +78,7 @@
             <p class="md:flex hidden">Организация</p>
           </button>
         </div>
-        <div class="flex items-center lg:order-2" v-if="$route.name == 'OrganizationPage'">
+        <div class="flex items-center lg:order-2" v-if="$route.name != 'AllOrganization'">
           <a
             href="/"
             class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
