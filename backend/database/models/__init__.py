@@ -100,7 +100,7 @@ class DBOrganization(SQLModel, table=True):
     description: Optional[str] = Field(default=None, max_length=150)
 
     user_bindings: DBOrganizationUser = Relationship(back_populates="organization")
-    bots: list["DBOrganization"] = Relationship(back_populates="organization")
+    bots: list["DBOrganizationBot"] = Relationship(back_populates="organization")
 
 
 class DBOrganizationBot(SQLModel, table=True):
