@@ -97,6 +97,28 @@ class Api {
         return data.users
       })
   }
+
+  getOrganizationBots(id) {
+    return this.client
+      .get(`${import.meta.env.VITE_BACKEND_URL}/organizations/${id}/bots`)
+      .then(({ data }) => {
+        if(data.reason) {
+          return null
+        }
+        return data.bots
+      })
+  }
+
+  createOrganizationBots(id, token) {
+    return this.client
+      .post(`${import.meta.env.VITE_BACKEND_URL}/organizations/${id}/bots`, {token:  token})
+      .then(({ data }) => {
+        if(data.reason) {
+          return null
+        }
+        return data.id
+      })
+  }
 }
 
 export const api = new Api()
