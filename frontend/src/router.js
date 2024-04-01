@@ -12,6 +12,11 @@ const router = createRouter({
       },
       children: [
         {
+          path: '/',
+          name: 'AllOrganization',
+          component: () => import('./pages/AllOrganizations.vue')
+        },
+        {
           path: '/organization/:id',
           name: 'OrganizationPage',
           component: () => import('./pages/OrganizationLayout.vue'),
