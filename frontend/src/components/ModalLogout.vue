@@ -84,7 +84,6 @@ export default defineComponent({
     isShown: Boolean,
     closeModal: Function
   },
-
   methods: {
     async logout() {
       localStorage.removeItem('token')

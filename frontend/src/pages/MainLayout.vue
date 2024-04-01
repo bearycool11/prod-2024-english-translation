@@ -28,7 +28,7 @@
               />
             </svg>
           </button>
-          <button class="cursor-pointer flex items-center font-medium text-xl">Username</button>
+          <button class="cursor-pointer flex items-center font-medium text-xl">{{ profile.name }}</button>
           <button class="ml-3 bg-red-100 p-[2px] hover:bg-red-200 rounded flex" @click="toggleLogout">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -56,6 +56,15 @@
             Добавить организацию
           </button>
         </div>
+        <div class="flex items-center lg:order-2" v-if="$route.name == 'OrganizationPage'">
+          <a
+           href="/"
+            class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            type="button"
+          >
+            Все организации
+        </a>
+        </div>
       </div>
     </nav>
   </div>
@@ -74,6 +83,7 @@ import { api } from '@/logic/api.js'
 export default defineComponent({
   components: { ModalNewOrganization, ModalLogout },
   async beforeMount() {
+    api.getProfile().then((profile) => { this.profile = profile});
     api.getOrganizations().then((organizations) => {
       store.data.organizations = organizations
     })
@@ -82,7 +92,8 @@ export default defineComponent({
     return {
       isShowModal: false,
       isShowModalLogout: false,
-      organizations: []
+      organizations: [],
+      profile: ''
     }
   },
   methods: {

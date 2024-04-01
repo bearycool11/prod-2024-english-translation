@@ -80,6 +80,12 @@ class Api {
   async syncAuth() {
     return await this.client.get(`${import.meta.env.VITE_BACKEND_URL}/auth/check`)
   }
+
+  getProfile() {
+    return this.client.get(`${import.meta.env.VITE_BACKEND_URL}/auth/profile`).then(({ data }) => {
+      return data.profile
+    })
+  }
 }
 
 export const api = new Api()
