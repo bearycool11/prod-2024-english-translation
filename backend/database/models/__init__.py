@@ -1,3 +1,4 @@
+import datetime
 from typing import Optional
 
 from sqlalchemy import Column
@@ -90,3 +91,4 @@ class DBTask(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
     handler: str
     arguments: dict = Field(default_factory=dict, sa_column=Column(JSON))
+    planned_time: datetime.datetime
