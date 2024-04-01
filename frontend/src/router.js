@@ -23,12 +23,11 @@ const router = createRouter({
             {
               path: '',
               name: 'posts',
-              component: () => import('./components/ModalLogout.vue'),
+              component: () => import('./components/ModalLogout.vue')
             },
             {
               path: 'users',
-              name: 'users',
-            
+              name: 'users'
             },
             {
               path: 'history',
@@ -50,8 +49,7 @@ const router = createRouter({
           path: '',
           name: 'AllOrganization',
           component: () => import('./pages/AllOrganizations.vue')
-        },
-        
+        }
       ]
     },
     {

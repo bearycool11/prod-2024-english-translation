@@ -12,15 +12,21 @@
         <div
           v-for="(bot, index) in store.data.bots"
           :key="index"
-          class="mt-4 p-6  bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700"
-        ><div class="flex items-center">
-          <h5 class="mb-2 text-2xl font-bold truncate tracking-tight text-gray-900 dark:text-white">
-            Телеграм бот {{ bot.bot_id }}
-          </h5>
-          <button class="ml-4 mb-2 p-1 text-red-600 bg-red-100 hover:bg-red-200 rounded-md font-medium flex">Удалить</button>
-        </div>
+          class="mt-4 p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700"
+        >
+          <div class="flex items-center">
+            <h5
+              class="mb-2 text-2xl font-bold truncate tracking-tight text-gray-900 dark:text-white"
+            >
+              Телеграм бот {{ bot.bot_id }}
+            </h5>
+            <button
+              class="ml-4 mb-2 p-1 text-red-600 bg-red-100 hover:bg-red-200 rounded-md font-medium flex"
+            >
+              Удалить
+            </button>
+          </div>
           <p class="truncate max-w-60 w-auto">{{ replaceAfterColon(bot.bot_token) }}</p>
-          
         </div>
       </div>
     </div>
@@ -73,10 +79,10 @@ onMounted(() => {
   api.getOrganizationBots(props.id).then((data) => {
     store.data.bots = data
     console.log(store.data.bots.length === 0)
-  if (store.data.bots.length === 0) {
-    store.data.canAddBots = true
-  }
+    if (store.data.bots.length === 0) {
+      store.data.canAddBots = true
+    }
   })
-//   console.log(store.data.canAddBots)
+  //   console.log(store.data.canAddBots)
 })
 </script>
