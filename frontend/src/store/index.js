@@ -10,6 +10,7 @@ export const store = reactive({
   },
   data: {
     organizations: [],
-    bots: []
+    bots: [],
+    canAddBots: false
   }
 })

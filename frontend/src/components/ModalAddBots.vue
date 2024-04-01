@@ -109,6 +109,7 @@ export default defineComponent({
           api.getOrganizationBots(this.id).then((bots) => {
             store.data.bots = bots
           })
+          store.data.canAddBots = false
           this.closeModal()
         })
         .catch((e) => {

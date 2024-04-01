@@ -41,6 +41,7 @@ const router = createRouter({
             {
               path: 'social',
               name: 'social networks',
+              props: true,
               component: () => import('./pages/SocialNetworks.vue')
             }
           ]
