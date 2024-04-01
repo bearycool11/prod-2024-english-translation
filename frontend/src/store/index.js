@@ -3,7 +3,8 @@ import { reactive } from 'vue'
 export const store = reactive({
   auth: {
     isAuth: false,
-    isLoading: true
+    isLoading: true,
+    username: ''
   },
   ui: {
     isSideBarOpen: false

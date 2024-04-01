@@ -1,5 +1,5 @@
 <template>
-  <div class="flex">
+  <div class="flex" v-if="profile.name">
     <RouterView class="flex" v-if="$route.name != 'AllOrganization'" />
     <nav
       class="bg-white border-gray-200 lg:px-6 sm:px-8 px-2 py-2.5 dark:bg-gray-800 w-full absolute z-50 shadow-md"
@@ -30,9 +30,9 @@
               />
             </svg>
           </button>
-          <button class="cursor-pointer flex items-center font-medium text-xl">
+          <a class="cursor-pointer flex items-center font-medium text-xl" href="/">
             {{ profile.name }}
-          </button>
+          </a>
           <button
             class="ml-3 bg-red-100 p-[2px] hover:bg-red-200 rounded flex"
             @click="toggleLogout"
@@ -97,8 +97,9 @@ import { api } from '@/logic/api.js'
 
 export default defineComponent({
   components: { ModalNewOrganization, ModalLogout },
-  async beforeMount() {
+  beforeMount() {
     api.getProfile().then((profile) => {
+      store.auth.username = profile.name
       this.profile = profile
     })
     api.getOrganizations().then((organizations) => {

@@ -37,11 +37,11 @@ class Api {
     )
   }
 
-  async register({ login, password }) {
+  async register({ login, password, name }) {
     await this.client.post(`${import.meta.env.VITE_BACKEND_URL}/auth/register`, {
       login,
       password,
-      name: login
+      name
     })
     const { data } = await this.client.post(`${import.meta.env.VITE_BACKEND_URL}/auth/sign-in`, {
       login,
@@ -120,6 +120,17 @@ class Api {
       })
       .catch(() => {
         throw 'Неправильный токен'
+      })
+  }
+
+  getOrganizationInfo(id) {
+    return this.client
+      .get(`${import.meta.env.VITE_BACKEND_URL}/organizations/${id}`)
+      .then(({ data }) => {
+        if (data.reason) {
+          return null
+        }
+        return data
       })
   }
 }
