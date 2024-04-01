@@ -56,6 +56,11 @@ def get_uniq_users(users: list[DBOrganizationUser]):
     return uniq_users
 
 
+def get_user(user: DBOrganizationUser):
+    return OrganizationUser(user=UserPublicProfile(**user.user.dict()),
+                            rights=[UserRight(**user.permission_data.dict())])
+
+
 def check_if_all_permissions_in_db(permissions: list[str], session: Session):
     permissions_from_db = [i.name for i in session.query(DBPermission).all()]
     for i in range(len(permissions)):
@@ -510,7 +515,8 @@ def get_active_posts(
             DBOrganizationUser.organization_id == organization_id).count() == 0:
         response.status_code = 403
         return ErrorResponse(reason="Don\'t have required permissions")
-    posts: list[DBPost] = db_session.query(DBPost).filter(DBPost.sent_status != SentStatus.SENT_OK, DBPost.organization_id == organization_id).all()
+    posts: list[DBPost] = db_session.query(DBPost).filter(DBPost.sent_status != SentStatus.SENT_OK,
+                                                          DBPost.organization_id == organization_id).all()
     return GetPostsResponse(posts=[Post(**i.dict(), created_by_username=i.user.login) for i in posts])
 
 
@@ -532,7 +538,9 @@ def edit_post(
             DBOrganizationUser.organization_id == organization_id).count() == 0:
         response.status_code = 403
         return ErrorResponse(reason="Don\'t have required permissions")
-    if db_session.query(DBPost).filter(DBPost.id == body.id, DBPost.organization_id == organization_id, DBPost.sent_status != SentStatus.SENT_OK, DBPost.sent_status != SentStatus.WAITING).count() == 0:
+    if db_session.query(DBPost).filter(DBPost.id == body.id, DBPost.organization_id == organization_id,
+                                       DBPost.sent_status != SentStatus.SENT_OK,
+                                       DBPost.sent_status != SentStatus.WAITING).count() == 0:
         response.status_code = 403
         return ErrorResponse(reason="Don\'t have required permissions")
     if (body.is_approved is not None) and current_user.organization_bindings.join(DBPermission).filter(
@@ -584,7 +592,8 @@ def get_inactive_posts(
             DBOrganizationUser.organization_id == organization_id).count() == 0:
         response.status_code = 403
         return ErrorResponse(reason="Don\'t have required permissions")
-    posts = db_session.query(DBPost).filter(DBPost.sent_status == SentStatus.SENT_OK, DBPost.organization_id == organization_id).all()
+    posts = db_session.query(DBPost).filter(DBPost.sent_status == SentStatus.SENT_OK,
+                                            DBPost.organization_id == organization_id).all()
     return GetPostsResponse(posts=[Post(**i.dict()) for i in posts])
 
 
@@ -594,18 +603,23 @@ def get_inactive_posts(
     responses={
         '200': {'model': OrganizationUser},
         '401': {'model': ErrorResponse},
-        '403': {'model': ErrorResponse}
+        '404': {'model': ErrorResponse}
     }
 )
 def get_my_permissions(
         organization_id: int,
-        response: Response, current_user=Depends(get_current_user)
+        response: Response, current_user=Depends(get_current_user), db_session=Depends(get_session)
 ) -> Union[OrganizationUser, ErrorResponse]:
     if current_user.organization_bindings.join(DBPermission).filter(
             DBOrganizationUser.organization_id == organization_id).count() == 0:
         response.status_code = 403
         return ErrorResponse(reason="Don\'t have required permissions")
-    return OrganizationUser(**current_user.to_dict())
+    user_data = db_session.query(DBOrganizationUser).filter(DBOrganizationUser.organization_id == organization_id,
+                                                            DBOrganizationUser.user_id == current_user).first()
+    if user_data is None:
+        response.status_code = 404
+        return ErrorResponse(reason="Not found")
+    return get_user(user_data)
 
 
 @router.post(
