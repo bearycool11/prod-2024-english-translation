@@ -100,7 +100,9 @@ class DBOrganization(SQLModel, table=True):
     description: Optional[str] = Field(default=None, max_length=150)
 
     user_bindings: DBOrganizationUser = Relationship(back_populates="organization")
-    bots: list["DBOrganizationBot"] = Relationship(back_populates="organization")
+    bots: list["DBOrganizationBot"] = Relationship(back_populates="organization", sa_relationship_kwargs={
+        "primaryjoin": "DBOrganizationBot.organization_id==DBOrganization.id"
+    })
 
 
 class DBOrganizationBot(SQLModel, table=True):
