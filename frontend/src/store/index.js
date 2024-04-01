@@ -9,6 +9,7 @@ export const store = reactive({
     isSideBarOpen: false
   },
   data: {
-    organizations: []
+    organizations: [],
+    bots: []
   }
 })

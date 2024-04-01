@@ -91,7 +91,7 @@ class Api {
     return this.client
       .get(`${import.meta.env.VITE_BACKEND_URL}/organizations/${id}/users`)
       .then(({ data }) => {
-        if(data.reason) {
+        if (data.reason) {
           return null
         }
         return data.users
@@ -102,7 +102,7 @@ class Api {
     return this.client
       .get(`${import.meta.env.VITE_BACKEND_URL}/organizations/${id}/bots`)
       .then(({ data }) => {
-        if(data.reason) {
+        if (data.reason) {
           return null
         }
         return data.bots
@@ -111,12 +111,15 @@ class Api {
 
   createOrganizationBots(id, token) {
     return this.client
-      .post(`${import.meta.env.VITE_BACKEND_URL}/organizations/${id}/bots`, {token:  token})
+      .post(`${import.meta.env.VITE_BACKEND_URL}/organizations/${id}/bots`, { token: token })
       .then(({ data }) => {
-        if(data.reason) {
-          return null
+        if (data.reason) {
+          throw 'Неверный токен'
         }
         return data.id
+      })
+      .catch(() => {
+        throw 'Неправильный токен'
       })
   }
 }
