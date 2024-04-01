@@ -583,7 +583,7 @@ def get_inactive_posts(
             DBOrganizationUser.organization_id == organization_id).count() == 0:
         response.status_code = 403
         return ErrorResponse(reason="Don\'t have required permissions")
-    posts = db_session.query(DBPost).filter(DBPost.sent_status == SentStatus.SENT_OK).all()
+    posts = db_session.query(DBPost).filter(DBPost.sent_status == SentStatus.SENT_OK, DBPost.organization_id == organization_id).all()
     return GetPostsResponse(posts=[Post(**i.dict()) for i in posts])
 
 
