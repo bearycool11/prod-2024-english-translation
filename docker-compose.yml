@@ -71,7 +71,7 @@ services:
       - smm_ya_backend
     environment:
       - POSTGRES_CONN=postgresql://root:root@smm_ya_database:5432/smm_ya_database
-    # restart: always
+    restart: always
     networks:
       smm_ya:
         ipv4_address: 172.31.0.6
