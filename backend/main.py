@@ -11,7 +11,7 @@ from database.models import DBUser, DBOrganization, DBOrganizationUser, DBPermis
 from models import PingResponse, AuthSignInPostResponse, AuthSignInPostRequest, ErrorResponse, ProfileResponse, \
     AuthRegisterPostRequest, UserProfile, Organization, OrganizationCreatePostResponse, OrganizationCreatePostRequest, \
     UserOrganizationsGetResponse, OrganizationUsersGetResponse, OrganizationUser, UserPublicProfile, UserRight, \
-    AddBotPostResponse, AddBotPostRequest, ListBotGetResponse, Bot
+    AddBotPostResponse, AddBotPostRequest, ListBotGetResponse, Bot, AddUserPostRequest, AddUserPostResponse
 from tools.auth import create_access_token, get_current_user
 
 import requests as r
@@ -203,6 +203,43 @@ def get_organization_users(
         return ErrorResponse(reason="Don\'t have required permissions")
     result = db_session.query(DBOrganizationUser).filter(DBOrganizationUser.organization_id == organization_id).all()
     return OrganizationUsersGetResponse(users=get_uniq_users(result))
+
+
+@router.post(
+    '/organizations/{organization_id}/users',
+    response_model=Union[AddUserPostResponse, ErrorResponse],
+    responses={
+        '200': {'model': AddUserPostResponse},
+        '401': {'model': ErrorResponse},
+        '403': {'model': ErrorResponse},
+        '404': {'model': ErrorResponse},
+        '409': {'model': ErrorResponse}
+    }
+)
+def add_user_to_organization(
+        organization_id: int,
+        response: Response, body: AddUserPostRequest, db_session: Session = Depends(get_session),
+        current_user=Depends(get_current_user)
+) -> Union[AddUserPostResponse, ErrorResponse]:
+    if current_user.organization_bindings.join(DBPermission).filter(
+            DBOrganizationUser.organization_id == organization_id, DBPermission.level >= 4).count() == 0:
+        response.status_code = 403
+        return ErrorResponse(reason="Don\'t have required permissions")
+    user = db_session.query(DBUser).filter_by(login=body.login).first()
+    if user is None:
+        response.status_code = 404
+        return ErrorResponse(reason="User not found")
+    if user.organization_bindings.filter(DBOrganizationUser.organization_id == organization_id).count() != 0:
+        response.status_code = 409
+        return ErrorResponse(reason="conflict")
+    db_model = DBOrganizationUser(user_id=user.id, organization_id=organization_id, permission="viewer")
+    db_session.add(db_model)
+    try:
+        db_session.commit()
+    except:
+        response.status_code = 409
+        return ErrorResponse(reason="conflict")
+    return AddUserPostResponse(user=UserPublicProfile(**user.dict()))
 
 
 @router.post(

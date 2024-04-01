@@ -75,6 +75,7 @@ class Bot(BaseModel):
     bot_id: int
     bot_token: str
 
+
 class OrganizationUsersGetResponse(BaseModel):
     users: list[OrganizationUser]
 
@@ -89,3 +90,11 @@ class AddBotPostResponse(BaseModel):
 
 class ListBotGetResponse(BaseModel):
     bots: list[Bot]
+
+
+class AddUserPostRequest(BaseModel):
+    login: str
+
+
+class AddUserPostResponse(BaseModel):
+    user: UserPublicProfile
