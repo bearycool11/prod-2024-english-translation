@@ -94,7 +94,15 @@ class ListBotGetResponse(BaseModel):
 
 class AddUserPostRequest(BaseModel):
     login: str
+    permissions: list[str]
 
 
 class AddUserPostResponse(BaseModel):
+    user: UserPublicProfile
+
+
+class DeleteUserRequest(BaseModel):
+    login: str
+
+class DeleteUserResponse(BaseModel):
     user: UserPublicProfile

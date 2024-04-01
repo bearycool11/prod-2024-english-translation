@@ -11,10 +11,13 @@ from database.models import DBUser, DBOrganization, DBOrganizationUser, DBPermis
 from models import PingResponse, AuthSignInPostResponse, AuthSignInPostRequest, ErrorResponse, ProfileResponse, \
     AuthRegisterPostRequest, UserProfile, Organization, OrganizationCreatePostResponse, OrganizationCreatePostRequest, \
     UserOrganizationsGetResponse, OrganizationUsersGetResponse, OrganizationUser, UserPublicProfile, UserRight, \
-    AddBotPostResponse, AddBotPostRequest, ListBotGetResponse, Bot, AddUserPostRequest, AddUserPostResponse
+    AddBotPostResponse, AddBotPostRequest, ListBotGetResponse, Bot, AddUserPostRequest, AddUserPostResponse, \
+    DeleteUserResponse, DeleteUserRequest
 from tools.auth import create_access_token, get_current_user
 
 import requests as r
+
+import uvicorn
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -50,6 +53,16 @@ def get_uniq_users(users: list[DBOrganizationUser]):
                 OrganizationUser(user=UserPublicProfile(**i.user.dict()),
                                  rights=[UserRight(**i.permission_data.dict())]))
     return uniq_users
+
+
+def check_if_all_permissions_in_db(permissions: list[str], session: Session):
+    permissions_from_db = [i.name for i in session.query(DBPermission).all()]
+    for i in range(len(permissions)):
+        if permissions[i] in permissions_from_db:
+            continue
+        else:
+            return False
+    return True
 
 
 app = FastAPI(
@@ -210,6 +223,7 @@ def get_organization_users(
     response_model=Union[AddUserPostResponse, ErrorResponse],
     responses={
         '200': {'model': AddUserPostResponse},
+        '400': {'model': ErrorResponse},
         '401': {'model': ErrorResponse},
         '403': {'model': ErrorResponse},
         '404': {'model': ErrorResponse},
@@ -221,6 +235,9 @@ def add_user_to_organization(
         response: Response, body: AddUserPostRequest, db_session: Session = Depends(get_session),
         current_user=Depends(get_current_user)
 ) -> Union[AddUserPostResponse, ErrorResponse]:
+    if not check_if_all_permissions_in_db(body.permissions, db_session) or len(body.permissions) == 0:
+        response.status_code = 400
+        return ErrorResponse(reason="Wrong permission type")
     if current_user.organization_bindings.join(DBPermission).filter(
             DBOrganizationUser.organization_id == organization_id, DBPermission.level >= 4).count() == 0:
         response.status_code = 403
@@ -240,6 +257,43 @@ def add_user_to_organization(
         response.status_code = 409
         return ErrorResponse(reason="conflict")
     return AddUserPostResponse(user=UserPublicProfile(**user.dict()))
+
+
+@router.delete(
+    '/organizations/{organization_id}/users',
+    response_model=Union[DeleteUserResponse, ErrorResponse],
+    responses={
+        '200': {'model': DeleteUserResponse},
+        '401': {'model': ErrorResponse},
+        '403': {'model': ErrorResponse},
+        '404': {'model': ErrorResponse}
+    }
+)
+def delete_user_from_organization(
+        organization_id: int,
+        response: Response, body: DeleteUserRequest, db_session: Session = Depends(get_session),
+        current_user: DBUser = Depends(get_current_user)
+) -> Union[DeleteUserResponse, ErrorResponse]:
+    if current_user.organization_bindings.join(DBPermission).filter(
+            DBOrganizationUser.organization_id == organization_id, DBPermission.level >= 4).count() == 0:
+        response.status_code = 403
+        return ErrorResponse(reason="Don\'t have required permissions")
+    user_to_delete = db_session.query(DBUser).filter_by(login=body.login).first()
+    if user_to_delete is None or user_to_delete.organization_bindings.filter(
+            DBOrganizationUser.organization_id == organization_id).count() == 0:
+        response.status_code = 404
+        return ErrorResponse(reason="No such user in organization")
+    current_user_level = current_user.organization_bindings.join(DBPermission).order_by(
+        DBPermission.level.desc()).filter(
+        DBOrganizationUser.organization_id == organization_id).first().permission_data.level
+    if user_to_delete.organization_bindings.join(DBPermission).filter(
+            DBOrganizationUser.organization_id == organization_id,
+            DBPermission.level >= current_user_level).count() != 0:
+        response.status_code = 403
+        return ErrorResponse(reason="You can\'t delete admin or owner")
+    user_to_delete.organization_bindings.filter(DBOrganizationUser.organization_id == organization_id).delete()
+    db_session.commit()
+    return DeleteUserResponse(user=UserPublicProfile(**user_to_delete.dict()))
 
 
 @router.post(
@@ -317,3 +371,4 @@ def get_organization_info(
 
 
 app.include_router(router)
+# uvicorn.run(app, host='0.0.0.0', port=5437, log_level="debug")
