@@ -16,8 +16,8 @@ from models import StatusResponse, AuthSignInPostResponse, AuthSignInPostRequest
     UserOrganizationsGetResponse, OrganizationUsersGetResponse, OrganizationUser, UserPublicProfile, UserRight, \
     AddBotPostResponse, AddBotPostRequest, ListBotGetResponse, Bot, AddUserPostRequest, AddUserPostResponse, \
     DeleteUserResponse, DeleteUserRequest, AddChannelPostResponse, AddChannelPostRequest, GetChannelsResponse, Channel, \
-    DeleteChannelRequest, DeleteChannelResponse, GetActivePostsResponse, PrivateSetPostStatusRequest, Post, \
-    AddNewPostRequest, AddNewPostResponse, ScheduleTimeRequest, PostIdResponse
+    DeleteChannelRequest, DeleteChannelResponse, GetPostsResponse, PrivateSetPostStatusRequest, Post, \
+    AddNewPostRequest, AddNewPostResponse, EditPostResponse, EditPostRequest, ScheduleTimeRequest, PostIdResponse
 from tools.auth import create_access_token, get_current_user
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -495,9 +495,9 @@ def add_new_post(
 
 @router.get(
     '/organizations/{organization_id}/posts',
-    response_model=Union[GetActivePostsResponse, ErrorResponse],
+    response_model=Union[GetPostsResponse, ErrorResponse],
     responses={
-        '200': {'model': GetActivePostsResponse},
+        '200': {'model': GetPostsResponse},
         '401': {'model': ErrorResponse},
         '403': {'model': ErrorResponse}
     }
@@ -505,13 +505,90 @@ def add_new_post(
 def get_active_posts(
         organization_id: int,
         response: Response, db_session: Session = Depends(get_session), current_user=Depends(get_current_user)
-) -> Union[GetActivePostsResponse, ErrorResponse]:
+) -> Union[GetPostsResponse, ErrorResponse]:
     if current_user.organization_bindings.join(DBPermission).filter(
             DBOrganizationUser.organization_id == organization_id).count() == 0:
         response.status_code = 403
         return ErrorResponse(reason="Don\'t have required permissions")
-    posts = db_session.query(DBPost).filter(DBPost.sent_status != SentStatus.SENT_OK).all()
-    return GetActivePostsResponse(posts=[Post(**i.dict()) for i in posts])
+    posts: list[DBPost] = db_session.query(DBPost).filter(DBPost.sent_status != SentStatus.SENT_OK).all()
+    return GetPostsResponse(posts=[Post(**i.dict(), created_by_username=i.user.login) for i in posts])
+
+
+@router.patch(
+    '/organizations/{organization_id}/posts',
+    response_model=Union[EditPostResponse, ErrorResponse],
+    responses={
+        '200': {'model': EditPostResponse},
+        '401': {'model': ErrorResponse},
+        '403': {'model': ErrorResponse}
+    }
+)
+def edit_post(
+        organization_id: int,
+        response: Response, body: EditPostRequest, db_session: Session = Depends(get_session),
+        current_user=Depends(get_current_user)
+) -> Union[EditPostResponse, ErrorResponse]:
+    if current_user.organization_bindings.filter(
+            DBOrganizationUser.organization_id == organization_id).count() == 0:
+        response.status_code = 403
+        return ErrorResponse(reason="Don\'t have required permissions")
+    if db_session.query(DBPost).filter(DBPost.id == body.id, DBPost.organization_id == organization_id).count() == 0:
+        response.status_code = 403
+        return ErrorResponse(reason="Don\'t have required permissions")
+    if (body.is_approved is not None) and current_user.organization_bindings.join(DBPermission).filter(
+            DBOrganizationUser.organization_id == organization_id, DBPermission.level.in_([2, 3, 4, 5])).count() == 0:
+        response.status_code = 403
+        return ErrorResponse(reason="Don\'t have required permissions")
+    if (body.content is not None) and current_user.organization_bindings.join(DBPermission).filter(
+            DBOrganizationUser.organization_id == organization_id, DBPermission.level.in_([2, 4, 5])).count() == 0:
+        response.status_code = 403
+        return ErrorResponse(reason="Don\'t have required permissions")
+    if (body.comment is not None or body.sent_status is not None) and current_user.organization_bindings.join(
+            DBPermission).filter(
+        DBOrganizationUser.organization_id == organization_id, DBPermission.level.in_([3, 4, 5])).count() == 0:
+        response.status_code = 403
+        return ErrorResponse(reason="Don\'t have required permissions")
+    db_model = db_session.query(DBPost).filter(DBPost.id == body.id)
+    if body.is_approved is not None:
+        db_model.update({
+            DBPost.is_approved: body.is_approved
+        })
+    if body.content is not None:
+        db_model.update({
+            DBPost.content: body.content,
+            DBPost.revision_id: DBPost.revision_id + 1
+        })
+    if body.comment is not None:
+        db_model.update({
+            DBPost.comment: body.comment
+        })
+    if body.sent_status is not None:
+        db_model.update({
+            DBPost.sent_status: body.sent_status
+        })
+    db_session.commit()
+    return EditPostResponse(post=Post(**db_model.first().dict()))
+
+
+@router.get(
+    '/organizations/{organization_id}/inactive_posts',
+    response_model=Union[GetPostsResponse, ErrorResponse],
+    responses={
+        '200': {'model': GetPostsResponse},
+        '401': {'model': ErrorResponse},
+        '403': {'model': ErrorResponse}
+    }
+)
+def get_inactive_posts(
+        organization_id: int,
+        response: Response, db_session: Session = Depends(get_session), current_user=Depends(get_current_user)
+) -> Union[GetPostsResponse, ErrorResponse]:
+    if current_user.organization_bindings.join(DBPermission).filter(
+            DBOrganizationUser.organization_id == organization_id).count() == 0:
+        response.status_code = 403
+        return ErrorResponse(reason="Don\'t have required permissions")
+    posts = db_session.query(DBPost).filter(DBPost.sent_status == SentStatus.SENT_OK).all()
+    return GetPostsResponse(posts=[Post(**i.dict()) for i in posts])
 
 
 @router.post(

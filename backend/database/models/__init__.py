@@ -16,7 +16,7 @@ class Status(enum.Enum):
 
 class SentStatus(enum.Enum):
     NOT_READY = "NOT_READY"
-    TIME_NOT_ENTERED = "TIME_NOT_ENTERED"
+    TIME_NOT_ENTERED = "TIME_NOT_ENTERED"  # not using this one
     WAITING = "WAITING"
     SENT_OK = "SENT_OK"
     SENT_ERROR = "SENT_ERROR"
@@ -33,7 +33,7 @@ class DBUser(SQLModel, table=True):
 
     organization_bindings: list["DBOrganizationUser"] = Relationship(back_populates="user",
                                                                      sa_relationship_kwargs={"lazy": "dynamic"})
-
+    posts: list["DBPost"] = Relationship(back_populates="user")
 
 class DBPost(SQLModel, table=True):
     __tablename__ = "posts"
@@ -48,6 +48,7 @@ class DBPost(SQLModel, table=True):
     planned_time: Optional[datetime.datetime]
     sent_status: SentStatus = Field(default=SentStatus.NOT_READY)
 
+    user: DBUser = Relationship(back_populates="posts")
     channels: list["DBChannel"] = Relationship(sa_relationship_kwargs={"secondary": "post_channel_bindings",
                                                                        "primaryjoin": "DBPost.id==post_channel_bindings.c.post_id",
                                                                        "secondaryjoin": "DBChannel.id==post_channel_bindings.c.channel_id",

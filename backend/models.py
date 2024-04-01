@@ -39,6 +39,7 @@ class UserProfile(BaseModel):
 class UserPublicProfile(BaseModel):
     id: int
     name: str = Field(max_length=50)
+    login: str = Field(max_length=50)
 
 
 class ProfileResponse(BaseModel):
@@ -150,6 +151,7 @@ class Post(BaseModel):
     id: Optional[int]
     organization_id: int
     created_by: int
+    created_by_username: str
     content: str
     revision_id: int
     is_approved: Status
@@ -158,7 +160,7 @@ class Post(BaseModel):
     sent_status: SentStatus
 
 
-class GetActivePostsResponse(BaseModel):
+class GetPostsResponse(BaseModel):
     posts: list[Post]
 
 
@@ -167,6 +169,18 @@ class AddNewPostRequest(BaseModel):
 
 
 class AddNewPostResponse(BaseModel):
+    post: Post
+
+
+class EditPostRequest(BaseModel):
+    id: int
+    content: Optional[str] = None
+    is_approved: Optional[str] = None
+    comment: Optional[str] = None
+    sent_status: Optional[str] = None
+
+
+class EditPostResponse(BaseModel):
     post: Post
 
 
