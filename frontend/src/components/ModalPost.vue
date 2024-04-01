@@ -83,40 +83,20 @@
 </template>
 <script>
 import { defineComponent } from 'vue'
-import { api } from '@/logic/api.js'
-import { store } from '@/store/index.js'
+//   import { api } from '@/logic/api.js'
+//   import { store } from '@/store/index.js'
 
 export default defineComponent({
   props: {
     isShown: Boolean,
-    closeModal: Function,
-    id: String,
-    botId: Number
+    closeModal: Function
   },
   data() {
     return {
-      ch_id: '',
       text: ''
     }
   },
 
-  methods: {
-    async addChannel() {
-      console.log()
-      api
-        .addChannels(this.id, this.ch_id, this.botId)
-        .then(() => {
-          api.getChannels(this.id).then((channels) => {
-            store.data.channels = channels
-          })
-
-          this.closeModal()
-        })
-        .catch((e) => {
-          this.text = ''
-          this.text = e
-        })
-    }
-  }
+  methods: {}
 })
 </script>

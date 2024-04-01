@@ -12,8 +12,8 @@
         <p class="flex px-6 py-2 rounded-md bg-neutral-100 w-auto">Сначала добавьте бота</p>
       </div>
       <div class="flex justify-evenly flex-wrap"></div>
-    
-    <div class="flex justify-evenly flex-wrap">
+
+      <div class="flex justify-evenly flex-wrap">
         <div
           v-for="(channel, index) in store.data.channels"
           :key="index"
@@ -26,7 +26,7 @@
               {{ channel.name }}
             </h5>
             <button
-            @click="deleteChannel(channel.id)"
+              @click="deleteChannel(channel.id)"
               class="ml-4 mb-2 p-1 text-red-600 bg-red-100 hover:bg-red-200 rounded-md font-medium flex"
             >
               Удалить
@@ -37,7 +37,12 @@
       </div>
     </div>
   </div>
-  <ModalAddChannels :isShown="isShowModal" :closeModal="closeModal" :id="props.id" :botId="store.auth.bot_id"/>
+  <ModalAddChannels
+    :isShown="isShowModal"
+    :closeModal="closeModal"
+    :id="props.id"
+    :botId="store.auth.bot_id"
+  />
 </template>
 <script setup>
 import { onMounted, ref } from 'vue'
@@ -66,9 +71,9 @@ onMounted(() => {
   })
 
   api.getChannels(props.id).then((channels) => {
-            store.data.channels = channels
-    })
-console.log(store.data.channels)
+    store.data.channels = channels
+  })
+  console.log(store.data.channels)
 })
 function closeModal() {
   isShowModal.value = false
@@ -81,14 +86,11 @@ const props = defineProps({
 })
 
 function deleteChannel(ch_id) {
-    console.log(ch_id)
-    api.deleteChannels(props.id, ch_id).then(() => {
-        api.getChannels(props.id).then((channels) => {
-            store.data.channels = channels
+  console.log(ch_id)
+  api.deleteChannels(props.id, ch_id).then(() => {
+    api.getChannels(props.id).then((channels) => {
+      store.data.channels = channels
     })
-    })
-
+  })
 }
-
-onMounted(() => {})
 </script>

@@ -23,7 +23,8 @@ const router = createRouter({
             {
               path: '',
               name: 'posts',
-              component: () => import('./components/ModalLogout.vue')
+              props: true,
+              component: () => import('./pages/PostsPage.vue')
             },
             {
               path: 'users',
