@@ -282,7 +282,7 @@ def change_user_permissions(
             DBOrganizationUser.organization_id == organization_id, DBPermission.level >= 4).count() == 0:
         response.status_code = 403
         return ErrorResponse(reason="Don\'t have required permissions")
-    user = db_session.query(DBOrganizationUser).filter(DBOrganizationUser.user.login == body.login).first()
+    user = db_session.query(DBOrganizationUser).join(DBUser).filter(DBUser.login == body.login).first()
     if user is None:
         response.status_code = 404
         return ErrorResponse(reason="User not found")
