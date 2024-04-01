@@ -51,9 +51,6 @@ services:
     container_name: SMM-ya-nginx
     ports:
       - "80:80"
-    depends_on:
-      - smm_ya_backend
-      - smm_ya_frontend
     networks:
       smm_ya:
         ipv4_address: 172.31.0.5
