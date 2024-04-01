@@ -48,11 +48,6 @@ const router = createRouter({
               props: true,
               component: () => import('./pages/SocialNetworks.vue')
             },
-            {
-              path: 'posts',
-              name: 'posts',
-              component: () => import('./pages/Posts.vue')
-            },
           ]
         },
         {
