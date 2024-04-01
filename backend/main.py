@@ -589,9 +589,9 @@ def get_inactive_posts(
 
 @router.get(
     '/organizations/{organization_id}/mypermissions',
-    response_model=Union[GetActivePostsResponse, ErrorResponse],
+    response_model=Union[OrganizationUsersGetResponse, ErrorResponse],
     responses={
-        '200': {'model': GetActivePostsResponse},
+        '200': {'model': OrganizationUsersGetResponse},
         '401': {'model': ErrorResponse},
         '403': {'model': ErrorResponse}
     }
