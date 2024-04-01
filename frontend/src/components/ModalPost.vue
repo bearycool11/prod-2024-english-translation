@@ -8,14 +8,14 @@
     v-if="isShown"
     class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50"
   >
-    <div class="relative p-4 w-full max-w-md max-h-full top-0 right-0 left-0 z-50">
+    <div class="relative p-4 w-full max-w-lg max-h-full top-0 right-0 left-0 z-50">
       <div class="relative bg-white rounded-lg shadow dark:bg-gray-700 min-w-80">
         <div
           class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600"
         >
           <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Пост</h3>
           <button
-            @click="closeModal"
+            @click="this.$props.closeModal"
             type="button"
             class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
             
@@ -75,7 +75,7 @@
                 clip-rule="evenodd"
               ></path>
             </svg>
-            Добавить канал
+           {{ buttonText }}
           </button>
         </form>
       </div>
@@ -105,6 +105,7 @@ export default defineComponent({
   data() {
     return {
       text: '',
+      buttonText: 'Создать пост',
       areaContent: ''
     }
   },

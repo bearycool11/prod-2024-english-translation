@@ -14,7 +14,7 @@
       <div class="flex justify-evenly flex-wrap"></div>
 
       <div class="flex justify-evenly flex-wrap">
-        <div
+        <button
           v-for="(post, index) in store.data.posts"
           :key="index"
           @click="openModal(index)"
@@ -35,48 +35,49 @@
             </div>
             <div class="p-2 bg-blue-100 rounded-md">{{ post.sent_status }}</div>
           </div>
-          <ModalPost
-            v-if="isShowModal[index]"
-            :isShown="isShowModal[index]"
-            :closeModal="() => closeModal(index)"
-            :content="post.content"
-            :index="index"
-          />
-          {{ index }}
-        </div>
+        </button>
       </div>
     </div>
   </div>
+  <ModalPost
+          v-if="state.isShowModal"
+          :isShown="state.isShowModal" :closeModal="closeModal" 
+            :content="state.targetPost.content"
+          />
 </template>
 <script setup>
-// import { onMounted, reactive } from 'vue'
-// import { api } from '@/logic/api.js'
-// import ModalPost from '@/components/ModalPost.vue'
-// import { store } from '@/store/index.js'
-// const isShowModal = reactive([false])
+import { onMounted,  reactive } from 'vue'
+import { api } from '@/logic/api.js'
+import ModalPost from '@/components/ModalPost.vue'
+import { store } from '@/store/index.js'
 
-// function openModal(index) {
+const state = reactive({
+  isShowModal: false,
+  targetPost: {}
+})
 
-//     isShowModal[index] = true
-// }
-// onMounted(() => {
-//   api.getPosts(props.id).then((data) => {
-//     store.data.posts = data
-//   })
-// })
+function openModal(index) {
+  state.targetPost = store.data.posts[index];
+  state.isShowModal = true
+}
+onMounted(() => {
+  api.getPosts(props.id).then((data) => {
+    store.data.posts = data
+    state.targetPost = {};
+  })
+})
 
-// function closeModal() {
-//   console.log(1)
-//   isShowModal[0] = false
-// }
+function closeModal() {
+  state.isShowModal = false
+}
 
-// const props = defineProps({
-//   id: {
-//     type: String
-//   }
-// })
+const props = defineProps({
+  id: {
+    type: String
+  }
+})
 </script>
-<script>
+<!-- <script>
 import { defineComponent } from 'vue'
 import { api } from '@/logic/api.js'
 import { store } from '@/store/index.js'
@@ -91,16 +92,16 @@ export default defineComponent({
     return {
       text: '',
       areaContent: '',
-      isShowModal: []
+      isShowModal: false
     }
   },
   methods: {
-    openModal(index) {
-      this.isShowModal[index] = true
+    openModal() {
+      this.isShowModal= true
     },
-    closeModal(index) {
+    closeModal() {
       console.log(1)
-      this.isShowModal[index] = false
+      this.isShowModal = false
     }
   },
   beforeMount() {
@@ -109,4 +110,4 @@ export default defineComponent({
     })
   }
 })
-</script>
+</script> -->
