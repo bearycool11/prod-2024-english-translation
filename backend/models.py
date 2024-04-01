@@ -1,5 +1,6 @@
-from pydantic import BaseModel, Field
 from typing import Optional
+
+from pydantic import BaseModel, Field
 
 
 class PingResponse(BaseModel):
@@ -40,7 +41,8 @@ class UserPublicProfile(BaseModel):
 class UserRights(BaseModel):
     rights: list[str]
 
-class AuthRegisterPostResponse(BaseModel):
+
+class ProfileResponse(BaseModel):
     profile: UserProfile
 
 
@@ -62,6 +64,7 @@ class OrganizationCreatePostResponse(BaseModel):
 class OrganizationUser(BaseModel):
     user: UserPublicProfile
     rights: UserRights
+
 
 class UserOrganizationsGetResponse(BaseModel):
     organizations: list[Organization]

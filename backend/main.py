@@ -8,7 +8,7 @@ from starlette.responses import Response
 
 from database.database_connector import get_session
 from database.models import DBUser, DBOrganization, DBOrganizationUser
-from models import PingResponse, AuthSignInPostResponse, AuthSignInPostRequest, ErrorResponse, AuthRegisterPostResponse, \
+from models import PingResponse, AuthSignInPostResponse, AuthSignInPostRequest, ErrorResponse, ProfileResponse, \
     AuthRegisterPostRequest, UserProfile, Organization, OrganizationCreatePostResponse, OrganizationCreatePostRequest, \
     UserOrganizationsGetResponse
 from tools.auth import create_access_token, get_current_user
@@ -84,17 +84,16 @@ def auth_sign_in(response: Response, body: AuthSignInPostRequest,
 
 @router.post(
     '/auth/register',
-    response_model=Union[AuthRegisterPostResponse, ErrorResponse],
+    response_model=Union[ProfileResponse, ErrorResponse],
     responses={
-        '201': {'model': AuthRegisterPostResponse},
+        '201': {'model': ProfileResponse},
         '400': {'model': ErrorResponse},
         '409': {'model': ErrorResponse},
     },
-    response_model_exclude_none=True,
 )
 def auth_register(
         response: Response, body: AuthRegisterPostRequest, db_session: Session = Depends(get_session)
-) -> Union[AuthRegisterPostResponse, ErrorResponse]:
+) -> Union[ProfileResponse, ErrorResponse]:
     db_model = DBUser(**body.dict())
     db_model.password = get_password_hash(db_model.password)
     db_session.add(db_model)
@@ -104,7 +103,17 @@ def auth_register(
         response.status_code = 409
         return ErrorResponse(reason="conflict")
     response.status_code = 201
-    return AuthRegisterPostResponse(profile=UserProfile(**db_model.dict()))
+    return ProfileResponse(profile=UserProfile(**db_model.dict()))
+
+
+@router.get(
+    '/auth/profile',
+    response_model=ProfileResponse,
+)
+def auth_profile(
+        current_user: DBUser = Depends(get_current_user)
+) -> ProfileResponse:
+    return ProfileResponse(profile=UserProfile(**current_user.dict()))
 
 
 # add new orgs
