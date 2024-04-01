@@ -2,15 +2,12 @@
   <div class="flex px-4 mt-20">
     <div class="w-full">
       <button
-        v-if="store.data.canAddBots === false"
+        v-if="store.auth.permissions.some(obj => obj.name !== 'viewer')"
         @click="openCreateModal"
         class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
       >
         Добавить пост
       </button>
-      <div v-else>
-        <p class="flex px-6 py-2 rounded-md bg-neutral-100 w-auto">Сначала добавьте бота</p>
-      </div>
       <div class="flex justify-evenly flex-wrap"></div>
 
       <div class="flex justify-evenly flex-wrap">
@@ -18,7 +15,7 @@
           v-for="(post, index) in store.data.posts"
           :key="index"
           @click="openModal(index)"
-          class="mt-4 p-6 bg-white border cursor-pointer border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 max-w-md"
+          class="mt-4 p-6 mx-2 bg-white border cursor-pointer border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 max-w-md"
         >
           <div class="flex items-center">
             <h5
@@ -41,7 +38,9 @@
   <ModalPost
     :isShown="state.isShowModal"
     :closeModal="closeModal"
-    :content="state.targetPost.content"
+    :content="state.targetPost"
+    :creation="state.creation"
+    :id="props.id"
   />
 </template>
 <script setup>
@@ -52,7 +51,8 @@ import { store } from '@/store/index.js'
 
 const state = reactive({
   isShowModal: false,
-  targetPost: {}
+  targetPost: {},
+  creation: false
 })
 
 function openModal(index) {
@@ -63,6 +63,7 @@ function openModal(index) {
 function openCreateModal() {
   state.targetPost = {}
   state.isShowModal = true
+  state.creation = true
 }
 onMounted(() => {
   api.getPosts(props.id).then((data) => {
@@ -73,6 +74,7 @@ onMounted(() => {
 
 function closeModal() {
   state.isShowModal = false
+  state.creation = false
 }
 
 const props = defineProps({
@@ -105,37 +107,3 @@ const date = (isoString) => {
   }
 }
 </script>
-<!-- <script>
-import { defineComponent } from 'vue'
-import { api } from '@/logic/api.js'
-import { store } from '@/store/index.js'
-import ModalPost from '@/components/ModalPost.vue'
-export default defineComponent({
-  name: 'PostsPage',
-  components: { ModalPost },
-  props: {
-    id: String
-  },
-  data() {
-    return {
-      text: '',
-      areaContent: '',
-      isShowModal: false
-    }
-  },
-  methods: {
-    openModal() {
-      this.isShowModal= true
-    },
-    closeModal() {
-      console.log(1)
-      this.isShowModal = false
-    }
-  },
-  beforeMount() {
-    api.getPosts(this.id).then((data) => {
-      store.data.posts = data
-    })
-  }
-})
-</script> -->

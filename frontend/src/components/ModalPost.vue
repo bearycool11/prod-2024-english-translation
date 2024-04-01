@@ -9,7 +9,7 @@
     class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50"
   >
     <div class="relative p-4 w-full max-w-lg max-h-full top-0 right-0 left-0 z-50">
-      <div class="relative bg-white rounded-lg shadow dark:bg-gray-700 min-w-80">
+      <div class="relative bg-white rounded-lg shadow dark:bg-gray-700 md:min-w-[600px] w-72">
         <div
           class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600"
         >
@@ -49,9 +49,9 @@
                 name="name"
                 id="name"
                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                placeholder="ID телеграм канала"
+                placeholder="Содержание поста"
                 required
-                :value="content"
+                :value="content.content"
                 @input="(event) => (areaContent = event.target.value)"
               />
             </div>
@@ -82,33 +82,40 @@
 </template>
 <script>
 import { defineComponent } from 'vue'
-//   import { api } from '@/logic/api.js'
-//   import { store } from '@/store/index.js'
+import { api } from '@/logic/api.js'
+import { store } from '@/store/index.js'
 
 export default defineComponent({
   name: 'ModalPost',
   props: {
     isShown: Boolean,
     closeModal: Function,
-    organization_id: Number,
-    created_by: Number,
-    content: String,
-    revision_id: Number,
-    is_approved: String,
-    comment: String,
-    planned_time: String,
-    sent_status: String,
-    index: Number
+    content: Object,
+    creation: Boolean,
+    id: String
   },
   data() {
     return {
       text: '',
-      buttonText: 'Создать пост',
       areaContent: ''
+    }
+  },
+  computed: {
+    buttonText(){
+        console.log(this.creation)
+        return this.creation ? 'Создать пост' : 'Сохранить пост'
     }
   },
   beforeMount() {
     console.log(this.isShown, 1)
+  },
+  methods: {
+    addChannel() {
+        api.addPost(this.id, this.areaContent).then(()=> {
+            api.getPosts(this.id).then((data)=> { store.data.posts = data})
+        })
+        this.closeModal()
+    }
   }
 })
 </script>

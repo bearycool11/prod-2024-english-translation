@@ -241,6 +241,16 @@ class Api {
         return data.rights
       })
   }
+ addPost(id, content) {
+    return this.client
+      .post(`${import.meta.env.VITE_BACKEND_URL}/organizations/${id}/posts`, {content: content})
+      .then(({ data }) => {
+        if (data.reason) {
+          return null
+        }
+        return data.rights
+      })
+  }
 }
 
 export const api = new Api()

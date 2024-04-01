@@ -17,6 +17,7 @@ export const store = reactive({
     organizations: [],
     bots: [],
     canAddBots: false,
-    channels: []
+    channels: [],
+    posts: []
   }
 })

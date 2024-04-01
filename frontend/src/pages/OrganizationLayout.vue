@@ -140,7 +140,7 @@
                 clip-rule="evenodd"
               />
             </svg>
-            <span class="flex-1 ms-3 whitespace-nowrap">Соц. сети</span>
+            <span class="flex-1 ms-3 whitespace-nowrap">Боты</span>
           </router-link>
         </li>
       </ul>
