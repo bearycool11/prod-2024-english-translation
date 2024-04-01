@@ -68,6 +68,7 @@ services:
     container_name: SMM-ya-worker
     depends_on:
       - smm_ya_database
+      - smm_ya_backend
     environment:
       - POSTGRES_CONN=postgresql://root:root@smm_ya_database:5432/smm_ya_database
     # restart: always

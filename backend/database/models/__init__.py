@@ -1,4 +1,7 @@
 from typing import Optional
+
+from sqlalchemy import Column
+from sqlalchemy.dialects.postgresql import JSON
 from sqlmodel import SQLModel, Field, Relationship
 import enum
 
@@ -79,3 +82,11 @@ class DBOrganizationBot(SQLModel, table=True):
     organization_id: int = Field(foreign_key="organizations.id")
     bot_id: int = Field(primary_key=True)
     bot_token: str
+
+
+class DBTask(SQLModel, table=True):
+    __tablename__ = "tasks"
+
+    id: int = Field(default=None, primary_key=True)
+    handler: str
+    arguments: dict = Field(default_factory=dict, sa_column=Column(JSON))
