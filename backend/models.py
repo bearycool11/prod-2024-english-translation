@@ -147,16 +147,23 @@ class PrivateSetPostStatusRequest(BaseModel):
 
 
 class Post(BaseModel):
-    id: int
+    id: Optional[int]
     organization_id: int
     created_by: int
     content: str
     revision_id: int
     is_approved: Status
     comment: str
-    planned_time: Optional[datetime.datetime]
+    planned_time: Optional[datetime.datetime] = None
     sent_status: SentStatus
 
 
 class GetActivePostsResponse(BaseModel):
     posts: list[Post]
+
+
+class AddNewPostRequest(BaseModel):
+    content: str
+
+class AddNewPostResponse(BaseModel):
+    post: Post

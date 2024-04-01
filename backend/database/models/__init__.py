@@ -38,7 +38,7 @@ class DBUser(SQLModel, table=True):
 class DBPost(SQLModel, table=True):
     __tablename__ = "posts"
 
-    id: int = Field(primary_key=True, unique=True)
+    id: int = Field(default=None, primary_key=True, unique=True)
     organization_id: int = Field(foreign_key="organizations.id")
     created_by: int = Field(foreign_key="users.id")
     content: str

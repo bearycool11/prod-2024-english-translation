@@ -16,7 +16,8 @@ from models import StatusResponse, AuthSignInPostResponse, AuthSignInPostRequest
     UserOrganizationsGetResponse, OrganizationUsersGetResponse, OrganizationUser, UserPublicProfile, UserRight, \
     AddBotPostResponse, AddBotPostRequest, ListBotGetResponse, Bot, AddUserPostRequest, AddUserPostResponse, \
     DeleteUserResponse, DeleteUserRequest, AddChannelPostResponse, AddChannelPostRequest, GetChannelsResponse, Channel, \
-    DeleteChannelRequest, DeleteChannelResponse, GetActivePostsResponse, PrivateSetPostStatusRequest, Post
+    DeleteChannelRequest, DeleteChannelResponse, GetActivePostsResponse, PrivateSetPostStatusRequest, Post, \
+    AddNewPostRequest, AddNewPostResponse
 from tools.auth import create_access_token, get_current_user
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -189,7 +190,7 @@ def organization_create(
         '401': {'model': ErrorResponse}
     }
 )
-def get_user_ogranizations(
+def get_user_organizations(
         current_user: DBUser = Depends(get_current_user)
 ) -> Union[UserOrganizationsGetResponse, ErrorResponse]:
     return UserOrganizationsGetResponse(
@@ -248,8 +249,9 @@ def add_user_to_organization(
     if user.organization_bindings.filter(DBOrganizationUser.organization_id == organization_id).count() != 0:
         response.status_code = 409
         return ErrorResponse(reason="conflict")
-    db_model = DBOrganizationUser(user_id=user.id, organization_id=organization_id, permission="viewer")
-    db_session.add(db_model)
+    for permission in body.permissions:
+        db_model = DBOrganizationUser(user_id=user.id, organization_id=organization_id, permission=permission)
+        db_session.add(db_model)
     try:
         db_session.commit()
     except:
@@ -458,6 +460,37 @@ def delete_channel_from_organization(
     db_session.query(DBChannel).filter(DBChannel.id == body.id).delete()
     db_session.commit()
     return DeleteChannelResponse(id=body.id)
+
+
+@router.post(
+    '/organizations/{organization_id}/posts',
+    response_model=Union[AddNewPostResponse, ErrorResponse],
+    responses={
+        '201': {'model': AddNewPostResponse},
+        '400': {'model': ErrorResponse},
+        '401': {'model': ErrorResponse},
+        '403': {'model': ErrorResponse}
+    }
+)
+def add_new_post(
+        organization_id: int,
+        response: Response, body: AddNewPostRequest, db_session: Session = Depends(get_session),
+        current_user: DBUser = Depends(get_current_user)
+) -> Union[AddNewPostResponse, ErrorResponse]:
+    if current_user.organization_bindings.join(DBPermission).filter(
+            DBOrganizationUser.organization_id == organization_id, DBPermission.level.in_([2, 4, 5])).count() == 0:
+        response.status_code = 403
+        return ErrorResponse(reason="Don\'t have required permissions")
+    db_model = DBPost(**body.dict())
+    db_model.organization_id = organization_id
+    db_model.created_by = current_user.id
+    db_model.content = db_model.content
+    db_session.add(db_model)
+    db_session.commit()
+    response.status_code = 201
+    db_model.id = db_session.query(DBPost).order_by(DBPost.id.desc()).first().id
+    post = Post(**db_model.dict())
+    return AddNewPostResponse(post=post)
 
 
 @router.get(
