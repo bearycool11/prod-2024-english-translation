@@ -101,7 +101,7 @@ class AddUserPostRequest(BaseModel):
     permissions: list[str]
 
 
-class AddUserPostResponse(BaseModel):
+class UserPostResponse(BaseModel):
     user: UserPublicProfile
 
 

@@ -14,7 +14,7 @@ from database.models import DBUser, DBOrganization, DBOrganizationUser, DBPermis
 from models import StatusResponse, AuthSignInPostResponse, AuthSignInPostRequest, ErrorResponse, ProfileResponse, \
     AuthRegisterPostRequest, UserProfile, Organization, OrganizationCreatePostResponse, OrganizationCreatePostRequest, \
     UserOrganizationsGetResponse, OrganizationUsersGetResponse, OrganizationUser, UserPublicProfile, UserRight, \
-    AddBotPostResponse, AddBotPostRequest, ListBotGetResponse, Bot, AddUserPostRequest, AddUserPostResponse, \
+    AddBotPostResponse, AddBotPostRequest, ListBotGetResponse, Bot, AddUserPostRequest, UserPostResponse, \
     DeleteUserResponse, DeleteUserRequest, AddChannelPostResponse, AddChannelPostRequest, GetChannelsResponse, Channel, \
     DeleteChannelRequest, DeleteChannelResponse, GetPostsResponse, PrivateSetPostStatusRequest, Post, \
     AddNewPostRequest, AddNewPostResponse, EditPostResponse, EditPostRequest, ScheduleTimeRequest, PostIdResponse
@@ -225,9 +225,9 @@ def get_organization_users(
 
 @router.post(
     '/organizations/{organization_id}/users',
-    response_model=Union[AddUserPostResponse, ErrorResponse],
+    response_model=Union[UserPostResponse, ErrorResponse],
     responses={
-        '200': {'model': AddUserPostResponse},
+        '200': {'model': UserPostResponse},
         '400': {'model': ErrorResponse},
         '401': {'model': ErrorResponse},
         '403': {'model': ErrorResponse},
@@ -239,7 +239,7 @@ def add_user_to_organization(
         organization_id: int,
         response: Response, body: AddUserPostRequest, db_session: Session = Depends(get_session),
         current_user=Depends(get_current_user)
-) -> Union[AddUserPostResponse, ErrorResponse]:
+) -> Union[UserPostResponse, ErrorResponse]:
     if not check_if_all_permissions_in_db(body.permissions, db_session) or len(body.permissions) == 0:
         response.status_code = 400
         return ErrorResponse(reason="Wrong permission type")
@@ -262,7 +262,45 @@ def add_user_to_organization(
     except:
         response.status_code = 409
         return ErrorResponse(reason="conflict")
-    return AddUserPostResponse(user=UserPublicProfile(**user.dict()))
+    return UserPostResponse(user=UserPublicProfile(**user.dict()))
+
+
+@router.patch(
+    '/organizations/{organization_id}/users',
+    response_model=Union[UserPostResponse, ErrorResponse],
+    responses={
+        '200': {'model': UserPostResponse},
+        '401': {'model': ErrorResponse},
+        '403': {'model': ErrorResponse},
+        '404': {'model': ErrorResponse}
+    }
+)
+def change_user_permissions(
+        organization_id: int,
+        response: Response, body: AddUserPostRequest, db_session: Session = Depends(get_session),
+        current_user=Depends(get_current_user)
+) -> Union[UserPostResponse, ErrorResponse]:
+    if not check_if_all_permissions_in_db(body.permissions, db_session) or len(body.permissions) == 0:
+        response.status_code = 400
+        return ErrorResponse(reason="Wrong permission type")
+    if current_user.organization_bindings.join(DBPermission).filter(
+            DBOrganizationUser.organization_id == organization_id, DBPermission.level >= 4).count() == 0:
+        response.status_code = 403
+        return ErrorResponse(reason="Don\'t have required permissions")
+    user = db_session.query(DBOrganizationUser).filter(DBOrganizationUser.user.login == body.login).first()
+    if user is None:
+        response.status_code = 404
+        return ErrorResponse(reason="User not found")
+    db_session.query(DBOrganizationUser).filter(DBOrganizationUser.user_id == user.id).delete()
+    for permission in body.permissions:
+        db_model = DBOrganizationUser(user_id=user.id, organization_id=organization_id, permission=permission)
+        db_session.add(db_model)
+    try:
+        db_session.commit()
+    except:
+        response.status_code = 409
+        return ErrorResponse(reason="conflict")
+    return UserPostResponse(user=UserPublicProfile(**user.dict()))
 
 
 @router.delete(
