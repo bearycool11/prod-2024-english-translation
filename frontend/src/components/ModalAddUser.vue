@@ -72,12 +72,12 @@
                   if (e.target.checked) {
                     this.permissions = [...permissions, right]
                   } else {
-                    this.permissions = permissions.filter((newRight) => newRight !== right)
+                    this.permissions = permissions.map((right) => right?.name || right).filter((newRight) => newRight !== right)
                   }
                 }
               "
               :disabled="right === 'viewer'"
-              :checked="permissions.includes(right)"
+              :checked="isChecked(right)"
               class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
             />
             <label :for="right" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
@@ -129,6 +129,11 @@ export default defineComponent({
   },
 
   methods: {
+    isChecked(right) {
+      return this.permissions.find((permission) => {
+        return permission === right || permission.name === right
+      })
+    },
     async deleteUser() {
       api
         .deleteUser(this.id, this.login)
@@ -141,13 +146,19 @@ export default defineComponent({
     },
     async addUser() {
       if (!!this.$props.initialUser?.user?.login) {
+        console.log(this.permissions);
+
         await api
           .updateUser(this.id, {
             login: this.login,
-            permissions: this.permissions
+            permissions: this.permissions.map((right) => right?.name || right)
           })
           .then((user) => {
-            store.data.users = [{ ...user, rights: this.permissions }, ...[...store.data.users].filter(({ user }) => user.login !== this.login)]
+            const newUsers = [...store.data.users];
+            const index = newUsers.findIndex(({ user }) => user.login === this.login)
+            newUsers[index] = { ...user, rights: this.permissions };
+
+            store.data.users = newUsers;
           })
           .finally(() => {
             this.closeModal()
@@ -156,9 +167,15 @@ export default defineComponent({
       }
 
       api
-        .inviteUser(this.id, { login: this.login, permissions: this.permissions })
+        .inviteUser(this.id, {
+          login: this.login,
+          permissions: this.permissions.map((right) => right?.name || right)
+        })
         .then((user) => {
-          store.data.users = [{ ...user, rights: this.permissions }, ...store.data.users]
+          store.data.users = [...store.data.users, {
+            ...user,
+            rights: this.permissions.map((right) => right?.name || right)
+          }]
         })
         .finally(() => {
           this.closeModal()
