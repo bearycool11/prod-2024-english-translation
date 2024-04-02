@@ -20,7 +20,7 @@
               v-if="
                 mystore.auth.permissions.some((obj) => obj.name === 'admin' || obj.name === 'owner')
               "
-              class="mb-2 z-40 bg-red-100 p-[4px] hover:bg-red-200 rounded flex text-red-600"
+              class="mb-2 z-40 bg-red-100 p-[4px] px-2 hover:bg-red-200 rounded flex text-red-600"
             >
               Удалить
             </button>
@@ -55,6 +55,13 @@
         <form :onsubmit="(e) => e.preventDefault()" class="p-4 md:p-5">
           <div class="grid gap-4 mb-4 grid-cols-2">
             <div class="col-span-2">
+              <div class="mb-2 focus:outline-0" v-if="this.content.is_approved === 'REJECTED'">
+                <div
+                  class="bg-red-100 resize-none focus:outline-0 outline-0 focus:shadow-outline border-0 border-gray-200 text-red-600 text-sm rounded-md block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                >
+                  {{ content.comment }}
+                </div>
+              </div>
               <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                 >Содержание</label
               >
@@ -198,7 +205,7 @@
               </label>
             </div>
           </div>
-          
+
           <div class="flex justify-between flex-wrap">
             <button
               v-if="this.content.is_approved !== 'APPROVED'"
@@ -269,6 +276,25 @@
               </button>
             </div>
           </div>
+          <div v-if="this.content.is_approved === 'WAITING' && this.showCommentArea">
+            <label for="name" class="block my-2 text-sm font-medium text-gray-900 dark:text-white"
+              >Оставьте комментарий</label
+            >
+            <textarea
+              :readonly="
+                !mystore.auth.permissions.some(
+                  (obj) => obj.name === 'editor' || obj.name === 'admin' || obj.name === 'owner'
+                ) || this.content.is_approved === 'APPROVED'
+              "
+              type="text"
+              name="comment"
+              id="comment"
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+              placeholder="Комментарий проверяющего"
+              required
+              v-model="newComment"
+            />
+          </div>
         </form>
       </div>
     </div>
@@ -295,6 +321,7 @@ export default defineComponent({
     return {
       text: '',
       areaContent: '',
+      commentContent: '',
       time: '',
       date: '',
       mystore: null,
@@ -302,6 +329,8 @@ export default defineComponent({
       mychannels: this.$props.channels,
       myId: [],
       passId: [],
+      newComment: '',
+      showCommentArea: false
     }
   },
   computed: {
@@ -313,8 +342,8 @@ export default defineComponent({
   beforeMount() {
     this.text = ''
     this.mystore = store
-    this.avId = this.channels.map((el)=> el.id)
-    this.passId = this.content?.channels?.map((ch)=> ch.id)
+    this.avId = this.channels.map((el) => el.id)
+    this.passId = this.content?.channels?.map((ch) => ch.id)
   },
   methods: {
     isChecked(chid) {
@@ -349,7 +378,7 @@ export default defineComponent({
           .patchPost(this.id, this.post_id, {
             content: content,
             is_approved: this.content.is_approved,
-            channels:  this.myId 
+            channels: this.myId
           })
           .then(() => {
             api.getPosts(this.id).then((data) => {
@@ -381,7 +410,7 @@ export default defineComponent({
       return isoDateTimeString
     },
     sendToReview() {
-      api.patchPost(this.id, this.post_id, { is_approved: 'WAITING',  }).then(() => {
+      api.patchPost(this.id, this.post_id, { is_approved: 'WAITING' }).then(() => {
         api.getPosts(this.id).then((data) => {
           store.data.posts = data
         })
@@ -389,20 +418,28 @@ export default defineComponent({
       this.closeModal()
     },
     approvePost() {
-      api.patchPost(this.id, this.post_id, { is_approved: 'APPROVED' }).then(() => {
-        api.getPosts(this.id).then((data) => {
-          store.data.posts = data
+      api
+        .patchPost(this.id, this.post_id, { is_approved: 'APPROVED', comment: this.newComment })
+        .then(() => {
+          api.getPosts(this.id).then((data) => {
+            store.data.posts = data
+          })
         })
-      })
       this.closeModal()
     },
     rejectPost() {
-      api.patchPost(this.id, this.post_id, { is_approved: 'REJECTED' }).then(() => {
-        api.getPosts(this.id).then((data) => {
-          store.data.posts = data
-        })
-      })
-      this.closeModal()
+      if (this.showCommentArea) {
+        api
+          .patchPost(this.id, this.post_id, { is_approved: 'REJECTED', comment: this.newComment })
+          .then(() => {
+            api.getPosts(this.id).then((data) => {
+              store.data.posts = data
+            })
+          })
+        this.closeModal()
+      } else {
+        this.showCommentArea = true
+      }
     },
     deletePost() {
       api
