@@ -678,7 +678,7 @@ def schedule_post(organization_id: int, post_id: int, response: Response, body: 
         task = DBTask(handler="send_message",
                       arguments={"bot_token": channel.bot.bot_token, "telegram_channel_id": channel.telegram_id,
                                  "message_text": post_model.content, "post_id": post_model.id,
-                                 "channel_id": channel.id},
+                                 "channel_id": channel.id, "organization_id": organization_id},
                       planned_time=body.time)
         db_session.add(task)
     db_session.commit()
