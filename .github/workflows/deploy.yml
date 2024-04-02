@@ -16,3 +16,6 @@ jobs:
             cd /home/ubuntu/SMM-ya/
             git pull
             sudo docker-compose up --build -d
+
+concurrency:
+  group: ${{ github.head_ref ||  github.ref }}
