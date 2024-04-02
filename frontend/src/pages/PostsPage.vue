@@ -1,5 +1,5 @@
 <template>
-  <div class="flex mt-20 w-full">
+  <div class="flex mt-20 w-full h-screen overflow-y-auto ">
     <div class="w-full px-4">
       <button
         v-if="

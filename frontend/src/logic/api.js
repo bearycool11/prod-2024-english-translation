@@ -327,7 +327,6 @@ class Api {
   }
 
   deletePosts(id, post_id) {
-    console.log(post_id)
     return this.client
       .delete(`${import.meta.env.VITE_BACKEND_URL}/organizations/${id}/posts`, {data:{id: post_id}})
       .then(({ data }) => {
@@ -338,6 +337,31 @@ class Api {
         throw 'Не удалось удалить'
       })
   }
+
+  callEmergency(id) {
+    return this.client
+      .post(`${import.meta.env.VITE_BACKEND_URL}/organizations/${id}/block_tasks`)
+      .then(({ data }) => {
+       
+        return data
+      })
+      .catch(() => {
+        throw 'Не работает кнопка'
+      })
+  }
+
+  recallEmergency(id) {
+    return this.client
+      .post(`${import.meta.env.VITE_BACKEND_URL}/organizations/${id}/unblock_tasks`)
+      .then(({ data }) => {
+       
+        return data
+      })
+      .catch(() => {
+        throw 'Не работает кнопка'
+      })
+  }
 }
+
 
 export const api = new Api()
