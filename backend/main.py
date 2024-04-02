@@ -17,7 +17,8 @@ from models import StatusResponse, AuthSignInPostResponse, AuthSignInPostRequest
     AddBotPostResponse, AddBotPostRequest, ListBotGetResponse, Bot, AddUserPostRequest, UserPostResponse, \
     DeleteUserResponse, DeleteUserRequest, AddChannelPostRequest, GetChannelsResponse, Channel, \
     DeleteChannelRequest, DeleteChannelResponse, GetPostsResponse, PrivateSetPostStatusRequest, Post, \
-    AddNewPostRequest, AddNewPostResponse, EditPostResponse, EditPostRequest, ScheduleTimeRequest, PostIdResponse, DeletePostRequest, DeletePostResponse
+    AddNewPostRequest, AddNewPostResponse, EditPostResponse, EditPostRequest, ScheduleTimeRequest, PostIdResponse, \
+    DeletePostRequest, DeletePostResponse
 from tools.auth import create_access_token, get_current_user
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -282,6 +283,10 @@ def change_user_permissions(
             DBOrganizationUser.organization_id == organization_id, DBPermission.level >= 4).count() == 0:
         response.status_code = 403
         return ErrorResponse(reason="Don\'t have required permissions")
+    if ("admin" in body.permissions or "owner" in body.permissions) and current_user.organization_bindings.join(
+            DBPermission).filter(DBOrganizationUser.organization_id == organization_id, DBPermission.level == 5).count() == 0:
+        response.status_code = 403
+        return ErrorResponse(reason="Don\'t have required permissions")
     user = db_session.query(DBOrganizationUser).join(DBUser).filter(DBUser.login == body.login).first()
     if user is None:
         response.status_code = 404
@@ -456,7 +461,8 @@ def add_channel_to_organization(
                                                   DBOrganizationBot.organization_id == organization_id).count() == 0:
         response.status_code = 403
         return ErrorResponse(reason="Don\'t have required permissions")
-    if db_session.query(DBChannel).filter(DBChannel.telegram_id == body.telegram_id, DBChannel.bot_id == body.bot_id).count() != 0:
+    if db_session.query(DBChannel).filter(DBChannel.telegram_id == body.telegram_id,
+                                          DBChannel.bot_id == body.bot_id).count() != 0:
         response.status_code = 409
         return ErrorResponse(reason="Channel already exists")
     db_model = DBChannel(**body.dict())
@@ -529,6 +535,7 @@ def add_new_post(
     post = Post(**db_model.dict(), created_by_name=db_model.user.name,
                 channels=[Channel(**j.dict()) for j in db_model.channels], tags=[k.tag for k in db_model.tag_bindings])
     return AddNewPostResponse(post=post)
+
 
 @router.delete(
     '/organizations/{organization_id}/posts',
@@ -737,8 +744,9 @@ def schedule_post(organization_id: int, post_id: int, response: Response, body: 
     post_model.sent_status = SentStatus.WAITING
     db_session.add(post_model)
     for channel in post_model.channels:
-        task = DBTask(handler="send_message", arguments={"bot_token": channel.bot.bot_token, "channel_id": channel.telegram_id,
-                                                         "message_text": post_model.content, "post_id": post_model.id},
+        task = DBTask(handler="send_message",
+                      arguments={"bot_token": channel.bot.bot_token, "channel_id": channel.telegram_id,
+                                 "message_text": post_model.content, "post_id": post_model.id},
                       planned_time=body.time)
         db_session.add(task)
     db_session.commit()
