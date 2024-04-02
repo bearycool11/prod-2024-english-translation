@@ -210,7 +210,7 @@ export default defineComponent({
     },
     convertToISODateTime(dateString, timeString) {
       const combinedDateTimeString = `${dateString}T${timeString}:00`
-      
+
       const date = new Date(combinedDateTimeString)
 
       const isoDateTimeString = date.toISOString()

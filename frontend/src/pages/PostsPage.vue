@@ -86,28 +86,28 @@ const props = defineProps({
 })
 
 const date = (isoString) => {
- // Check if the input is null
- if (isoString === null) {
-    return '';
- }
+  // Check if the input is null
+  if (isoString === null) {
+    return ''
+  }
 
- // Parse the ISO string into a Date object
- const date = new Date(isoString);
+  // Parse the ISO string into a Date object
+  const date = new Date(isoString)
 
- // Format the date according to the current locale and timezone
- const formattedDate = new Intl.DateTimeFormat('ru-RU', {
+  // Format the date according to the current locale and timezone
+  const formattedDate = new Intl.DateTimeFormat('ru-RU', {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
     hour: '2-digit',
     minute: '2-digit',
     timeZoneName: 'short'
- }).format(date);
+  }).format(date)
 
- // Extract the formatted date and time parts
- const [dayMonthYear, timeWithTimezone] = formattedDate.split(', ');
+  // Extract the formatted date and time parts
+  const [dayMonthYear, timeWithTimezone] = formattedDate.split(', ')
 
- // Return the formatted date with the timezone included
- return 'Запланирован ' + dayMonthYear + ' ' + timeWithTimezone;
+  // Return the formatted date with the timezone included
+  return 'Запланирован ' + dayMonthYear + ' ' + timeWithTimezone
 }
 </script>

@@ -256,13 +256,16 @@ class Api {
   }
   schedulePost(id, time, post_id) {
     return this.client
-      .post(`${import.meta.env.VITE_BACKEND_URL}/organizations/${id}/posts/${post_id}/schedule`, {time: time})
+      .post(`${import.meta.env.VITE_BACKEND_URL}/organizations/${id}/posts/${post_id}/schedule`, {
+        time: time
+      })
       .then(({ data }) => {
         if (data.reason) {
           throw 'Не удалось отправить пост'
         }
         return data.rights
-      }).catch(()=> {
+      })
+      .catch(() => {
         throw 'Не удалось отправить пост'
       })
   }
