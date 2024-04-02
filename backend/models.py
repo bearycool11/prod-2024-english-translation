@@ -140,9 +140,9 @@ class DeleteChannelResponse(BaseModel):
 class PrivateSetPostStatusRequest(BaseModel):
     post_id: int
     post_status: str
-    telegram_message_id: int
-    channel_id: int
-    chat_username: str
+    telegram_message_id: Optional[int] = None
+    channel_id: Optional[int] = None
+    chat_username: Optional[str] = None
 
 
 class PostSentInfo(BaseModel):
