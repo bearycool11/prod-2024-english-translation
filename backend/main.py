@@ -709,7 +709,7 @@ def schedule_post(organization_id: int, post_id: int, response: Response, body: 
     return PostIdResponse(**post_model.dict())
 
 
-@router.get(
+@router.post(
     "/private/set_post_sent_state",
     response_model=Union[StatusResponse, ErrorResponse],
     responses={
