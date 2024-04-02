@@ -35,6 +35,7 @@ class DBUser(SQLModel, table=True):
                                                                      sa_relationship_kwargs={"lazy": "dynamic"})
     posts: list["DBPost"] = Relationship(back_populates="user")
 
+
 class DBPost(SQLModel, table=True):
     __tablename__ = "posts"
 
@@ -48,6 +49,7 @@ class DBPost(SQLModel, table=True):
     sent_status: SentStatus = Field(default=SentStatus.NOT_READY)
 
     user: DBUser = Relationship(back_populates="posts")
+    tag_bindings: list["DBTag"] = Relationship(back_populates="post")
     channels: list["DBChannel"] = Relationship(sa_relationship_kwargs={"secondary": "post_channel_bindings",
                                                                        "primaryjoin": "DBPost.id==post_channel_bindings.c.post_id",
                                                                        "secondaryjoin": "DBChannel.id==post_channel_bindings.c.channel_id",
@@ -122,6 +124,13 @@ class DBTask(SQLModel, table=True):
     handler: str
     arguments: dict = Field(default_factory=dict, sa_column=Column(JSON))
     planned_time: datetime.datetime
+
+
+class DBTag(SQLModel, table=True):
+    tag: str = Field(primary_key=True)
+    post_id: int = Field(foreign_key="posts.id", primary_key=True)
+
+    post: DBPost = Relationship(back_populates="tag_bindings")
 
 
 post_channel_bindings = Table(

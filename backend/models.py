@@ -158,6 +158,7 @@ class Post(BaseModel):
     planned_time: Optional[datetime.datetime] = None
     sent_status: SentStatus
     channels: list[Channel]
+    tags: list[str]
 
 
 class GetPostsResponse(BaseModel):

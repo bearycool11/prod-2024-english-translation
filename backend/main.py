@@ -527,7 +527,8 @@ def add_new_post(
     db_session.commit()
     response.status_code = 201
     db_model.id = db_session.query(DBPost).order_by(DBPost.id.desc()).first().id
-    post = Post(**db_model.dict(), created_by_name=db_model.user.name, channels=[Channel(**j.dict()) for j in db_model.channels])
+    post = Post(**db_model.dict(), created_by_name=db_model.user.name,
+                channels=[Channel(**j.dict()) for j in db_model.channels], tags=[k.tag for k in db_model.tag_bindings])
     return AddNewPostResponse(post=post)
 
 
@@ -551,7 +552,7 @@ def get_active_posts(
     posts: list[DBPost] = db_session.query(DBPost).filter(DBPost.sent_status != SentStatus.SENT_OK,
                                                           DBPost.organization_id == organization_id).all()
     return GetPostsResponse(
-        posts=[Post(**i.dict(), created_by_name=i.user.name, channels=[Channel(**j.dict()) for j in i.channels]) for i
+        posts=[Post(**i.dict(), created_by_name=i.user.name, channels=[Channel(**j.dict()) for j in i.channels], tags=[k.tag for k in i.tag_bindings]) for i
                in posts])
 
 
@@ -616,7 +617,7 @@ def edit_post(
     db_session.add(db_model)
     db_session.commit()
     return EditPostResponse(post=Post(**db_model.dict(), created_by_name=db_model.user.name,
-                                      channels=[Channel(**j.dict()) for j in db_model.channels]))
+                                      channels=[Channel(**j.dict()) for j in db_model.channels], tags=[k.tag for k in db_model.tag_bindings]))
 
 
 @router.get(
@@ -636,10 +637,10 @@ def get_inactive_posts(
             DBOrganizationUser.organization_id == organization_id).count() == 0:
         response.status_code = 403
         return ErrorResponse(reason="Don\'t have required permissions")
-    posts = db_session.query(DBPost).filter(DBPost.sent_status == SentStatus.SENT_OK,
+    posts: list[DBPost] = db_session.query(DBPost).filter(DBPost.sent_status == SentStatus.SENT_OK,
                                             DBPost.organization_id == organization_id).all()
     return GetPostsResponse(
-        posts=[Post(**i.dict(), created_by_name=i.user.name, channels=[Channel(**j.dict()) for j in i.channels]) for i
+        posts=[Post(**i.dict(), created_by_name=i.user.name, channels=[Channel(**j.dict()) for j in i.channels], tags=[k.tag for k in i.tag_bindings]) for i
                in posts])
 
 
