@@ -147,7 +147,6 @@ class PrivateSetPostStatusRequest(BaseModel):
 
 class PostSentInfo(BaseModel):
     id: int
-    channel: Optional[Channel] = None
     telegram_message_id: Optional[int] = None
     chat_username: Optional[str] = None
 

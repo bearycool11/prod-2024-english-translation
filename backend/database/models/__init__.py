@@ -147,7 +147,6 @@ class DbSentPostInfo(SQLModel, table=True):
     chat_username: Optional[str] = Field(nullable=True)
 
     post: DBPost = Relationship(back_populates="sent_infos")
-    channel: DBChannel = Relationship()
 
 
 post_channel_bindings = Table(
