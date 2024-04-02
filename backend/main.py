@@ -535,7 +535,16 @@ def add_new_post(
             DBOrganizationUser.organization_id == organization_id, DBPermission.level.in_([2, 4, 5])).count() == 0:
         response.status_code = 403
         return ErrorResponse(reason="Don\'t have required permissions")
+    channels = body.channels
+    body.channels = []
     db_model = DBPost(**body.dict())
+    for i in channels:
+        channel = db_session.query(DBChannel).join(DBOrganizationBot).filter(DBChannel.id == i,
+                                                                             DBOrganizationBot.organization_id == organization_id).first()
+        if channel is None:
+            response.status_code = 403
+            return ErrorResponse(reason="Don\'t have required permissions")
+        db_model.channels.append(channel)
     db_model.organization_id = organization_id
     db_model.created_by = current_user.id
     db_session.add(db_model)
