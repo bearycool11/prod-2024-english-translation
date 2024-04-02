@@ -482,10 +482,11 @@ def delete_post(
             DBOrganizationUser.organization_id == organization_id, DBPermission.level.in_([4, 5])).count() == 0:
         response.status_code = 403
         return ErrorResponse(reason="Don\'t have required permissions")
-    post = db_session.query(DBPost).filter(DBPost.organization_id == organization_id, DBPost.id == body.id)
-    if post.first() is None:
+    post = db_session.query(DBPost).filter(DBPost.organization_id == organization_id, DBPost.id == body.id).first()
+    if post is None:
         return ErrorResponse(reason="No such post")
-    post.delete()
+    post.channels = []
+    db_session.delete(post)
     db_session.commit()
     return DeletePostResponse(**body.dict())
 
