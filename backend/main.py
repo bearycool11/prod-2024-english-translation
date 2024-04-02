@@ -91,7 +91,7 @@ def ping() -> StatusResponse:
     return StatusResponse(status="ok")
 
 
-@router.get('/auth/check', response_model=StatusResponse)
+@router.get('/auth/check', response_model=StatusResponse, tags=["auth"])
 def auth_check(current_user: DBUser = Depends(get_current_user)) -> StatusResponse:  # noqa: unused
     return StatusResponse(status="ok")
 
@@ -102,7 +102,7 @@ def auth_check(current_user: DBUser = Depends(get_current_user)) -> StatusRespon
     responses={
         '200': {'model': AuthSignInPostResponse},
         '401': {'model': ErrorResponse},
-    },
+    }, tags=["auth"]
 )
 def auth_sign_in(response: Response, body: AuthSignInPostRequest,
                  db_session: Session = Depends(get_session)) -> Union[AuthSignInPostResponse, ErrorResponse]:
@@ -121,7 +121,7 @@ def auth_sign_in(response: Response, body: AuthSignInPostRequest,
         '201': {'model': ProfileResponse},
         '400': {'model': ErrorResponse},
         '409': {'model': ErrorResponse},
-    },
+    }, tags=["auth"]
 )
 def auth_register(
         response: Response, body: AuthRegisterPostRequest, db_session: Session = Depends(get_session)
@@ -140,7 +140,7 @@ def auth_register(
 
 @router.get(
     '/auth/profile',
-    response_model=ProfileResponse,
+    response_model=ProfileResponse, tags=["auth"]
 )
 def auth_profile(
         current_user: DBUser = Depends(get_current_user)
@@ -156,7 +156,8 @@ def auth_profile(
         '400': {'model': ErrorResponse},
         '401': {'model': ErrorResponse},
         '409': {'model': ErrorResponse}
-    }
+    },
+    tags=["organizations"]
 )
 def organization_create(
         response: Response, body: OrganizationCreatePostRequest, db_session=Depends(get_session),
@@ -189,7 +190,7 @@ def organization_create(
     responses={
         '200': {'model': UserOrganizationsGetResponse},
         '401': {'model': ErrorResponse}
-    }
+    }, tags=["organizations"]
 )
 def get_user_organizations(
         current_user: DBUser = Depends(get_current_user)
@@ -205,7 +206,7 @@ def get_user_organizations(
         '200': {'model': OrganizationUsersGetResponse},
         '401': {'model': ErrorResponse},
         '403': {'model': ErrorResponse}
-    }
+    }, tags=["users"]
 )
 def get_organization_users(
         organization_id: int, response: Response, db_session=Depends(get_session),
@@ -229,7 +230,7 @@ def get_organization_users(
         '403': {'model': ErrorResponse},
         '404': {'model': ErrorResponse},
         '409': {'model': ErrorResponse}
-    }
+    }, tags=["users"]
 )
 def add_user_to_organization(
         organization_id: int,
@@ -274,7 +275,7 @@ def add_user_to_organization(
         '401': {'model': ErrorResponse},
         '403': {'model': ErrorResponse},
         '404': {'model': ErrorResponse}
-    }
+    }, tags=["users"]
 )
 def change_user_permissions(
         organization_id: int,
@@ -320,7 +321,7 @@ def change_user_permissions(
         '401': {'model': ErrorResponse},
         '403': {'model': ErrorResponse},
         '404': {'model': ErrorResponse}
-    }
+    }, tags=["users"]
 )
 def delete_user_from_organization(
         organization_id: int,
@@ -358,7 +359,7 @@ def delete_user_from_organization(
         '401': {'model': ErrorResponse},
         '403': {'model': ErrorResponse},
         '409': {'model': ErrorResponse}
-    }
+    }, tags=["bots"]
 )
 def add_organization_bot(
         organization_id: int,
@@ -389,7 +390,7 @@ def add_organization_bot(
         '200': {'model': ListBotGetResponse},
         '401': {'model': ErrorResponse},
         '403': {'model': ErrorResponse}
-    }
+    }, tags=["bots"]
 )
 def get_organization_bots(
         organization_id: int,
@@ -410,7 +411,7 @@ def get_organization_bots(
         '200': {'model': Organization},
         '401': {'model': ErrorResponse},
         '403': {'model': ErrorResponse}
-    }
+    }, tags=["organizations"]
 )
 def get_organization_info(
         organization_id: int,
@@ -430,7 +431,7 @@ def get_organization_info(
         '200': {'model': GetChannelsResponse},
         '401': {'model': ErrorResponse},
         '403': {'model': ErrorResponse}
-    }
+    }, tags=["channels"]
 )
 def get_organization_channels(
         organization_id: int,
@@ -455,7 +456,7 @@ def get_organization_channels(
         '403': {'model': ErrorResponse},
         '404': {'model': ErrorResponse},
         '409': {'model': ErrorResponse}
-    }
+    }, tags=["channels"]
 )
 def add_channel_to_organization(
         organization_id: int,
@@ -495,7 +496,7 @@ def add_channel_to_organization(
         '401': {'model': ErrorResponse},
         '403': {'model': ErrorResponse},
         '404': {'model': ErrorResponse}
-    }
+    }, tags=["channels"]
 )
 def delete_channel_from_organization(
         organization_id: int,
@@ -523,7 +524,7 @@ def delete_channel_from_organization(
         '400': {'model': ErrorResponse},
         '401': {'model': ErrorResponse},
         '403': {'model': ErrorResponse}
-    }
+    }, tags=["posts"]
 )
 def add_new_post(
         organization_id: int,
@@ -554,7 +555,7 @@ def add_new_post(
         '400': {'model': ErrorResponse},
         '401': {'model': ErrorResponse},
         '403': {'model': ErrorResponse}
-    }
+    }, tags=["posts"]
 )
 def add_new_post(
         organization_id: int,
@@ -580,7 +581,7 @@ def add_new_post(
         '200': {'model': GetPostsResponse},
         '401': {'model': ErrorResponse},
         '403': {'model': ErrorResponse}
-    }
+    }, tags=["posts"]
 )
 def get_active_posts(
         organization_id: int,
@@ -605,7 +606,7 @@ def get_active_posts(
         '200': {'model': EditPostResponse},
         '401': {'model': ErrorResponse},
         '403': {'model': ErrorResponse}
-    }
+    }, tags=["posts"]
 )
 def edit_post(
         organization_id: int,
@@ -677,7 +678,7 @@ def edit_post(
         '200': {'model': GetPostsResponse},
         '401': {'model': ErrorResponse},
         '403': {'model': ErrorResponse}
-    }
+    }, tags=["posts"]
 )
 def get_inactive_posts(
         organization_id: int,
@@ -702,7 +703,7 @@ def get_inactive_posts(
         '200': {'model': OrganizationUser},
         '401': {'model': ErrorResponse},
         '404': {'model': ErrorResponse}
-    }
+    }, tags=["permissions"]
 )
 def get_my_permissions(
         organization_id: int,
@@ -729,7 +730,7 @@ def get_my_permissions(
         '401': {'model': ErrorResponse},
         '403': {'model': ErrorResponse},
         '404': {'model': ErrorResponse},
-    }
+    }, tags=["posts"]
 )
 def schedule_post(organization_id: int, post_id: int, response: Response, body: ScheduleTimeRequest,
                   db_session: Session = Depends(get_session),
