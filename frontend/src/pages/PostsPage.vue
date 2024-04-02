@@ -1,6 +1,6 @@
 <template>
   <div class="flex mt-20 w-full">
-    <div class="w-full px-4 w-full">
+    <div class="w-full px-4">
       <button
         v-if="
           store.auth.permissions.some(
@@ -17,7 +17,7 @@
           v-for="(post, index) in store.data.posts"
           :key="index"
           @click="openModal(index)"
-          class="w-full p-6 min-w-sm w-80 bg-white border cursor-pointer border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 max-w-md"
+          class="p-6 min-w-sm w-80 bg-white border cursor-pointer border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 max-w-md"
         >
           <div class="flex items-center justify-between">
             <h5
@@ -88,26 +88,28 @@ const props = defineProps({
 })
 
 const date = (isoString) => {
-  {
-    // Check if the input is null
-    if (isoString === null) {
-      return ''
-    }
+ // Check if the input is null
+ if (isoString === null) {
+    return '';
+ }
 
-    // Parse the ISO string into a Date object
-    const date = new Date(isoString)
+ // Parse the ISO string into a Date object
+ const date = new Date(isoString);
 
-    // Extract the day, month, year, hours, and minutes
-    const day = date.getDate()
-    const month = date.getMonth() + 1 // Months are 0-based in JavaScript
-    const year = date.getFullYear()
-    const hours = date.getHours()
-    const minutes = date.getMinutes()
+ // Format the date according to the current locale and timezone
+ const formattedDate = new Intl.DateTimeFormat('ru-RU', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZoneName: 'short'
+ }).format(date);
 
-    // Format the values into DD.MM.YYYY HH:MM
-    const formattedDate = `${day < 10 ? '0' + day : day}.${month < 10 ? '0' + month : month}.${year} ${hours < 10 ? '0' + hours : hours}:${minutes < 10 ? '0' + minutes : minutes}`
+ // Extract the formatted date and time parts
+ const [dayMonthYear, timeWithTimezone] = formattedDate.split(', ');
 
-    return 'Запланирован ' + formattedDate
-  }
+ // Return the formatted date with the timezone included
+ return 'Запланирован ' + dayMonthYear + ' ' + timeWithTimezone;
 }
 </script>
