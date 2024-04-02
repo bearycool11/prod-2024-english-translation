@@ -3,6 +3,11 @@ import { store } from '@/store/index.js'
 
 import.meta.env.VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL ?? '/api'
 
+function compareISOStrings(a, b) {
+  if (a > b) return -1;
+  if (a < b) return 1;
+  return 0;
+}
 class Api {
   constructor() {
     this.client = axios.create()
@@ -228,7 +233,7 @@ class Api {
         if (data.reason) {
           return null
         }
-        return data.posts
+        return [...data.posts.sort((a, b) => compareISOStrings(a.update_time, b.update_time))].reverse();
       })
   }
   getMyPermissions(id) {
@@ -310,6 +315,22 @@ class Api {
       })
       .catch(() => {
         throw 'Не удалось получить посты'
+      })
+  }
+
+  deletePosts(id, post_id) {
+    console.log(post_id)
+    return this.client
+      .delete(`${import.meta.env.VITE_BACKEND_URL}/organizations/${id}/posts`, {data:{id: post_id}})
+      .then(({ data }) => {
+        if (data.reason) {
+          throw 'Не удалось удалить'
+        }
+
+        return data
+      })
+      .catch(() => {
+        throw 'Не удалось удалить'
       })
   }
 }

@@ -127,13 +127,24 @@ export default defineComponent({
     return {
       permissions: this.$props.initialUser?.rights || ['viewer'],
       login: this.$props.initialUser?.user?.login,
-      rights: ['viewer', 'editor', 'reviewer'],
+      rights: ['viewer', 'editor', 'reviewer',],
       mystore: null,
     }
   },
   beforeMount(){
     this.mystore = store
-   this.mystore.auth.permissions.some((obj) => obj.name === 'owner' ) ? this.rights.push('admin') : null
+    // console.log(this.mystore.auth.permissions.some((obj) => obj.name === 'owner' ))
+    // if ( this.mystore.auth.permissions.some((obj) => obj.name === 'owner' )) {
+    //   this.rights.push('admin')
+    // }
+
+  },
+  mounted() {
+    console.log(this.mystore.auth.permissions.some((obj) => obj.name === 'owner' ))
+    if ( this.mystore.auth.permissions.some((obj) => obj.name === 'owner' )) {
+      this.rights.push('admin')
+    }
+
   },
 
   methods: {

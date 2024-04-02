@@ -26,13 +26,6 @@
               >
                 {{ post.content }}
               </h5>
-              <button
-              v-if="store.auth.permissions.some(
-            (obj) => obj.name === 'admin' || obj.name === 'owner'
-          )"
-               class="mb-2  bg-red-100 p-[4px] hover:bg-red-200 rounded flex text-red-600">
-                Удалить
-              </button>
             </div>
             <div class="flex gap-1 mt-auto flex-wrap">
               <div class="flex">
@@ -82,7 +75,7 @@ function openCreateModal() {
 }
 onMounted(() => {
   api.getPosts(props.id).then((data) => {
-    store.data.posts = data.reverse()
+    store.data.posts = data
     state.targetPost = {}
   })
 })
@@ -97,6 +90,7 @@ const props = defineProps({
     type: String
   }
 })
+
 
 const date = (utcIsoString) => {
   if (!utcIsoString) {

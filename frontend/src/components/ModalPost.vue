@@ -14,7 +14,17 @@
           class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600"
         >
           <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Пост</h3>
-          <div class="">
+          <div class="flex">
+          <button
+            @click="deletePost"
+            v-if="
+              mystore.auth.permissions.some((obj) => obj.name === 'admin' || obj.name === 'owner')
+            "
+            class="mb-2 z-40 bg-red-100 p-[4px] hover:bg-red-200 rounded flex text-red-600"
+          >
+            Удалить
+          </button>
+          <div>
             <button
               @click="this.$props.closeModal"
               type="button"
@@ -38,6 +48,8 @@
               <span class="sr-only">Close modal</span>
             </button>
           </div>
+        </div>
+
         </div>
         <!-- Modal body -->
 
@@ -311,6 +323,14 @@ export default defineComponent({
           store.data.posts = data
         })
       })
+      this.closeModal()
+    },
+    deletePost() {
+      api.deletePosts(this.id, this.post_id).then(
+        api.getPosts(this.id).then((data) => {
+          store.data.posts = data
+        })
+      )
       this.closeModal()
     }
   }
