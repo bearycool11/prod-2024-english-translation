@@ -14,7 +14,7 @@ from models import ErrorResponse, Organization, OrganizationCreatePostResponse, 
     DeleteUserResponse, DeleteUserRequest, AddChannelPostRequest, GetChannelsResponse, Channel, \
     DeleteChannelRequest, DeleteChannelResponse, GetPostsResponse, Post, \
     AddNewPostRequest, AddNewPostResponse, EditPostResponse, EditPostRequest, ScheduleTimeRequest, PostIdResponse, \
-    DeletePostRequest, DeletePostResponse, UserRight
+    DeletePostRequest, DeletePostResponse, UserRight, PostSentInfo
 from tools.auth import get_current_user
 
 router = APIRouter(prefix="/organizations")
@@ -459,7 +459,8 @@ def add_new_post(
     response.status_code = 201
     db_model.id = db_session.query(DBPost).order_by(DBPost.id.desc()).first().id
     post = Post(**db_model.dict(), created_by_name=db_model.user.name,
-                channels=[Channel(**j.dict()) for j in db_model.channels], tags=[k.tag for k in db_model.tag_bindings])
+                channels=[Channel(**j.dict()) for j in db_model.channels], tags=[k.tag for k in db_model.tag_bindings],
+                sent_infos=[PostSentInfo(**k.dict()) for k in db_model.sent_infos])
     return AddNewPostResponse(post=post)
 
 
@@ -512,7 +513,8 @@ def get_active_posts(
                                                           DBPost.organization_id == organization_id).all()
     return GetPostsResponse(
         posts=[Post(**i.dict(), created_by_name=i.user.name, channels=[Channel(**j.dict()) for j in i.channels],
-                    tags=[k.tag for k in i.tag_bindings]) for i
+                    tags=[k.tag for k in i.tag_bindings],
+                    sent_infos=[PostSentInfo(**k.dict()) for k in i.sent_infos]) for i
                in posts])
 
 
@@ -585,7 +587,8 @@ def edit_post(
     db_session.commit()
     return EditPostResponse(post=Post(**db_model.dict(), created_by_name=db_model.user.name,
                                       channels=[Channel(**j.dict()) for j in db_model.channels],
-                                      tags=[k.tag for k in db_model.tag_bindings]))
+                                      tags=[k.tag for k in db_model.tag_bindings],
+                                      sent_infos=[PostSentInfo(**k.dict()) for k in db_model.sent_infos]))
 
 
 @router.get(
@@ -609,7 +612,8 @@ def get_inactive_posts(
                                                           DBPost.organization_id == organization_id).all()
     return GetPostsResponse(
         posts=[Post(**i.dict(), created_by_name=i.user.name, channels=[Channel(**j.dict()) for j in i.channels],
-                    tags=[k.tag for k in i.tag_bindings]) for i
+                    tags=[k.tag for k in i.tag_bindings],
+                    sent_infos=[PostSentInfo(**k.dict()) for k in i.sent_infos]) for i
                in posts])
 
 
