@@ -145,6 +145,7 @@ class DeleteChannelResponse(BaseModel):
 class PrivateSetPostStatusRequest(BaseModel):
     post_id: int
     post_status: str
+    telegram_message_id: int
 
 
 class Post(BaseModel):

@@ -740,6 +740,7 @@ def set_post_sent_state(request: Request, response: Response, body: PrivateSetPo
         response.status_code = 404
         return ErrorResponse(reason="not found")
     post.sent_status = body.post_status
+    post.telegram_message_id = body.telegram_message_id
     db_session.add(post)
     try:
         db_session.commit()
