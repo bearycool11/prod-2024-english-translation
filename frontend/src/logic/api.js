@@ -241,15 +241,16 @@ class Api {
         return data.rights
       })
   }
- addPost(id, content) {
+  addPost(id, content) {
     return this.client
-      .post(`${import.meta.env.VITE_BACKEND_URL}/organizations/${id}/posts`, {content: content})
+      .post(`${import.meta.env.VITE_BACKEND_URL}/organizations/${id}/posts`, { content: content })
       .then(({ data }) => {
         if (data.reason) {
           throw 'Вы не можете добавить пост'
         }
         return data.rights
-      }).catch(()=> {
+      })
+      .catch(() => {
         throw 'Вы не можете добавить пост'
       })
   }

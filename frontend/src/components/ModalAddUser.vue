@@ -72,7 +72,9 @@
                   if (e.target.checked) {
                     this.permissions = [...permissions, right]
                   } else {
-                    this.permissions = permissions.map((right) => right?.name || right).filter((newRight) => newRight !== right)
+                    this.permissions = permissions
+                      .map((right) => right?.name || right)
+                      .filter((newRight) => newRight !== right)
                   }
                 }
               "
@@ -146,7 +148,7 @@ export default defineComponent({
     },
     async addUser() {
       if (!!this.$props.initialUser?.user?.login) {
-        console.log(this.permissions);
+        console.log(this.permissions)
 
         await api
           .updateUser(this.id, {
@@ -154,16 +156,16 @@ export default defineComponent({
             permissions: this.permissions.map((right) => right?.name || right)
           })
           .then((user) => {
-            const newUsers = [...store.data.users];
+            const newUsers = [...store.data.users]
             const index = newUsers.findIndex(({ user }) => user.login === this.login)
-            newUsers[index] = { ...user, rights: this.permissions };
+            newUsers[index] = { ...user, rights: this.permissions }
 
-            store.data.users = newUsers;
+            store.data.users = newUsers
           })
           .finally(() => {
             this.closeModal()
           })
-        return;
+        return
       }
 
       api
@@ -172,10 +174,13 @@ export default defineComponent({
           permissions: this.permissions.map((right) => right?.name || right)
         })
         .then((user) => {
-          store.data.users = [...store.data.users, {
-            ...user,
-            rights: this.permissions.map((right) => right?.name || right)
-          }]
+          store.data.users = [
+            ...store.data.users,
+            {
+              ...user,
+              rights: this.permissions.map((right) => right?.name || right)
+            }
+          ]
         })
         .finally(() => {
           this.closeModal()

@@ -1,21 +1,23 @@
 <template>
-  <div class="flex px-4 mt-20">
-    <div class="w-full">
+  <div class="flex mt-20 w-full">
+    <div class="w-full px-4 w-full">
       <button
-        v-if="store.auth.permissions.some(obj => obj.name === 'editor' || obj.name === 'admin' || obj.name === 'owner')"
+        v-if="
+          store.auth.permissions.some(
+            (obj) => obj.name === 'editor' || obj.name === 'admin' || obj.name === 'owner'
+          )
+        "
         @click="openCreateModal"
-        class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+        class="block text-white mb-4 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
       >
         Добавить пост
       </button>
-      <div class="flex justify-evenly flex-wrap"></div>
-
-      <div class="flex justify-evenly flex-wrap">
+      <div class="grid md:grid-cols-3 sm:grid-cols-2 gap-2 w-full mb-4">
         <button
           v-for="(post, index) in store.data.posts"
           :key="index"
           @click="openModal(index)"
-          class="mt-4 p-6 mx-2 min-w-sm w-80 bg-white border cursor-pointer border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 max-w-md"
+          class="w-full p-6 min-w-sm w-80 bg-white border cursor-pointer border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 max-w-md"
         >
           <div class="flex items-center justify-between">
             <h5
@@ -67,7 +69,7 @@ function openCreateModal() {
 }
 onMounted(() => {
   api.getPosts(props.id).then((data) => {
-    store.data.posts = data
+    store.data.posts = data.reverse()
     state.targetPost = {}
   })
 })

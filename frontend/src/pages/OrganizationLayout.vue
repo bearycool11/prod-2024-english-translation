@@ -7,7 +7,7 @@
   <aside
     v-if="name"
     id="default-sidebar"
-    class="top-0 left-0 z-40 w-64 h-screen transition-transform sm:static fixed md:translate-x-0 pt-12"
+    class="top-0 left-0 z-40 shrink min-w-64 transition-transform sm:static fixed md:translate-x-0 pt-12"
     :class="{
       '-translate-x-full': !store.ui.isSideBarOpen,
       'translate-x-0': store.ui.isSideBarOpen
@@ -42,7 +42,9 @@
         </li>
         <li>
           <router-link
-            v-if="store.auth.permissions.some(obj => obj.name === 'admin' || obj.name === 'owner')"
+            v-if="
+              store.auth.permissions.some((obj) => obj.name === 'admin' || obj.name === 'owner')
+            "
             :to="`/organization/${id}/users`"
             class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
           >
