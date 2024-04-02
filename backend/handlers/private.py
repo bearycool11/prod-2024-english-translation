@@ -5,7 +5,7 @@ from starlette.requests import Request
 from starlette.responses import Response
 
 from database.database_connector import get_session
-from database.models import DBPost
+from database.models import DBPost, DbSentPostInfo
 from models import StatusResponse, ErrorResponse, PrivateSetPostStatusRequest
 
 router = APIRouter(prefix='/private')
@@ -32,8 +32,9 @@ def set_post_sent_state(request: Request, response: Response, body: PrivateSetPo
         response.status_code = 404
         return ErrorResponse(reason="not found")
     post.sent_status = body.post_status
-    post.telegram_message_id = body.telegram_message_id
+    post_send_data = DbSentPostInfo(**body.dict())
     db_session.add(post)
+    db_session.add(post_send_data)
     try:
         db_session.commit()
     except:

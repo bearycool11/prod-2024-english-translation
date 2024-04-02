@@ -47,7 +47,6 @@ class DBPost(SQLModel, table=True):
     comment: Optional[str]
     planned_time: Optional[datetime.datetime]
     sent_status: SentStatus = Field(default=SentStatus.NOT_READY)
-    telegram_message_id: Optional[int] = Field(sa_column=Column(BigInteger, default=None, nullable=True))
     updated_at: datetime.datetime = Field(sa_column=Column(DateTime, default=func.now(), onupdate=func.now()))
 
     user: DBUser = Relationship(back_populates="posts")
@@ -58,6 +57,7 @@ class DBPost(SQLModel, table=True):
                                                                        "back_populates": "posts",
                                                                        "lazy": "dynamic"})
     organization: "DBOrganization" = Relationship()
+    sent_infos: "DbSentPostInfo" = Relationship()
 
 
 class DBPermission(SQLModel, table=True):
@@ -135,6 +135,19 @@ class DBTag(SQLModel, table=True):
     post_id: int = Field(foreign_key="posts.id", primary_key=True)
 
     post: DBPost = Relationship(back_populates="tag_bindings")
+
+
+class DbSentPostInfo(SQLModel, table=True):
+    __tablename__ = "sent_post_info"
+
+    id: int = Field(primary_key=True, default=None, unique=True)
+    post_id: int = Field(foreign_key="posts.id", primary_key=True)
+    channel_id: int = Field(foreign_key="channels.id", primary_key=True)
+    telegram_message_id: int = Field(sa_column=Column(BigInteger))
+    chat_username: Optional[str] = Field(nullable=True)
+
+    post: DBPost = Relationship(back_populates="sent_infos")
+    channel: DBChannel = Relationship()
 
 
 post_channel_bindings = Table(

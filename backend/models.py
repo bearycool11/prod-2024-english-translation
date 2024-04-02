@@ -141,6 +141,15 @@ class PrivateSetPostStatusRequest(BaseModel):
     post_id: int
     post_status: str
     telegram_message_id: int
+    channel_id: int
+    chat_username: str
+
+
+class PostSentInfo(BaseModel):
+    id: int
+    channel: Channel
+    telegram_message_id: int
+    chat_username: Optional[str] = None
 
 
 class Post(BaseModel):
@@ -156,7 +165,7 @@ class Post(BaseModel):
     channels: list[Channel]
     tags: list[str]
     updated_at: Optional[datetime.datetime] = None
-    telegram_message_id: Optional[int] = None
+    sent_infos: list[PostSentInfo] = []
 
 
 class GetPostsResponse(BaseModel):
