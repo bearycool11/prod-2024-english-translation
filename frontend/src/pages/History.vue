@@ -40,12 +40,10 @@ const state = reactive({
 })
 
 onMounted(() => {
-  api
-    .getHistory(props.id)
-    .then((data) => {
-      state.posts = data.reverse()
-      state.targetPost = {}
-    })
+  api.getHistory(props.id).then((data) => {
+    state.posts = data.reverse()
+    state.targetPost = {}
+  })
 })
 
 const props = defineProps({

@@ -19,7 +19,9 @@
     >
       <ul class="space-y-2 font-medium">
         <li>
-          <h5 class="mb-2 text-lg font-bold truncate">{{ name }}</h5>
+          <h5 class="mb-2 max-h-72 text-lg font-bold break-all truncate">
+            Организация: {{ name }}
+          </h5>
         </li>
         <li>
           <router-link
@@ -173,6 +175,7 @@ const props = defineProps({
     default: '1'
   }
 })
+
 onMounted(() => {
   api.getOrganizationInfo(props.id).then((data) => {
     name.value = data.name
