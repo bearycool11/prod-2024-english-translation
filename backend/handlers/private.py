@@ -32,12 +32,15 @@ def set_post_sent_state(request: Request, response: Response, body: PrivateSetPo
         response.status_code = 404
         return ErrorResponse(reason="not found")
     post.sent_status = body.post_status
-    post_send_data = DBSentPostInfo(channel_id=body.channel_id,
-                                    post_id=body.post_id,
-                                    telegram_message_id=body.telegram_message_id,
-                                    chat_username=body.chat_username)
+    if body.clear_planned_time:
+        post.planned_time = None
+    if body.post_status == "SENT_OK":
+        post_send_data = DBSentPostInfo(channel_id=body.channel_id,
+                                        post_id=body.post_id,
+                                        telegram_message_id=body.telegram_message_id,
+                                        chat_username=body.chat_username)
+        db_session.add(post_send_data)
     db_session.add(post)
-    db_session.add(post_send_data)
     try:
         db_session.commit()
     except:
