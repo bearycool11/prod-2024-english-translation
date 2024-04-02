@@ -37,7 +37,7 @@ B2B-продукт: SMM-платформа для вашей команды с �
 ## Жизненный цикл поста
 <p align="center">
   <a href="https://github.com/Central-University-IT-prod/PROD-yet-another-common">
-    <img src="images/post_live_cycle.png" alt="Logo" width="1280" height="425">
+    <img src="images/post_live_cycle.png" alt="Logo" width="1280" height="212">
   </a>
 </p>
 
