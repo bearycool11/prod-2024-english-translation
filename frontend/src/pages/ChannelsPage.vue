@@ -2,13 +2,14 @@
   <div class="flex px-4 mt-20">
     <div class="">
       <button
-        v-if="store.data.canAddBots === false"
+        v-if="store.data.canAddBots === false && store.auth.permissions.some((obj) => obj.name === 'admin' || obj.name === 'owner')"
+        
         @click="toggleModal"
         class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
       >
         Добавить канал
       </button>
-      <div v-else>
+      <div v-if="store.data.canAddBots === true">
         <p class="flex px-6 py-2 rounded-md bg-neutral-100 w-auto">Сначала добавьте бота</p>
       </div>
       <div class="flex justify-evenly flex-wrap"></div>
@@ -26,6 +27,7 @@
               {{ channel.name }}
             </h5>
             <button
+            v-if="store.auth.permissions.some((obj) => obj.name === 'admin' || obj.name === 'owner')"
               @click="deleteChannel(channel.id)"
               class="ml-4 mb-2 p-1 text-red-600 bg-red-100 hover:bg-red-200 rounded-md font-medium flex"
             >
