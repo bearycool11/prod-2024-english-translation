@@ -50,7 +50,7 @@ class DBPost(SQLModel, table=True):
     telegram_message_id: Optional[int] = Field(sa_column=Column(BigInteger, default=None, nullable=True))
 
     user: DBUser = Relationship(back_populates="posts")
-    tag_bindings: list["DBTag"] = Relationship(back_populates="post")
+    tag_bindings: list["DBTag"] = Relationship(back_populates="post", sa_relationship_kwargs={"lazy": "dynamic"})
     channels: list["DBChannel"] = Relationship(sa_relationship_kwargs={"secondary": "post_channel_bindings",
                                                                        "primaryjoin": "DBPost.id==post_channel_bindings.c.post_id",
                                                                        "secondaryjoin": "DBChannel.id==post_channel_bindings.c.channel_id",

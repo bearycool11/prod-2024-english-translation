@@ -10,7 +10,7 @@ from starlette.responses import Response
 
 from database.database_connector import get_session
 from database.models import DBUser, DBOrganization, DBOrganizationUser, DBPermission, DBOrganizationBot, DBChannel, \
-    DBPost, SentStatus, Status, DBTask
+    DBPost, SentStatus, Status, DBTask, DBTag
 from models import StatusResponse, AuthSignInPostResponse, AuthSignInPostRequest, ErrorResponse, ProfileResponse, \
     AuthRegisterPostRequest, UserProfile, Organization, OrganizationCreatePostResponse, OrganizationCreatePostRequest, \
     UserOrganizationsGetResponse, OrganizationUsersGetResponse, OrganizationUser, UserPublicProfile, UserRight, \
@@ -522,7 +522,6 @@ def add_new_post(
     db_model = DBPost(**body.dict())
     db_model.organization_id = organization_id
     db_model.created_by = current_user.id
-    db_model.content = db_model.content
     db_session.add(db_model)
     db_session.commit()
     response.status_code = 201
@@ -552,7 +551,8 @@ def get_active_posts(
     posts: list[DBPost] = db_session.query(DBPost).filter(DBPost.sent_status != SentStatus.SENT_OK,
                                                           DBPost.organization_id == organization_id).all()
     return GetPostsResponse(
-        posts=[Post(**i.dict(), created_by_name=i.user.name, channels=[Channel(**j.dict()) for j in i.channels], tags=[k.tag for k in i.tag_bindings]) for i
+        posts=[Post(**i.dict(), created_by_name=i.user.name, channels=[Channel(**j.dict()) for j in i.channels],
+                    tags=[k.tag for k in i.tag_bindings]) for i
                in posts])
 
 
@@ -607,6 +607,13 @@ def edit_post(
                 response.status_code = 403
                 return ErrorResponse(reason="Don\'t have required permissions")
             db_model.channels.append(channel)
+    if body.tags is not None:
+        for tag in db_model.tag_bindings:
+            db_session.delete(tag)
+        for i in body.tags:
+            tag = DBTag(tag=i, post_id=body.id)
+            db_session.add(tag)
+            db_model.tag_bindings.append(tag)
     if body.is_approved is not None:
         db_model.is_approved = body.is_approved
     if body.comment is not None:
@@ -617,7 +624,8 @@ def edit_post(
     db_session.add(db_model)
     db_session.commit()
     return EditPostResponse(post=Post(**db_model.dict(), created_by_name=db_model.user.name,
-                                      channels=[Channel(**j.dict()) for j in db_model.channels], tags=[k.tag for k in db_model.tag_bindings]))
+                                      channels=[Channel(**j.dict()) for j in db_model.channels],
+                                      tags=[k.tag for k in db_model.tag_bindings]))
 
 
 @router.get(
@@ -638,9 +646,10 @@ def get_inactive_posts(
         response.status_code = 403
         return ErrorResponse(reason="Don\'t have required permissions")
     posts: list[DBPost] = db_session.query(DBPost).filter(DBPost.sent_status == SentStatus.SENT_OK,
-                                            DBPost.organization_id == organization_id).all()
+                                                          DBPost.organization_id == organization_id).all()
     return GetPostsResponse(
-        posts=[Post(**i.dict(), created_by_name=i.user.name, channels=[Channel(**j.dict()) for j in i.channels], tags=[k.tag for k in i.tag_bindings]) for i
+        posts=[Post(**i.dict(), created_by_name=i.user.name, channels=[Channel(**j.dict()) for j in i.channels],
+                    tags=[k.tag for k in i.tag_bindings]) for i
                in posts])
 
 

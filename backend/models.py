@@ -179,6 +179,7 @@ class EditPostRequest(BaseModel):
     is_approved: Optional[Status] = None
     comment: Optional[str] = None
     channels: Optional[list[int]] = None
+    tags: Optional[list[str]] = None
 
 
 class EditPostResponse(BaseModel):
