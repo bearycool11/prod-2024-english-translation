@@ -683,7 +683,7 @@ def schedule_post(organization_id: int, post_id: int, response: Response, body: 
                   db_session: Session = Depends(get_session),
                   current_user=Depends(get_current_user)) -> Union[PostIdResponse, ErrorResponse]:
     if current_user.organization_bindings.join(DBPermission).filter(
-            DBOrganizationUser.organization_id == organization_id, DBPermission.level in [2, 4, 5]).count() == 0:
+            DBOrganizationUser.organization_id == organization_id, DBPermission.level.in_([2, 4, 5])).count() == 0:
         response.status_code = 403
         return ErrorResponse(reason="Don\'t have required permissions")
     post_model = db_session.query(DBPost).join(DBOrganization).filter(DBPost.id == post_id,
