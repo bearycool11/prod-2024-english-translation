@@ -18,7 +18,8 @@
             <button
               @click="deletePost"
               v-if="
-                mystore.auth.permissions.some(
+                this.content.sent_status !== 'WAITING' && 
+                this.mystore.auth.permissions.some(
                   (obj) => obj.name === 'admin' || obj.name === 'owner'
                 ) && !this.creation
               "
@@ -137,7 +138,7 @@
                     :disabled="
                       !mystore.auth.permissions.some(
                         (obj) =>
-                          obj.name === 'rewiever' || obj.name === 'admin' || obj.name === 'owner'
+                          obj.name === 'reviewer' || obj.name === 'admin' || obj.name === 'owner'
                       )
                     "
                   />
@@ -170,7 +171,7 @@
                     :disabled="
                       !mystore.auth.permissions.some(
                         (obj) =>
-                          obj.name === 'rewiever' || obj.name === 'admin' || obj.name === 'owner'
+                          obj.name === 'reviewer' || obj.name === 'admin' || obj.name === 'owner'
                       )
                     "
                   />
@@ -245,7 +246,8 @@
           <div class="flex justify-between flex-wrap">
             <button
               v-if="
-                (this.content.is_approved !== 'APPROVED') ||
+              this.content.sent_status !== 'WAITING' && 
+                (this.content.is_approved !== 'APPROVED') &&
                 this.mystore.auth.permissions.some(
                   (obj) => obj.name === 'editor' || obj.name === 'owner' || obj.name === 'admin'
                 )
@@ -268,13 +270,14 @@
               </svg>
               {{ buttonText }}
             </button>
+            
             <button
               v-if="
                 !this.creation &&
                 this.content.is_approved === 'APPROVED' &&
                 this.content.sent_status !== 'WAITING' &&
                 this.mystore.auth.permissions.some(
-                  (obj) => obj.name === 'rewiever' || obj.name === 'admin' || obj.name === 'owner'
+                  (obj) => obj.name === 'reviewer' || obj.name === 'admin' || obj.name === 'owner'
                 )
               "
               @click="schedulePost"
