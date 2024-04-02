@@ -61,7 +61,7 @@ const router = createRouter({
               name: 'emergency',
               props: true,
               component: () => import('./pages/EmergencyButton.vue')
-            },
+            }
           ]
         },
         {

@@ -1,5 +1,7 @@
 <template>
-  <div class="flex flex-col mt-10 p-10 w-full">
+  <div class="flex flex-col mt-10 p-10 w-full" v-if="store.auth.permissions.some(
+            (obj) =>  obj.name === 'admin' || obj.name === 'owner'
+          )">
     <h1
       class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white"
     >
@@ -26,6 +28,7 @@
 <script setup>
 import { api } from '@/logic/api.js'
 import { reactive } from 'vue'
+import {store} from '../store/index.js'
 const props = defineProps({
   id: {
     type: String
