@@ -254,6 +254,22 @@ class Api {
         throw 'Вы не можете добавить пост'
       })
   }
+
+  getHistory(id) {
+    return this.client
+      .get(`${import.meta.env.VITE_BACKEND_URL}/organizations/${id}/inactive_posts/`)
+      .then(({ data }) => {
+        if (data.reason) {
+          throw 'Не удалось получить посты'
+        }
+
+        return data.posts
+      })
+      .catch(() => {
+        throw 'Не удалось получить посты'
+      })
+  }
+
   schedulePost(id, time, post_id) {
     return this.client
       .post(`${import.meta.env.VITE_BACKEND_URL}/organizations/${id}/posts/${post_id}/schedule`, {

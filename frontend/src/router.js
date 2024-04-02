@@ -34,7 +34,9 @@ const router = createRouter({
             },
             {
               path: 'history',
-              name: 'posts history'
+              name: 'posts history',
+              props: true,
+              component: () => import('./pages/History.vue')
             },
             {
               path: 'channels',
