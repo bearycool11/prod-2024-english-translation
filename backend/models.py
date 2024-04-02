@@ -156,6 +156,7 @@ class Post(BaseModel):
     channels: list[Channel]
     tags: list[str]
     updated_at: Optional[datetime.datetime] = None
+    telegram_message_id: Optional[int] = None
 
 
 class GetPostsResponse(BaseModel):
