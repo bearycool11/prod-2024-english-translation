@@ -75,6 +75,7 @@ function openCreateModal() {
   state.isShowModal = true
   state.creation = true
 }
+
 onMounted(() => {
   api.getPosts(props.id).then((data) => {
     store.data.posts = data

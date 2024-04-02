@@ -1,28 +1,17 @@
 <template>
-  <div class="flex mt-20 w-full">
+  <div class="flex mt-17 w-full">
     <div class="w-full px-4">
-      <div class="grid md:grid-cols-3 sm:grid-cols-2 gap-2 w-full mb-4">
-        <div
+      <h1
+        class="text-3xl mb-6 font-bold leading-tight tracking-tight text-gray-900 dark:text-white"
+      >
+        История постов
+      </h1>
+      <div class="grid grid-cols-1 gap-2 w-full mb-4 max-w-2xl">
+        <history-post
           v-for="(post, index) in state.posts"
           :key="index"
-          class="h-80 flex flex-col justify-between p-6 min-w-sm w-full bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 max-w-md"
-        >
-          <h5
-            class="mb-2 mr-2 max-h-36 text-lg text-left font-bold text-wrap max-w-md truncate tracking-tight text-gray-900 dark:text-white"
-          >
-            {{ post.content }}
-          </h5>
-          <div class="flex gap-1  mt-auto flex-wrap">
-            <div class="flex">
-              <p class="text-wrap text-left">{{ date(post.planned_time) }}</p>
-            </div>
-
-            <div class="flex gap-1 mt-1 flex-wrap">
-              <div class="p-2 bg-blue-100 rounded-md">{{ post.is_approved }}</div>
-              <div class="p-2 bg-blue-100 rounded-md">{{ post.sent_status }}</div>
-            </div>
-          </div>
-        </div>
+          :post="post"
+        />
       </div>
     </div>
   </div>
@@ -30,6 +19,8 @@
 <script setup>
 import { onMounted, reactive } from 'vue'
 import { api } from '@/logic/api.js'
+import { store } from '@/store/index.js'
+import HistoryPost from "@/components/HistoryPost.vue";
 
 const state = reactive({
   isShowModal: false,
@@ -74,6 +65,6 @@ const date = (isoString) => {
   const [dayMonthYear, timeWithTimezone] = formattedDate.split(', ')
 
   // Return the formatted date with the timezone included
-  return 'Опубликован ' + dayMonthYear + ' ' + timeWithTimezone
+  return 'Запланирован ' + dayMonthYear + ' ' + timeWithTimezone
 }
 </script>

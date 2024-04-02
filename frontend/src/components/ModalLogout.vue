@@ -72,9 +72,9 @@
     </div>
   </div>
 </template>
+
 <script>
 import { defineComponent } from 'vue'
-//import { api } from '@/logic/api.js'
 import { store } from '@/store/index.js'
 import router from '@/router.js'
 

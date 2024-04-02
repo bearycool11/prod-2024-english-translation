@@ -39,6 +39,12 @@ const router = createRouter({
               component: () => import('./pages/History.vue')
             },
             {
+              path: 'post/:id',
+              name: 'post stat',
+              props: true,
+              component: () => import('./pages/PostStat.vue')
+            },
+            {
               path: 'channels',
               name: 'channels',
               props: true,
