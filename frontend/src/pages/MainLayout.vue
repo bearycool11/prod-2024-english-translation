@@ -124,9 +124,7 @@
   </div>
   <RouterView class="flex mt-20" v-if="$route.name == 'AllOrganization'" />
   <ModalNewOrganization
-    v-if="this.isShowModal"
-    :isShown="this.isShowModal"
-    :closeModal="closeModal"
+    
   />
   <ModalLogout :isShown="isShowModalLogout" :closeModal="closeLogout" />
 </template>
