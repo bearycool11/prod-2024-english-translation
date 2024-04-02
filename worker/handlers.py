@@ -8,7 +8,7 @@ from utils import task
 def send_message(bot_token, channel_id, message_text, post_id):
     bot = telebot.TeleBot(bot_token)
     try:
-        bot.send_message(chat_id=channel_id, text=message_text, parse_mode="MarkdownV2")
+        bot.send_message(chat_id=channel_id, text=message_text)
         requests.post("http://smm_ya_backend:5437/api/private/set_post_sent_state",
                       json={"post_id": post_id, "post_status": "SENT_OK"})
     except:
