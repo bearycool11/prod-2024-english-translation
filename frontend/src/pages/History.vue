@@ -5,14 +5,14 @@
         <div
           v-for="(post, index) in state.posts"
           :key="index"
-          class="p-6 min-w-sm w-full bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 max-w-md"
+          class="h-80 flex flex-col justify-between p-6 min-w-sm w-full bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 max-w-md"
         >
           <h5
-            class="mb-2 mr-2 text-lg text-left font-bold text-wrap max-w-md truncate tracking-tight text-gray-900 dark:text-white"
+            class="mb-2 mr-2 max-h-36 text-lg text-left font-bold text-wrap max-w-md truncate tracking-tight text-gray-900 dark:text-white"
           >
             {{ post.content }}
           </h5>
-          <div class="flex gap-1 mt-auto flex-wrap">
+          <div class="flex gap-1  mt-auto flex-wrap">
             <div class="flex">
               <p class="text-wrap text-left">{{ date(post.planned_time) }}</p>
             </div>
@@ -30,7 +30,6 @@
 <script setup>
 import { onMounted, reactive } from 'vue'
 import { api } from '@/logic/api.js'
-import { store } from '@/store/index.js'
 
 const state = reactive({
   isShowModal: false,
@@ -75,6 +74,6 @@ const date = (isoString) => {
   const [dayMonthYear, timeWithTimezone] = formattedDate.split(', ')
 
   // Return the formatted date with the timezone included
-  return 'Запланирован ' + dayMonthYear + ' ' + timeWithTimezone
+  return 'Опубликован ' + dayMonthYear + ' ' + timeWithTimezone
 }
 </script>

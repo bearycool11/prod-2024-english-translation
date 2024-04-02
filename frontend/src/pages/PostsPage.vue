@@ -12,7 +12,7 @@
       >
         Добавить пост
       </button>
-      <div class="grid md:grid-cols-3 sm:grid-cols-2 gap-2 w-full mb-4">
+      <div class="grid md:grid-cols-3 max-h-80 sm:grid-cols-2 gap-2 w-full mb-4">
         <button
           v-for="(post, index) in store.data.posts"
           :key="index"
