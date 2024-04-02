@@ -47,6 +47,7 @@ class DBPost(SQLModel, table=True):
     comment: Optional[str]
     planned_time: Optional[datetime.datetime]
     sent_status: SentStatus = Field(default=SentStatus.NOT_READY)
+    telegram_message_id: Optional[int] = Field(sa_column=Column(BigInteger, default=None, nullable=True))
 
     user: DBUser = Relationship(back_populates="posts")
     tag_bindings: list["DBTag"] = Relationship(back_populates="post")
