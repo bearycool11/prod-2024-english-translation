@@ -17,7 +17,7 @@
           v-for="(post, index) in store.data.posts"
           :key="index"
           @click="openModal(index)"
-          class="p-6 min-w-sm w-80 bg-white border cursor-pointer border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 max-w-md"
+          class="p-6 min-w-sm w-full bg-white border cursor-pointer border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 max-w-md"
         >
           <h5
             class="mb-2 mr-2 text-lg text-left font-bold text-wrap max-w-md truncate tracking-tight text-gray-900 dark:text-white"
