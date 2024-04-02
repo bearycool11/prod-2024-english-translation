@@ -243,6 +243,11 @@ def add_user_to_organization(
             DBOrganizationUser.organization_id == organization_id, DBPermission.level >= 4).count() == 0:
         response.status_code = 403
         return ErrorResponse(reason="Don\'t have required permissions")
+    if "owner" in body.permissions or ("admin" in body.permissions and current_user.organization_bindings.join(
+            DBPermission).filter(DBOrganizationUser.organization_id == organization_id,
+                                 DBPermission.level == 5).count() == 0):
+        response.status_code = 403
+        return ErrorResponse(reason="Don\'t have required permissions")
     user = db_session.query(DBUser).filter_by(login=body.login).first()
     if user is None:
         response.status_code = 404
@@ -283,24 +288,28 @@ def change_user_permissions(
             DBOrganizationUser.organization_id == organization_id, DBPermission.level >= 4).count() == 0:
         response.status_code = 403
         return ErrorResponse(reason="Don\'t have required permissions")
-    if ("admin" in body.permissions or "owner" in body.permissions) and current_user.organization_bindings.join(
-            DBPermission).filter(DBOrganizationUser.organization_id == organization_id, DBPermission.level == 5).count() == 0:
-        response.status_code = 403
-        return ErrorResponse(reason="Don\'t have required permissions")
-    user = db_session.query(DBOrganizationUser).join(DBUser).filter(DBUser.login == body.login).first()
+    user = db_session.query(DBUser).filter(DBUser.login == body.login).first()
     if user is None:
         response.status_code = 404
         return ErrorResponse(reason="User not found")
-    db_session.query(DBOrganizationUser).filter(DBOrganizationUser.user_id == user.user.id).delete()
+    user_permissions = user.organization_bindings.filter(DBOrganizationUser.organization_id == organization_id).all()
+    permissions = set(body.permissions).symmetric_difference(
+        {permission.permission_data.name for permission in user_permissions})
+    if "owner" in permissions or ("admin" in permissions and current_user.organization_bindings.join(
+            DBPermission).filter(DBOrganizationUser.organization_id == organization_id,
+                                 DBPermission.level == 5).count() == 0):
+        response.status_code = 403
+        return ErrorResponse(reason="Don\'t have required permissions")
+    db_session.query(DBOrganizationUser).filter(DBOrganizationUser.user_id == user.id).delete()
     for permission in body.permissions:
-        db_model = DBOrganizationUser(user_id=user.user.id, organization_id=organization_id, permission=permission)
+        db_model = DBOrganizationUser(user_id=user.id, organization_id=organization_id, permission=permission)
         db_session.add(db_model)
     try:
         db_session.commit()
     except:
         response.status_code = 409
         return ErrorResponse(reason="conflict")
-    return UserPostResponse(user=UserPublicProfile(**user.user.dict()))
+    return UserPostResponse(user=UserPublicProfile(**user.dict()))
 
 
 @router.delete(
