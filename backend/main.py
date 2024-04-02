@@ -527,7 +527,7 @@ def add_new_post(
     db_session.commit()
     response.status_code = 201
     db_model.id = db_session.query(DBPost).order_by(DBPost.id.desc()).first().id
-    post = Post(**db_model.dict())
+    post = Post(**db_model.dict(), created_by_name=db_model.user.name, channels=[Channel(**j.dict()) for j in db_model.channels])
     return AddNewPostResponse(post=post)
 
 
@@ -550,7 +550,9 @@ def get_active_posts(
         return ErrorResponse(reason="Don\'t have required permissions")
     posts: list[DBPost] = db_session.query(DBPost).filter(DBPost.sent_status != SentStatus.SENT_OK,
                                                           DBPost.organization_id == organization_id).all()
-    return GetPostsResponse(posts=[Post(**i.dict(), created_by_name=i.user.name) for i in posts])
+    return GetPostsResponse(
+        posts=[Post(**i.dict(), created_by_name=i.user.name, channels=[Channel(**j.dict()) for j in i.channels]) for i
+               in posts])
 
 
 @router.patch(
@@ -576,12 +578,17 @@ def edit_post(
                                        DBPost.sent_status != SentStatus.WAITING).count() == 0:
         response.status_code = 403
         return ErrorResponse(reason="Don\'t have required permissions")
+    if body.is_approved in [Status.APPROVED, Status.REJECTED]:
+        permissions = [3, 4, 5]
+    else:
+        permissions = [2, 4, 5]
     if (body.is_approved is not None) and current_user.organization_bindings.join(DBPermission).filter(
-            DBOrganizationUser.organization_id == organization_id, DBPermission.level.in_([2, 3, 4, 5])).count() == 0:
+            DBOrganizationUser.organization_id == organization_id, DBPermission.level.in_(permissions)).count() == 0:
         response.status_code = 403
         return ErrorResponse(reason="Don\'t have required permissions")
-    if (body.content is not None) and current_user.organization_bindings.join(DBPermission).filter(
-            DBOrganizationUser.organization_id == organization_id, DBPermission.level.in_([2, 4, 5])).count() == 0:
+    if (body.content is not None or body.channels is not None) and current_user.organization_bindings.join(
+            DBPermission).filter(
+        DBOrganizationUser.organization_id == organization_id, DBPermission.level.in_([2, 4, 5])).count() == 0:
         response.status_code = 403
         return ErrorResponse(reason="Don\'t have required permissions")
     if (body.comment is not None) and current_user.organization_bindings.join(
@@ -589,23 +596,27 @@ def edit_post(
         DBOrganizationUser.organization_id == organization_id, DBPermission.level.in_([3, 4, 5])).count() == 0:
         response.status_code = 403
         return ErrorResponse(reason="Don\'t have required permissions")
-    db_model = db_session.query(DBPost).filter(DBPost.id == body.id)
+    db_model: DBPost = db_session.query(DBPost).filter(DBPost.id == body.id).first()
+    if body.channels is not None:
+        db_model.channels = []
+        for i in body.channels:
+            channel = db_session.query(DBChannel).join(DBOrganizationBot).filter(DBChannel.id == i,
+                                                                                 DBOrganizationBot.organization_id == organization_id).first()
+            if channel is None:
+                response.status_code = 403
+                return ErrorResponse(reason="Don\'t have required permissions")
+            db_model.channels.append(channel)
     if body.is_approved is not None:
-        db_model.update({
-            DBPost.is_approved: body.is_approved
-        })
-    if body.content is not None:
-        new_model = db_model.first()
-        new_model.content = body.content
-        new_model.revision_id = db_model.first().revision_id + 1
-        db_session.add(new_model)
-        db_session.commit()
+        db_model.is_approved = body.is_approved
     if body.comment is not None:
-        db_model.update({
-            DBPost.comment: body.comment
-        })
+        db_model.comment = body.comment
+    if body.content is not None:
+        db_model.content = body.content
+        db_model.is_approved = Status.OPEN
+    db_session.add(db_model)
     db_session.commit()
-    return EditPostResponse(post=Post(**db_model.first().dict(), created_by_name=db_model.first().user.name))
+    return EditPostResponse(post=Post(**db_model.dict(), created_by_name=db_model.user.name,
+                                      channels=[Channel(**j.dict()) for j in db_model.channels]))
 
 
 @router.get(
@@ -627,7 +638,9 @@ def get_inactive_posts(
         return ErrorResponse(reason="Don\'t have required permissions")
     posts = db_session.query(DBPost).filter(DBPost.sent_status == SentStatus.SENT_OK,
                                             DBPost.organization_id == organization_id).all()
-    return GetPostsResponse(posts=[Post(**i.dict()) for i in posts])
+    return GetPostsResponse(
+        posts=[Post(**i.dict(), created_by_name=i.user.name, channels=[Channel(**j.dict()) for j in i.channels]) for i
+               in posts])
 
 
 @router.get(
@@ -674,8 +687,7 @@ def schedule_post(organization_id: int, post_id: int, response: Response, body: 
         response.status_code = 403
         return ErrorResponse(reason="Don\'t have required permissions")
     post_model = db_session.query(DBPost).join(DBOrganization).filter(DBPost.id == post_id,
-                                                                      DBOrganization.id == organization_id).order_by(
-        DBPost.revision_id.desc()).first()
+                                                                      DBOrganization.id == organization_id).first()
     if post_model is None:
         response.status_code = 404
         return ErrorResponse(reason="Not found")

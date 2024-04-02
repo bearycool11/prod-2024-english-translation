@@ -153,11 +153,11 @@ class Post(BaseModel):
     created_by: int
     created_by_name: Optional[str] = None
     content: str
-    revision_id: int
     is_approved: Status
     comment: Optional[str] = None
     planned_time: Optional[datetime.datetime] = None
     sent_status: SentStatus
+    channels: list[Channel]
 
 
 class GetPostsResponse(BaseModel):
@@ -177,6 +177,7 @@ class EditPostRequest(BaseModel):
     content: Optional[str] = None
     is_approved: Optional[Status] = None
     comment: Optional[str] = None
+    channels: Optional[list[int]] = None
 
 
 class EditPostResponse(BaseModel):

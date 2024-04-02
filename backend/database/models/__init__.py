@@ -42,7 +42,6 @@ class DBPost(SQLModel, table=True):
     organization_id: int = Field(foreign_key="organizations.id")
     created_by: int = Field(foreign_key="users.id")
     content: str
-    revision_id: int = Field(default=1, primary_key=True)
     is_approved: Status = Field(default=Status.OPEN)
     comment: Optional[str]
     planned_time: Optional[datetime.datetime]
@@ -129,6 +128,6 @@ post_channel_bindings = Table(
     "post_channel_bindings",
     SQLModel.metadata,
     Column("post_id", Integer, ForeignKey("posts.id"), primary_key=True),
-    Column("channel_id", Integer, ForeignKey("channels.id"), primary_key=True),
+    Column("channel_id", BigInteger, ForeignKey("channels.id"), primary_key=True),
     UniqueConstraint('post_id', 'channel_id', name='_post_channel_bindings_uc'),
 )
