@@ -4,7 +4,7 @@
     <nav
       class="bg-white border-gray-200 lg:px-6 sm:px-8 px-2 py-2.5 dark:bg-gray-800 w-screen shrink absolute z-50 shadow-md top-0"
     >
-      <div class="flex md:justify-start justify-between items-center max-w-screen-xl">
+      <div class="flex md:content-center justify-between items-center max-w-screen">
         <div class="flex items-center mr-10">
           <button
             @click="toggleSidebar"
@@ -31,7 +31,7 @@
             </svg>
           </button>
           <a
-            class="cursor-pointer flex items-center font-medium text-xl max-w-80 dark:text-neutral-200"
+            class="cursor-pointer flex text-nowrap items-center font-medium text-xl max-w-80 dark:text-neutral-200"
             href="/"
           >
             {{ profile.name }}

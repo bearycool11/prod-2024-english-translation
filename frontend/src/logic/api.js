@@ -35,9 +35,8 @@ class Api {
     this.client.interceptors.response.use(
       (r) => r,
       async (error) => {
-        $toast.error('Ошибка: что то пошло не так! повторите действие еще раз!')
-
         if (error.response.status !== 401) {
+          $toast.error('Ошибка: что то пошло не так! повторите действие еще раз!')
           throw error
         }
 
