@@ -12,3 +12,4 @@ class DBTask(SQLModel, table=True):
     handler: str
     arguments: dict = Field(default_factory=dict, sa_column=Column(JSON))
     planned_time: datetime.datetime
+    next_run_delta: int = Field(default=-1)
