@@ -6,7 +6,7 @@
   ></div>
   <div
     v-if="isShown"
-    class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50"
+    class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50"
   >
     <div class="relative p-4 w-full max-w-md max-h-full top-0 right-0 left-0 z-50">
       <div class="relative bg-white rounded-lg shadow dark:bg-gray-700 min-w-80">

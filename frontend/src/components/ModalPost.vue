@@ -6,7 +6,7 @@
   ></div>
   <div
     v-if="isShown"
-    class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50"
+    class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50"
   >
     <div class="relative p-4 w-full max-w-lg max-h-full top-0 right-0 left-0 z-50">
       <div class="relative bg-white rounded-lg shadow dark:bg-gray-700 md:min-w-[600px] w-72">
@@ -142,7 +142,7 @@
               </div>
             </div>
           </div>
-          <div class="flex justify-between">
+          <div class="flex justify-between flex-wrap">
             <button
               v-if="this.content.is_approved !== 'APPROVED'"
               @click="addPost"
@@ -189,7 +189,7 @@
               Отправить на одобрение
             </button>
             <div
-              class="flex"
+              class="flex md:mt-0 mt-4"
               v-if="
                 !this.creation &&
                 this.content.is_approved === 'WAITING' &&
