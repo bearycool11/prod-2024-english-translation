@@ -86,7 +86,7 @@ app.add_middleware(
 router = APIRouter(prefix='/api')
 
 
-@router.get('/ping', response_model=StatusResponse)
+@router.get('/ping', response_model=StatusResponse, tags=["ping"])
 def ping() -> StatusResponse:
     return StatusResponse(status="ok")
 
