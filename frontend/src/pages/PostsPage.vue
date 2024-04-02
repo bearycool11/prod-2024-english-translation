@@ -20,6 +20,9 @@
           class="p-6 min-w-sm bg-white border cursor-pointer border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 max-w-md"
         >
           <section class="flex flex-col h-full">
+            <h3 class="mb-5 text-lg font-bold text-gray-500 dark:text-gray-400">
+              #{{ post.id }}
+            </h3>
             <div class="flex items-center justify-between">
               <h5
                 class="mb-2 mr-2 text-lg text-left font-bold text-wrap max-w-md truncate tracking-tight text-gray-900 dark:text-white"
