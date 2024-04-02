@@ -154,11 +154,11 @@
                     if (e.target.checked) {
                       this.myId = [...this.myId, channel.id]
                     } else {
-                      this.myId = channels.filter((newId) => newId.id !== channel?.id)
+                      this.myId = this.avId.filter((newId) => newId !== channel?.id)
                     }
                   }
                 "
-                :checked="isChecked(channel)"
+                :checked="false"
                 class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
               />
               <label
@@ -175,18 +175,18 @@
             >
             <div v-for="channel in channels" :key="channel.id" class="flex items-center mb-4">
               <input
-                :id="channel.id"
+                :id="channel"
                 type="checkbox"
                 :onchange="
                   (e) => {
                     if (e.target.checked) {
                       this.myId = [...this.myId, channel.id]
                     } else {
-                      this.myId = channels.filter((newId) => newId.id !== channel?.id)
+                      this.myId = this.passId.filter((newId) => newId !== channel?.id)
                     }
                   }
                 "
-                :checked="isChecked2(channel)"
+                :checked="isChecked2(channel.id)"
                 class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
               />
               <label
@@ -299,7 +299,8 @@ export default defineComponent({
       mystore: null,
       canEdit: false,
       mychannels: this.$props.channels,
-      myId: []
+      myId: [],
+      passId: [],
     }
   },
   computed: {
@@ -311,17 +312,18 @@ export default defineComponent({
   beforeMount() {
     this.text = ''
     this.mystore = store
+    this.avId = this.channels.map((el)=> el.id)
+    this.passId = this.content?.channels?.map((ch)=> ch.id)
   },
   methods: {
-    isChecked(channel) {
-      return this.mychannels.find((ch) => {
-        console.log(this.mychannels, ch)
-        return ch !== channel || channel.id !== ch.id
+    isChecked(chid) {
+      return this.avId.find((id) => {
+        return id !== chid
       })
     },
-    isChecked2(channel) {
-      return this.content.channels.find((ch) => {
-        return ch !== channel || channel.id !== ch.id
+    isChecked2(chid) {
+      return this.passId.find((id) => {
+        return id === chid
       })
     },
     addPost() {

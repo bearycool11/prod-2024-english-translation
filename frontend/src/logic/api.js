@@ -197,7 +197,7 @@ class Api {
   addChannels(id, ch_id, bot_id) {
     return this.client
       .post(`${import.meta.env.VITE_BACKEND_URL}/organizations/${id}/channels`, {
-        id: ch_id,
+        telegram_id: ch_id,
         bot_id: bot_id
       })
       .then(({ data }) => {
