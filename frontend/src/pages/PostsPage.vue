@@ -43,6 +43,7 @@
     :content="state.targetPost"
     :creation="state.creation"
     :id="props.id"
+    :post_id="state.targetPost.id"
   />
 </template>
 <script setup>
@@ -60,6 +61,7 @@ const state = reactive({
 function openModal(index) {
   state.targetPost = store.data.posts[index]
   state.isShowModal = true
+  console.log(state.targetPost.id)
 }
 
 function openCreateModal() {

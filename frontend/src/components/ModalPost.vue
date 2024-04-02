@@ -117,36 +117,39 @@
             </div>
           </div>
           <div class="flex justify-between">
-            <button
-              @click="addChannel"
-              type="submit"
-              class="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+          <button
+            @click="schedulePost"
+            type="submit"
+            class="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+          >
+            <svg
+              class="me-1 -ms-1 w-5 h-5"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+              xmlns="http://www.w3.org/2000/svg"
             >
-              <svg
-                class="me-1 -ms-1 w-5 h-5"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  fill-rule="evenodd"
-                  d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
-                  clip-rule="evenodd"
-                ></path>
-              </svg>
-              {{ buttonText }}
-            </button>
-            <button
-              type="submit"
-              class="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-            >
-              Отправить
-            </button>
-          </div>
+              <path
+                fill-rule="evenodd"
+                d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                clip-rule="evenodd"
+              ></path>
+            </svg>
+            {{ buttonText }}
+          </button>
+          <button
+            
+            type="submit"
+            class="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+          >
+        
+            Отправить    
+        </button>
+        </div>
         </form>
       </div>
     </div>
   </div>
+  {{  post_id}}
 </template>
 <script>
 import { defineComponent } from 'vue'
@@ -160,7 +163,8 @@ export default defineComponent({
     closeModal: Function,
     content: Object,
     creation: Boolean,
-    id: String
+    id: String,
+    post_id: Number
   },
   data() {
     return {
@@ -170,7 +174,6 @@ export default defineComponent({
   },
   computed: {
     buttonText() {
-      console.log(this.creation)
       return this.creation ? 'Создать пост' : 'Сохранить пост'
     }
   },
@@ -184,9 +187,19 @@ export default defineComponent({
             store.data.posts = data
           })
           this.closeModal()
-        })
-        .catch((e) => {
-          this.text = e
+      }).catch((e) => {   
+            this.text = e
+          })
+     
+    },
+    schedulePost() {
+        api.schedulePost(this.id, this.time, this.post_id).then(()=> {
+            api
+          .getPosts(this.id)
+          .then((data) => {
+            store.data.posts = data
+          })
+          this.closeModal()
         })
     }
   }

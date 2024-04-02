@@ -254,6 +254,18 @@ class Api {
         throw 'Вы не можете добавить пост'
       })
   }
+  schedulePost(id, time, post_id) {
+    return this.client
+      .post(`${import.meta.env.VITE_BACKEND_URL}/organizations/${id}/posts/${post_id}/schedule`, {time: time})
+      .then(({ data }) => {
+        if (data.reason) {
+          throw 'Не удалось отправить пост'
+        }
+        return data.rights
+      }).catch(()=> {
+        throw 'Не удалось отправить пост'
+      })
+  }
 }
 
 export const api = new Api()
