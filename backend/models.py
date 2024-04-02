@@ -165,6 +165,7 @@ class GetPostsResponse(BaseModel):
 
 class AddNewPostRequest(BaseModel):
     content: str
+    channels: list[int]
 
 
 class AddNewPostResponse(BaseModel):
