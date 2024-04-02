@@ -12,9 +12,15 @@
       <h5 class="mb-2 text-2xl font-bold truncate tracking-tight text-gray-900 dark:text-white">
         {{ organization.name }}
       </h5>
-      <p class="font-normal truncate text-gray-700 dark:text-gray-400">
+      <div class="flex justify-between">
+        <p class="font-normal truncate text-gray-700 dark:text-gray-400">
         {{ organization.description }}
       </p>
+      <p class="font-light text-sm truncate text-gray-700 dark:text-gray-400">
+        Организация
+      </p>
+      </div>
+      
     </a>
   </div>
   <div v-else class="flex justify-center mt-10 w-full">

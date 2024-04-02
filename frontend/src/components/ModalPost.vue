@@ -186,6 +186,7 @@
                     }
                   }
                 "
+                :disabled="this.content.sent_status === 'WAITING'"
                 :checked="isChecked2(channel.id)"
                 class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
               />
@@ -380,7 +381,7 @@ export default defineComponent({
       return isoDateTimeString
     },
     sendToReview() {
-      api.patchPost(this.id, this.post_id, { is_approved: 'WAITING' }).then(() => {
+      api.patchPost(this.id, this.post_id, { is_approved: 'WAITING',  }).then(() => {
         api.getPosts(this.id).then((data) => {
           store.data.posts = data
         })

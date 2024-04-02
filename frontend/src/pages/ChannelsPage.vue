@@ -18,7 +18,7 @@
         <div
           v-for="(channel, index) in store.data.channels"
           :key="index"
-          class="mt-4 p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700"
+          class="mt-4 mx-2 p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700"
         >
           <div class="flex items-center">
             <h5
