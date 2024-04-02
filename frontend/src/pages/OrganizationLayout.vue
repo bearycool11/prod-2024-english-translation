@@ -7,7 +7,7 @@
   <aside
     v-if="name"
     id="default-sidebar"
-    class="top-0 left-0 z-40 w-64 h-screen transition-transform fixed"
+    class="top-0 left-0 z-40 w-64 h-screen transition-transform sm:static fixed md:translate-x-0 pt-12"
     :class="{
       '-translate-x-full': !store.ui.isSideBarOpen,
       'translate-x-0': store.ui.isSideBarOpen
@@ -15,7 +15,7 @@
     aria-label="Sidebar"
   >
     <div
-      class="h-full top-0 left-0 sticky px-3 py-4 pt-16 overflow-y-auto bg-gray-50 dark:bg-gray-800"
+      class="h-full top-0 left-0 sticky px-3 py-4 pt-4 overflow-y-auto bg-gray-50 dark:bg-gray-800"
     >
       <ul class="space-y-2 font-medium">
         <li>
@@ -42,7 +42,7 @@
         </li>
         <li>
           <router-link
-            v-if="store.auth.permissions.some(obj => obj.name === 'admin' || 'owner')"
+            v-if="store.auth.permissions.some(obj => obj.name === 'admin' || obj.name === 'owner')"
             :to="`/organization/${id}/users`"
             class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
           >
@@ -165,7 +165,7 @@ import { onMounted, ref } from 'vue'
 import { api } from '@/logic/api.js'
 
 const name = ref()
-// const id = router.params.
+
 const props = defineProps({
   id: {
     type: String,

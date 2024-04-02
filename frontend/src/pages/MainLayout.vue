@@ -2,7 +2,7 @@
   <div class="flex" v-if="profile.name">
     <RouterView class="flex" v-if="$route.name != 'AllOrganization'" />
     <nav
-      class="bg-white border-gray-200 lg:px-6 sm:px-8 px-2 py-2.5 dark:bg-gray-800 w-full absolute z-50 shadow-md"
+      class="bg-white border-gray-200 lg:px-6 sm:px-8 px-2 py-2.5 dark:bg-gray-800 w-full absolute z-50 shadow-md  top-0"
     >
       <div class="flex flex-wrap md:justify-start justify-between items-center max-w-screen-xl">
         <div class="flex items-center mr-10">
@@ -10,8 +10,7 @@
             @click="toggleSidebar"
             v-if="$route.name != 'AllOrganization'"
             type="button"
-            class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
-            data-modal-toggle="crud-modal"
+class="text-gray-400 sm:hidden bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"            data-modal-toggle="crud-modal"
           >
             <svg
               class="w-6 h-6 text-gray-800 dark:text-white"

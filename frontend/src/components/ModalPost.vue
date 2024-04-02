@@ -54,6 +54,7 @@
                 :value="content.content"
                 @input="(event) => (areaContent = event.target.value)"
               />
+              {{ text }}
             </div>
           </div>
           <button
@@ -73,7 +74,7 @@
                 clip-rule="evenodd"
               ></path>
             </svg>
-           {{ buttonText }}
+            {{ buttonText }}
           </button>
         </form>
       </div>
@@ -101,20 +102,26 @@ export default defineComponent({
     }
   },
   computed: {
-    buttonText(){
-        console.log(this.creation)
-        return this.creation ? 'Создать пост' : 'Сохранить пост'
+    buttonText() {
+      console.log(this.creation)
+      return this.creation ? 'Создать пост' : 'Сохранить пост'
     }
   },
   beforeMount() {
-    console.log(this.isShown, 1)
   },
   methods: {
     addChannel() {
-        api.addPost(this.id, this.areaContent).then(()=> {
-            api.getPosts(this.id).then((data)=> { store.data.posts = data})
-        })
-        this.closeModal()
+      api.addPost(this.id, this.areaContent).then(() => {
+        api
+          .getPosts(this.id)
+          .then((data) => {
+            store.data.posts = data
+          })
+          this.closeModal()
+      }).catch((e) => {   
+            this.text = e
+          })
+     
     }
   }
 })

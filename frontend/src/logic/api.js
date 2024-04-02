@@ -246,9 +246,11 @@ class Api {
       .post(`${import.meta.env.VITE_BACKEND_URL}/organizations/${id}/posts`, {content: content})
       .then(({ data }) => {
         if (data.reason) {
-          return null
+          throw 'Вы не можете добавить пост'
         }
         return data.rights
+      }).catch(()=> {
+        throw 'Вы не можете добавить пост'
       })
   }
 }
