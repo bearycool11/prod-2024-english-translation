@@ -124,66 +124,53 @@
   </div>
   <RouterView class="flex mt-20" v-if="$route.name == 'AllOrganization'" />
   <ModalNewOrganization
-    
+  v-if="isShowModal"
+    :isShown="isShowModal"
+    :closeModal="closeModal"
   />
   <ModalLogout :isShown="isShowModalLogout" :closeModal="closeLogout" />
 </template>
 
 <script setup>
-import { useDark, useToggle } from '@vueuse/core'
+import { ref, onBeforeMount } from 'vue';
+import { api } from '@/logic/api.js' // import your API module here
+import { store, toggleSidebar } from '@/store/toggleSidebar.js'
+import { useDark, useToggle } from '@vueuse/core'// import your store module here
+import ModalNewOrganization from '../components/ModalNewOrganization.vue'
+import ModalLogout from '../components/ModalLogout.vue'
+
+const isShowModal = ref();
+const isShowModalLogout = ref();
+const organizations = ref([]);
+const profile = ref('');
 
 const isDark = useDark()
 const toggleDark = useToggle(isDark)
-</script>
-<script>
-import { store, toggleSidebar } from '@/store/toggleSidebar.js'
-import ModalNewOrganization from '../components/ModalNewOrganization.vue'
-import ModalLogout from '../components/ModalLogout.vue'
-import { defineComponent } from 'vue'
-import { api } from '@/logic/api.js'
 
-export default defineComponent({
-  components: { ModalNewOrganization, ModalLogout },
-  beforeMount() {
-    api.getProfile().then((profile) => {
-      store.auth.username = profile.name
-      store.auth.id = profile.id
-      this.profile = profile
-    })
-    api.getOrganizations().then((organizations) => {
-      store.data.organizations = organizations
-    })
-  },
-  data() {
-    return {
-      isShowModal: false,
-      isShowModalLogout: false,
-      organizations: [],
-      profile: ''
-    }
-  },
-  methods: {
-    toggleSidebar,
-    toggleModal() {
-      if (this.isShowModal) {
-        this.isShowModal = false
-      } else {
-        this.isShowModal = true
-      }
-    },
-    toggleLogout() {
-      if (this.isShowModalLogout) {
-        this.isShowModalLogout = false
-      } else {
-        this.isShowModalLogout = true
-      }
-    },
-    closeModal() {
-      this.isShowModal = false
-    },
-    closeLogout() {
-      this.isShowModalLogout = false
-    }
-  }
-})
+const toggleModal = () => {
+  isShowModal.value = !isShowModal.value;
+};
+
+const toggleLogout = () => {
+  isShowModalLogout.value = !isShowModalLogout.value;
+};
+
+const closeModal = () => {
+  isShowModal.value = false;
+};
+
+const closeLogout = () => {
+  isShowModalLogout.value = false;
+};
+
+onBeforeMount(() => {
+  api.getProfile().then((profileData) => {
+    store.auth.username = profileData.name;
+    store.auth.id = profileData.id;
+    profile.value = profileData;
+  });
+  api.getOrganizations().then((organizationsData) => {
+    organizations.value = organizationsData;
+  });
+});
 </script>

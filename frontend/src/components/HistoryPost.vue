@@ -13,7 +13,7 @@
     <div v-if="!isPostPublic" class="mb-2 p-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
       <span class="font-medium">Пост в приватном канале</span>
     </div>
-    <div class="flex gap-1 mt-auto flex-wrap flex-col mt-auto">
+    <div class="flex gap-1 mt-auto flex-wrap flex-col">
       <div class="flex">
         <p class="text-wrap text-left dark:text-neutral-200">{{ date(post.planned_time) }}</p>
       </div>
