@@ -29,12 +29,12 @@
             <button
             v-if="store.auth.permissions.some((obj) => obj.name === 'admin' || obj.name === 'owner')"
               @click="deleteChannel(channel.id)"
-              class="ml-4 mb-2 p-1 text-red-600 bg-red-100 hover:bg-red-200 rounded-md font-medium flex"
+              class="ml-4 mb-2 p-1  text-red-600 bg-red-100 hover:bg-red-200 rounded-md font-medium flex"
             >
               Удалить
             </button>
           </div>
-          <p class="truncate max-w-60 w-auto">{{ channel.telegram_id }}</p>
+          <p class="truncate max-w-60 w-auto dark:text-neutral-200">{{ channel.telegram_id }}</p>
         </div>
       </div>
     </div>
@@ -65,11 +65,11 @@ function toggleModal() {
 onMounted(() => {
   api.getOrganizationBots(props.id).then((data) => {
     store.data.bots = data
-    if (store.data.bots.length === 0) {
+    if (store.data.bots?.length === 0) {
       store.data.canAddBots = true
       return
     }
-    store.auth.bot_id = store.data.bots[0].bot_id
+    store.auth.bot_id = store.data.bots[0]?.bot_id
   })
 
   api.getChannels(props.id).then((channels) => {

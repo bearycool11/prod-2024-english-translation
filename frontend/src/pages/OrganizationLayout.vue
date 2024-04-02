@@ -19,7 +19,7 @@
     >
       <ul class="space-y-2 font-medium">
         <li>
-          <h5 class="mb-2 max-h-72 text-lg font-bold break-all truncate">
+          <h5 class="mb-2 max-h-72 text-lg font-bold break-all truncate dark:text-neutral-200">
             Организация: {{ name }}
           </h5>
         </li>
@@ -125,7 +125,9 @@
         </li>
         <li>
           <router-link
-          v-if="store.auth.permissions.some((obj) => obj.name === 'admin' || obj.name === 'owner')"
+            v-if="
+              store.auth.permissions.some((obj) => obj.name === 'admin' || obj.name === 'owner')
+            "
             :to="`/organization/${id}/social`"
             class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
           >
@@ -159,7 +161,7 @@
       </div>
     </div>
   </aside>
-  <RouterView class="mt-20 w-full" />
+  <div lass="mt-20 w-full dark:bg-gray-800 shrink  h-screen"><RouterView /></div>
 </template>
 
 <script setup>

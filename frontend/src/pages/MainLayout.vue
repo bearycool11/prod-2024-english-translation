@@ -2,9 +2,9 @@
   <div class="flex" v-if="profile.name">
     <RouterView class="flex" v-if="$route.name != 'AllOrganization'" />
     <nav
-      class="bg-white border-gray-200 lg:px-6 sm:px-8 px-2 py-2.5 dark:bg-gray-800 w-full absolute z-50 shadow-md top-0"
+      class="bg-white border-gray-200 lg:px-6 sm:px-8 px-2 py-2.5 dark:bg-gray-800 w-screen shrink absolute z-50 shadow-md top-0"
     >
-      <div class="flex flex-wrap md:justify-start justify-between items-center max-w-screen-xl">
+      <div class="flex md:justify-start justify-between items-center max-w-screen-xl">
         <div class="flex items-center mr-10">
           <button
             @click="toggleSidebar"
@@ -30,7 +30,10 @@
               />
             </svg>
           </button>
-          <a class="cursor-pointer flex items-center font-medium text-xl max-w-80" href="/">
+          <a
+            class="cursor-pointer flex items-center font-medium text-xl max-w-80 dark:text-neutral-200"
+            href="/"
+          >
             {{ profile.name }}
           </a>
           <button
@@ -54,14 +57,14 @@
             </svg>
           </button>
         </div>
-        <div class="flex items-center lg:order-2" v-if="$route.name == 'AllOrganization'">
+        <div class="flex items-center" v-if="$route.name == 'AllOrganization'">
           <button
             @click="toggleModal"
-            class="flex items-center justify-between text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            class="flex items-center justify-between text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             type="button"
           >
             <svg
-              class="w-6 h-6 text-gray-800 dark:text-white mr-1"
+              class="w-6 h-6 text-gray-800 dark:text-white"
               aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -80,6 +83,42 @@
             <p class="md:flex hidden">Организация</p>
           </button>
         </div>
+        <div class="flex w-full justify-end">
+        <button class="flex" @click="toggleDark()">
+          <svg
+            v-if="!isDark"
+            class="w-6 h-6 text-gray-800 dark:text-white"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M11.675 2.015a.998.998 0 0 0-.403.011C6.09 2.4 2 6.722 2 12c0 5.523 4.477 10 10 10 4.356 0 8.058-2.784 9.43-6.667a1 1 0 0 0-1.02-1.33c-.08.006-.105.005-.127.005h-.001l-.028-.002A5.227 5.227 0 0 0 20 14a8 8 0 0 1-8-8c0-.952.121-1.752.404-2.558a.996.996 0 0 0 .096-.428V3a1 1 0 0 0-.825-.985Z"
+              clip-rule="evenodd"
+            />
+          </svg>
+          <svg
+            v-else
+            class="w-6 h-6 text-gray-800 dark:text-white"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M13 3a1 1 0 1 0-2 0v2a1 1 0 1 0 2 0V3ZM6.343 4.929A1 1 0 0 0 4.93 6.343l1.414 1.414a1 1 0 0 0 1.414-1.414L6.343 4.929Zm12.728 1.414a1 1 0 0 0-1.414-1.414l-1.414 1.414a1 1 0 0 0 1.414 1.414l1.414-1.414ZM12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10Zm-9 4a1 1 0 1 0 0 2h2a1 1 0 1 0 0-2H3Zm16 0a1 1 0 1 0 0 2h2a1 1 0 1 0 0-2h-2ZM7.757 17.657a1 1 0 1 0-1.414-1.414l-1.414 1.414a1 1 0 1 0 1.414 1.414l1.414-1.414Zm9.9-1.414a1 1 0 0 0-1.414 1.414l1.414 1.414a1 1 0 0 0 1.414-1.414l-1.414-1.414ZM13 19a1 1 0 1 0-2 0v2a1 1 0 1 0 2 0v-2Z"
+              clip-rule="evenodd"
+            />
+          </svg>
+        </button>
+      </div>
       </div>
     </nav>
   </div>
@@ -92,6 +131,12 @@
   <ModalLogout :isShown="isShowModalLogout" :closeModal="closeLogout" />
 </template>
 
+<script setup>
+import { useDark, useToggle } from '@vueuse/core'
+
+const isDark = useDark()
+const toggleDark = useToggle(isDark)
+</script>
 <script>
 import { store, toggleSidebar } from '@/store/toggleSidebar.js'
 import ModalNewOrganization from '../components/ModalNewOrganization.vue'

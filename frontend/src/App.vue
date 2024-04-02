@@ -5,7 +5,7 @@ useAuth()
 </script>
 
 <template>
-  <RouterView />
+  <main class="dark:bg-gray-800 shrink  h-screen"> <RouterView /></main>
 </template>
 
 <style scoped></style>

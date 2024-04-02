@@ -15,7 +15,7 @@
     </div>
     <div class="flex gap-1 mt-auto flex-wrap flex-col mt-auto">
       <div class="flex">
-        <p class="text-wrap text-left">{{ date(post.planned_time) }}</p>
+        <p class="text-wrap text-left dark:text-neutral-200">{{ date(post.planned_time) }}</p>
       </div>
       <div class="flex gap-1 mt-1 flex-wrap flex-col">
         <div class="p-2 bg-blue-100 rounded-md">{{ props.post.is_approved }}</div>

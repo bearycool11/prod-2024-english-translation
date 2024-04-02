@@ -27,7 +27,7 @@
               Удалить
             </button>
           </div>
-          <p class="truncate max-w-60 w-auto">{{ replaceAfterColon(bot.bot_token) }}</p>
+          <p class="truncate max-w-60 w-auto dark:text-neutral-200">{{ replaceAfterColon(bot.bot_token) }}</p>
         </div>
       </div>
     </div>
