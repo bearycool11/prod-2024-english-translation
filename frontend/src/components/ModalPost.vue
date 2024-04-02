@@ -15,41 +15,40 @@
         >
           <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Пост</h3>
           <div class="flex">
-          <button
-            @click="deletePost"
-            v-if="
-              mystore.auth.permissions.some((obj) => obj.name === 'admin' || obj.name === 'owner')
-            "
-            class="mb-2 z-40 bg-red-100 p-[4px] hover:bg-red-200 rounded flex text-red-600"
-          >
-            Удалить
-          </button>
-          <div>
             <button
-              @click="this.$props.closeModal"
-              type="button"
-              class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+              @click="deletePost"
+              v-if="
+                mystore.auth.permissions.some((obj) => obj.name === 'admin' || obj.name === 'owner')
+              "
+              class="mb-2 z-40 bg-red-100 p-[4px] hover:bg-red-200 rounded flex text-red-600"
             >
-              <svg
-                class="w-3 h-3"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 14 14"
-              >
-                <path
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
-                />
-              </svg>
-              <span class="sr-only">Close modal</span>
+              Удалить
             </button>
+            <div>
+              <button
+                @click="this.$props.closeModal"
+                type="button"
+                class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+              >
+                <svg
+                  class="w-3 h-3"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 14 14"
+                >
+                  <path
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
+                  />
+                </svg>
+                <span class="sr-only">Close modal</span>
+              </button>
+            </div>
           </div>
-        </div>
-
         </div>
         <!-- Modal body -->
 
@@ -142,6 +141,63 @@
               </div>
             </div>
           </div>
+          <div v-if="this.creation">
+            <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >Каналы</label
+            >
+            <div v-for="channel in channels" :key="channel.id" class="flex items-center mb-4">
+              <input
+                :id="channel.id"
+                type="checkbox"
+                :onchange="
+                  (e) => {
+                    if (e.target.checked) {
+                      this.myId = [...this.myId, channel.id]
+                    } else {
+                      this.myId = channels.filter((newId) => newId.id !== channel?.id)
+                    }
+                  }
+                "
+                :checked="isChecked(channel)"
+                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+              />
+              <label
+                :for="channel.id"
+                class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+              >
+                {{ channel.name }}
+              </label>
+            </div>
+          </div>
+          <div v-else>
+            <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >Каналы</label
+            >
+            <div v-for="channel in channels" :key="channel.id" class="flex items-center mb-4">
+              <input
+                :id="channel.id"
+                type="checkbox"
+                :onchange="
+                  (e) => {
+                    if (e.target.checked) {
+                      this.myId = [...this.myId, channel.id]
+                    } else {
+                      this.myId = channels.filter((newId) => newId.id !== channel?.id)
+                    }
+                  }
+                "
+                :checked="isChecked2(channel)"
+                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+              />
+              <label
+                :for="channel.id"
+                class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+              >
+                {{ channel.name }}
+              </label>
+            </div>
+          </div>
+          
           <div class="flex justify-between flex-wrap">
             <button
               v-if="this.content.is_approved !== 'APPROVED'"
@@ -231,7 +287,8 @@ export default defineComponent({
     content: Object,
     creation: Boolean,
     id: String,
-    post_id: Number
+    post_id: Number,
+    channels: Object
   },
   data() {
     return {
@@ -240,7 +297,9 @@ export default defineComponent({
       time: '',
       date: '',
       mystore: null,
-      canEdit: false
+      canEdit: false,
+      mychannels: this.$props.channels,
+      myId: []
     }
   },
   computed: {
@@ -250,18 +309,33 @@ export default defineComponent({
     }
   },
   beforeMount() {
+    this.text = ''
     this.mystore = store
   },
   methods: {
+    isChecked(channel) {
+      return this.mychannels.find((ch) => {
+        console.log(this.mychannels, ch)
+        return ch !== channel || channel.id !== ch.id
+      })
+    },
+    isChecked2(channel) {
+      return this.content.channels.find((ch) => {
+        return ch !== channel || channel.id !== ch.id
+      })
+    },
     addPost() {
+      console.log(this.myId)
       if (this.creation) {
         api
-          .addPost(this.id, this.areaContent)
+          .addPost(this.id, this.areaContent, { channels: this.myId })
           .then(() => {
             api.getPosts(this.id).then((data) => {
               store.data.posts = data
             })
             this.closeModal()
+            this.myId = []
+            this.mychannels = [...this.$props.channels]
           })
           .catch((e) => {
             this.text = e
@@ -271,12 +345,14 @@ export default defineComponent({
         api
           .patchPost(this.id, this.post_id, {
             content: content,
-            is_approved: this.content.is_approved
+            is_approved: this.content.is_approved,
+            channels:  this.myId 
           })
           .then(() => {
             api.getPosts(this.id).then((data) => {
               store.data.posts = data
             })
+            this.myId = []
           })
         this.closeModal()
       }
@@ -326,12 +402,20 @@ export default defineComponent({
       this.closeModal()
     },
     deletePost() {
-      api.deletePosts(this.id, this.post_id).then(
-        api.getPosts(this.id).then((data) => {
-          store.data.posts = data
+      api
+        .deletePosts(this.id, this.post_id)
+        .then(() => {
+          api.getPosts(this.id).then((data) => {
+            store.data.posts = data
+          })
+          this.closeModal()
         })
-      )
-      this.closeModal()
+        .catch((e) => {
+          api.getPosts(this.id).then((data) => {
+            store.data.posts = data
+          })
+          this.text = e
+        })
     }
   }
 })

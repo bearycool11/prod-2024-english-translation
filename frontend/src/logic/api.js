@@ -251,9 +251,9 @@ class Api {
         return data.rights
       })
   }
-  addPost(id, content) {
+  addPost(id, content, {channels}) {
     return this.client
-      .post(`${import.meta.env.VITE_BACKEND_URL}/organizations/${id}/posts`, { content: content })
+      .post(`${import.meta.env.VITE_BACKEND_URL}/organizations/${id}/posts`, { content: content, channels: channels })
       .then(({ data }) => {
         if (data.reason) {
           throw 'Вы не можете добавить пост'
@@ -296,7 +296,7 @@ class Api {
       })
   }
 
-  patchPost(id, post_id, {content = false, is_approved = false, comment = false}) {
+  patchPost(id, post_id, {content = false, is_approved = false, comment = false, channels =false}) {
     let data = {id: post_id}
 
     if (content) {
@@ -307,6 +307,9 @@ class Api {
     }
     if (comment) {
       data.comment = comment
+    }
+    if (channels) {
+      data.channels = channels
     }
 
     return this.client
@@ -328,10 +331,7 @@ class Api {
     return this.client
       .delete(`${import.meta.env.VITE_BACKEND_URL}/organizations/${id}/posts`, {data:{id: post_id}})
       .then(({ data }) => {
-        if (data.reason) {
-          throw 'Не удалось удалить'
-        }
-
+       
         return data
       })
       .catch(() => {

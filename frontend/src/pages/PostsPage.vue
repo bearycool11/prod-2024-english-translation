@@ -49,6 +49,8 @@
     :creation="state.creation"
     :id="props.id"
     :post_id="state.targetPost.id"
+    :channels="store.data.channels"
+    v-if="state.isShowModal"
   />
 </template>
 <script setup>

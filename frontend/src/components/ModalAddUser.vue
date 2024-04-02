@@ -63,7 +63,8 @@
               />
             </div>
           </div>
-          <div v-for="right in rights" class="flex items-center mb-4">
+          
+          <div v-for="right in rights" :key="right" class="flex items-center mb-4">
             <input
               :id="right"
               type="checkbox"

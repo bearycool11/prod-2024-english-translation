@@ -185,5 +185,8 @@ onMounted(() => {
   api.getMyPermissions(props.id).then((data) => {
     store.auth.permissions = data
   })
+  api.getChannels(props.id).then((data) => {
+    store.data.channels = data
+  })
 })
 </script>
