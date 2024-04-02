@@ -57,7 +57,7 @@ class DBPost(SQLModel, table=True):
                                                                        "back_populates": "posts",
                                                                        "lazy": "dynamic"})
     organization: "DBOrganization" = Relationship()
-    sent_infos: "DbSentPostInfo" = Relationship()
+    sent_infos: list["DbSentPostInfo"] = Relationship(back_populates="post")
 
 
 class DBPermission(SQLModel, table=True):
