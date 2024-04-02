@@ -24,10 +24,10 @@
             class="text-lg font-semibold text-gray-900 dark:text-white"
             :key="index"
           >
-            role: {{ right.name || right }}
+            {{ right.name || right }}
           </h3>
           <button
-            v-if="store.auth.id !== user.user.id"
+            v-if="allowEdit(user)"
             @click="() => toggleModal(user)"
             class="block mt-auto text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
           >
@@ -52,13 +52,16 @@
   />
 </template>
 <script setup>
-import { onMounted, reactive, ref } from 'vue'
+import { onMounted, reactive, ref, computed } from 'vue'
 import { api } from '@/logic/api.js'
 import { store } from '@/store/index.js'
 import ModalAddUser from '@/components/ModalAddUser.vue'
 
 const isShowModal = ref()
-
+const allowEdit = computed(
+  () => (user) => store.auth.id !== user.user.id && user.rights.some((obj) => obj.name === 'admin')
+)
+console.log(allowEdit)
 const state = reactive({
   targetUser: {}
 })

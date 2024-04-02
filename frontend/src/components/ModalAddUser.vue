@@ -120,14 +120,20 @@ export default defineComponent({
     isShown: Boolean,
     closeModal: Function,
     id: String,
-    initialUser: Object
+    initialUser: Object,
+    
   },
   data() {
     return {
       permissions: this.$props.initialUser?.rights || ['viewer'],
       login: this.$props.initialUser?.user?.login,
-      rights: ['viewer', 'editor', 'reviewer', 'admin']
+      rights: ['viewer', 'editor', 'reviewer'],
+      mystore: null,
     }
+  },
+  beforeMount(){
+    this.mystore = store
+   this.mystore.auth.permissions.some((obj) => obj.name === 'owner' ) ? this.rights.push('admin') : null
   },
 
   methods: {

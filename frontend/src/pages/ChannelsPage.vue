@@ -32,7 +32,7 @@
               Удалить
             </button>
           </div>
-          <p class="truncate max-w-60 w-auto">{{ channel.id }}</p>
+          <p class="truncate max-w-60 w-auto">{{ channel.telegram_id }}</p>
         </div>
       </div>
     </div>

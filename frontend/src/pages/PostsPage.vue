@@ -20,11 +20,20 @@
           class="p-6 min-w-sm bg-white border cursor-pointer border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 max-w-md"
         >
           <section class="flex flex-col h-full">
-            <h5
-              class="mb-2 mr-2 text-lg text-left font-bold text-wrap max-w-md truncate tracking-tight text-gray-900 dark:text-white"
-            >
-              {{ post.content }}
-            </h5>
+            <div class="flex items-center justify-between">
+              <h5
+                class="mb-2 mr-2 text-lg text-left font-bold text-wrap max-w-md truncate tracking-tight text-gray-900 dark:text-white"
+              >
+                {{ post.content }}
+              </h5>
+              <button
+              v-if="store.auth.permissions.some(
+            (obj) => obj.name === 'admin' || obj.name === 'owner'
+          )"
+               class="mb-2  bg-red-100 p-[4px] hover:bg-red-200 rounded flex text-red-600">
+                Удалить
+              </button>
+            </div>
             <div class="flex gap-1 mt-auto flex-wrap">
               <div class="flex">
                 <p class="text-wrap text-left">{{ date(post.planned_time) }}</p>

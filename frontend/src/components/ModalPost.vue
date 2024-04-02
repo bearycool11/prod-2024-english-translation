@@ -135,7 +135,7 @@
               v-if="this.content.is_approved !== 'APPROVED'"
               @click="addPost"
               type="submit"
-              class="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              class="text-white mr-2 inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             >
               <svg
                 class="me-1 -ms-1 w-5 h-5"
@@ -176,9 +176,8 @@
             >
               Отправить на одобрение
             </button>
-            <button
-              @click="approvePost"
-              class="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            <div
+              class="flex"
               v-if="
                 !this.creation &&
                 this.content.is_approved === 'WAITING' &&
@@ -187,8 +186,19 @@
                 )
               "
             >
-              Одобрить
-            </button>
+              <button
+                @click="approvePost"
+                class="text-white mr-2 inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              >
+                Одобрить
+              </button>
+              <button
+                @click="rejectPost"
+                class="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              >
+                Отклонить
+              </button>
+            </div>
           </div>
         </form>
       </div>
@@ -237,7 +247,7 @@ export default defineComponent({
           .addPost(this.id, this.areaContent)
           .then(() => {
             api.getPosts(this.id).then((data) => {
-              store.data.posts = [...data].reverse()
+              store.data.posts = data
             })
             this.closeModal()
           })
@@ -245,13 +255,18 @@ export default defineComponent({
             this.text = e
           })
       } else {
-        let content = this.areaContent === '' ? this.content.content  : this.areaContent
-        api.patchPost(this.id, this.post_id, {content: content, is_approved: this.content.is_approved}).then(() => {
-        api.getPosts(this.id).then((data) => {
-          store.data.posts = [...data].reverse()
-        })
-      })
-      this.closeModal()
+        let content = this.areaContent === '' ? this.content.content : this.areaContent
+        api
+          .patchPost(this.id, this.post_id, {
+            content: content,
+            is_approved: this.content.is_approved
+          })
+          .then(() => {
+            api.getPosts(this.id).then((data) => {
+              store.data.posts = data
+            })
+          })
+        this.closeModal()
       }
     },
     schedulePost() {
@@ -260,7 +275,7 @@ export default defineComponent({
         .schedulePost(this.id, this.convertToISODateTime(this.date, this.time), this.post_id)
         .then(() => {
           api.getPosts(this.id).then((data) => {
-            store.data.posts = [...data].reverse()
+            store.data.posts = data
           })
           this.closeModal()
         })
@@ -277,7 +292,23 @@ export default defineComponent({
     sendToReview() {
       api.patchPost(this.id, this.post_id, { is_approved: 'WAITING' }).then(() => {
         api.getPosts(this.id).then((data) => {
-          store.data.posts = [...data].reverse()
+          store.data.posts = data
+        })
+      })
+      this.closeModal()
+    },
+    approvePost() {
+      api.patchPost(this.id, this.post_id, { is_approved: 'APPROVED' }).then(() => {
+        api.getPosts(this.id).then((data) => {
+          store.data.posts = data
+        })
+      })
+      this.closeModal()
+    },
+    rejectPost() {
+      api.patchPost(this.id, this.post_id, { is_approved: 'REJECTED' }).then(() => {
+        api.getPosts(this.id).then((data) => {
+          store.data.posts = data
         })
       })
       this.closeModal()
