@@ -141,9 +141,9 @@ class DbSentPostInfo(SQLModel, table=True):
     __tablename__ = "sent_post_info"
 
     id: int = Field(primary_key=True, default=None, unique=True)
-    post_id: int = Field(foreign_key="posts.id", primary_key=True)
-    channel_id: int = Field(foreign_key="channels.id", primary_key=True)
-    telegram_message_id: int = Field(sa_column=Column(BigInteger))
+    post_id: Optional[int] = Field(foreign_key="posts.id", nullable=True)
+    channel_id: Optional[int] = Field(foreign_key="channels.id", nullable=True)
+    telegram_message_id: Optional[int] = Field(sa_column=Column(BigInteger, nullable=True))
     chat_username: Optional[str] = Field(nullable=True)
 
     post: DBPost = Relationship(back_populates="sent_infos")
