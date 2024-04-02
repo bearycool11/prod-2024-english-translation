@@ -45,3 +45,6 @@ B2B-продукт: SMM-платформа для вашей команды с �
 - Frontend:
   - Vue.JS
   - Flowbite
+- Mobile:
+  - Kotlin
+  - Android Jetpack
