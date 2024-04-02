@@ -557,7 +557,7 @@ def add_new_post(
         '403': {'model': ErrorResponse}
     }, tags=["posts"]
 )
-def add_new_post(
+def delete_post(
         organization_id: int,
         response: Response, body: DeletePostRequest, db_session: Session = Depends(get_session),
         current_user: DBUser = Depends(get_current_user)
