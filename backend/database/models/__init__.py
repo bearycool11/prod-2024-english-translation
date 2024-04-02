@@ -57,7 +57,7 @@ class DBPost(SQLModel, table=True):
                                                                        "back_populates": "posts",
                                                                        "lazy": "dynamic"})
     organization: "DBOrganization" = Relationship()
-    sent_infos: list["DbSentPostInfo"] = Relationship(back_populates="post")
+    sent_infos: list["DBSentPostInfo"] = Relationship(back_populates="post")
 
 
 class DBPermission(SQLModel, table=True):
@@ -137,7 +137,7 @@ class DBTag(SQLModel, table=True):
     post: DBPost = Relationship(back_populates="tag_bindings")
 
 
-class DbSentPostInfo(SQLModel, table=True):
+class DBSentPostInfo(SQLModel, table=True):
     __tablename__ = "sent_post_info"
 
     id: int = Field(primary_key=True, default=None, unique=True)
@@ -147,6 +147,12 @@ class DbSentPostInfo(SQLModel, table=True):
     chat_username: Optional[str] = Field(nullable=True)
 
     post: DBPost = Relationship(back_populates="sent_infos")
+
+
+class DBOrganizationStopToggle(SQLModel, table=True):
+    __tablename__ = "organization_stop_toggles"
+
+    organization_id: int = Field(primary_key=True, default=None)
 
 
 post_channel_bindings = Table(

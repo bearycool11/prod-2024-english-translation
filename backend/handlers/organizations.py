@@ -1,20 +1,20 @@
 from typing import Union
 
-import requests as r
+import requests
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from starlette.responses import Response
 
 from database.database_connector import get_session
 from database.models import DBUser, DBOrganization, DBOrganizationUser, DBPermission, DBOrganizationBot, DBChannel, \
-    DBPost, SentStatus, Status, DBTask, DBTag
+    DBPost, SentStatus, Status, DBTask, DBTag, DBOrganizationStopToggle
 from models import ErrorResponse, Organization, OrganizationCreatePostResponse, OrganizationCreatePostRequest, \
     UserOrganizationsGetResponse, OrganizationUsersGetResponse, OrganizationUser, UserPublicProfile, AddBotPostResponse, \
     AddBotPostRequest, ListBotGetResponse, Bot, AddUserPostRequest, UserPostResponse, \
     DeleteUserResponse, DeleteUserRequest, AddChannelPostRequest, GetChannelsResponse, Channel, \
     DeleteChannelRequest, DeleteChannelResponse, GetPostsResponse, Post, \
     AddNewPostRequest, AddNewPostResponse, EditPostResponse, EditPostRequest, ScheduleTimeRequest, PostIdResponse, \
-    DeletePostRequest, DeletePostResponse, UserRight, PostSentInfo
+    DeletePostRequest, DeletePostResponse, UserRight, PostSentInfo, OrganizationStopToggleIdResponse, StatusResponse
 from tools.auth import get_current_user
 
 router = APIRouter(prefix="/organizations")
@@ -277,7 +277,7 @@ def add_organization_bot(
             DBOrganizationUser.organization_id == organization_id, DBPermission.level >= 4).count() == 0:
         response.status_code = 403
         return ErrorResponse(reason="Don\'t have required permissions")
-    req = r.get(f'https://api.telegram.org/bot{body.token}/getMe')
+    req = requests.get(f'https://api.telegram.org/bot{body.token}/getMe')
     if req.status_code != 200:
         return ErrorResponse(reason="Invalid token")
     db_model = DBOrganizationBot(organization_id=organization_id, bot_token=body.token)
@@ -385,7 +385,7 @@ def add_channel_to_organization(
     db_model = DBChannel(**body.dict())
     token = db_session.query(DBOrganizationBot).filter(DBOrganizationBot.bot_id == body.bot_id,
                                                        DBOrganizationBot.organization_id == organization_id).first().bot_token
-    channel_info = r.get(f'https://api.telegram.org/bot{token}/getChat?chat_id={body.telegram_id}')
+    channel_info = requests.get(f'https://api.telegram.org/bot{token}/getChat?chat_id={body.telegram_id}')
     if channel_info.status_code != 200:
         response.status_code = 404
         return ErrorResponse(reason="Channel not found")
@@ -683,3 +683,57 @@ def schedule_post(organization_id: int, post_id: int, response: Response, body: 
         db_session.add(task)
     db_session.commit()
     return PostIdResponse(**post_model.dict())
+
+
+@router.post(
+    '/{organization_id}/block_tasks',
+    response_model=Union[OrganizationStopToggleIdResponse, ErrorResponse],
+    responses={
+        '200': {'model': OrganizationStopToggleIdResponse},
+        '401': {'model': ErrorResponse},
+        '403': {'model': ErrorResponse},
+        '409': {'model': ErrorResponse},
+    }, tags=["organizations"]
+)
+def block_tasks(organization_id: int, response: Response,
+                db_session: Session = Depends(get_session),
+                current_user=Depends(get_current_user)) -> Union[OrganizationStopToggleIdResponse, ErrorResponse]:
+    if current_user.organization_bindings.join(DBPermission).filter(
+            DBOrganizationUser.organization_id == organization_id, DBPermission.level >= 4).count() == 0:
+        response.status_code = 403
+        return ErrorResponse(reason="Don\'t have required permissions")
+    block_model = DBOrganizationStopToggle(organization_id=organization_id)
+    db_session.add(block_model)
+    try:
+        db_session.commit()
+    except:
+        response.status_code = 409
+        return ErrorResponse(reason="Already blocked")
+    return OrganizationStopToggleIdResponse(**block_model.dict())
+
+
+@router.post(
+    '/{organization_id}/unblock_tasks',
+    response_model=Union[OrganizationStopToggleIdResponse, ErrorResponse],
+    responses={
+        '200': {'model': OrganizationStopToggleIdResponse},
+        '400': {'model': ErrorResponse},
+        '401': {'model': ErrorResponse},
+        '403': {'model': ErrorResponse},
+    }, tags=["organizations"]
+)
+def unblock_tasks(organization_id: int, response: Response,
+                  db_session: Session = Depends(get_session),
+                  current_user=Depends(get_current_user)) -> Union[OrganizationStopToggleIdResponse, ErrorResponse]:
+    if current_user.organization_bindings.join(DBPermission).filter(
+            DBOrganizationUser.organization_id == organization_id, DBPermission.level >= 4).count() == 0:
+        response.status_code = 403
+        return ErrorResponse(reason="Don\'t have required permissions")
+    block_model = db_session.query(DBOrganizationStopToggle).filter(
+        DBOrganizationStopToggle.organization_id == organization_id).first()
+    if block_model is None:
+        response.status_code = 400
+        return ErrorResponse(reason="Not blocked")
+    db_session.delete(block_model)
+    db_session.commit()
+    return OrganizationStopToggleIdResponse(organization_id=organization_id)

@@ -207,3 +207,7 @@ class DeletePostRequest(BaseModel):
 
 class DeletePostResponse(BaseModel):
     id: int
+
+
+class OrganizationStopToggleIdResponse(BaseModel):
+    organization_id: int
