@@ -17,7 +17,7 @@
           v-for="(post, index) in store.data.posts"
           :key="index"
           @click="openModal(index)"
-          class="p-6 min-w-sm w-full bg-white border cursor-pointer border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 max-w-md"
+          class="p-6 min-w-sm bg-white border cursor-pointer border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 max-w-md"
         >
           <section class="flex flex-col h-full">
             <h5
@@ -64,7 +64,6 @@ const state = reactive({
 function openModal(index) {
   state.targetPost = store.data.posts[index]
   state.isShowModal = true
-  console.log(state.targetPost.id)
 }
 
 function openCreateModal() {
@@ -90,29 +89,18 @@ const props = defineProps({
   }
 })
 
-const date = (isoString) => {
-  // Check if the input is null
-  if (isoString === null) {
+const date = (utcIsoString) => {
+  if (!utcIsoString) {
     return ''
   }
 
-  // Parse the ISO string into a Date object
-  const date = new Date(isoString)
+  const londonTime = new Date(utcIsoString)
 
-  // Format the date according to the current locale and timezone
-  const formattedDate = new Intl.DateTimeFormat('ru-RU', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    timeZoneName: 'short'
-  }).format(date)
+  const localTimezoneOffset = new Date().getTimezoneOffset()
+  const localTime = new Date(londonTime.getTime() - localTimezoneOffset * 60000)
 
-  // Extract the formatted date and time parts
-  const [dayMonthYear, timeWithTimezone] = formattedDate.split(', ')
+  const formattedLocalTime = `${String(localTime.getDate()).padStart(2, '0')}.${String(localTime.getMonth() + 1).padStart(2, '0')}.${localTime.getFullYear()} ${String(localTime.getHours()).padStart(2, '0')}:${String(localTime.getMinutes()).padStart(2, '0')}`
 
-  // Return the formatted date with the timezone included
-  return 'Запланирован ' + dayMonthYear + ' ' + timeWithTimezone
+  return formattedLocalTime
 }
 </script>

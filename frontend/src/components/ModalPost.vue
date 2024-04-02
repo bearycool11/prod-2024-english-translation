@@ -40,6 +40,7 @@
           </div>
         </div>
         <!-- Modal body -->
+
         <form :onsubmit="(e) => e.preventDefault()" class="p-4 md:p-5">
           <div class="grid gap-4 mb-4 grid-cols-2">
             <div class="col-span-2">
@@ -47,6 +48,11 @@
                 >Содержание</label
               >
               <textarea
+                :readonly="
+                  !mystore.auth.permissions.some(
+                    (obj) => obj.name === 'editor' || obj.name === 'admin' || obj.name === 'owner'
+                  ) || this.content.is_approved !== 'OPEN' || this.content.is_approved  === undefined
+                "
                 type="text"
                 name="name"
                 id="name"
@@ -60,7 +66,11 @@
             </div>
             <div
               class="col-span-2"
-              v-if="!this.creation && this.content.is_approved === 'APPROVED'"
+              v-if="
+                !this.creation &&
+                this.content.is_approved === 'APPROVED' &&
+                this.content.sent_status !== 'WAITING'
+              "
             >
               <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                 >Запланировать</label
@@ -122,6 +132,7 @@
           </div>
           <div class="flex justify-between">
             <button
+              v-if="this.content.is_approved !== 'APPROVED'"
               @click="addChannel"
               type="submit"
               class="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
@@ -141,12 +152,18 @@
               {{ buttonText }}
             </button>
             <button
+              v-if="
+                !this.creation &&
+                this.content.is_approved === 'APPROVED' &&
+                this.content.sent_status !== 'WAITING'
+              "
               @click="schedulePost"
               type="submit"
               class="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             >
               Запланировать
             </button>
+            <button v-if="!this.creation && this.content.is_approved === 'APPROVED'"></button>
           </div>
         </form>
       </div>
@@ -174,7 +191,8 @@ export default defineComponent({
       text: '',
       areaContent: '',
       time: '',
-      date: ''
+      date: '',
+      mystore: null
     }
   },
   computed: {
@@ -182,7 +200,9 @@ export default defineComponent({
       return this.creation ? 'Создать пост' : 'Сохранить пост'
     }
   },
-  beforeMount() {},
+  beforeMount() {
+    this.mystore = store
+  },
   methods: {
     addChannel() {
       api
