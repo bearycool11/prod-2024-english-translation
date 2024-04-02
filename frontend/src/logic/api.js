@@ -285,6 +285,33 @@ class Api {
         throw 'Не удалось отправить пост'
       })
   }
+
+  patchPost(id, post_id, {content = false, is_approved = false, comment = false}) {
+    let data = {id: post_id}
+
+    if (content) {
+      data.content = content
+    }
+    if (is_approved) {
+      data.is_approved = is_approved
+    }
+    if (comment) {
+      data.comment = comment
+    }
+
+    return this.client
+      .patch(`${import.meta.env.VITE_BACKEND_URL}/organizations/${id}/posts`, data)
+      .then(({ data }) => {
+        if (data.reason) {
+          throw 'Не удалось получить посты'
+        }
+
+        return data.posts
+      })
+      .catch(() => {
+        throw 'Не удалось получить посты'
+      })
+  }
 }
 
 export const api = new Api()

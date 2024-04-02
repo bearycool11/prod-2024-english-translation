@@ -51,7 +51,7 @@
                 :readonly="
                   !mystore.auth.permissions.some(
                     (obj) => obj.name === 'editor' || obj.name === 'admin' || obj.name === 'owner'
-                  ) || this.content.is_approved !== 'OPEN' || this.content.is_approved  === undefined
+                  ) || this.content.is_approved === 'APPROVED'
                 "
                 type="text"
                 name="name"
@@ -133,7 +133,7 @@
           <div class="flex justify-between">
             <button
               v-if="this.content.is_approved !== 'APPROVED'"
-              @click="addChannel"
+              @click="addPost"
               type="submit"
               class="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             >
@@ -163,7 +163,32 @@
             >
               Запланировать
             </button>
-            <button v-if="!this.creation && this.content.is_approved === 'APPROVED'"></button>
+            <button
+              @click="sendToReview"
+              class="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              v-if="
+                !this.creation &&
+                this.content.is_approved === 'OPEN' &&
+                mystore.auth.permissions.some(
+                  (obj) => obj.name === 'editor' || obj.name === 'admin' || obj.name === 'owner'
+                )
+              "
+            >
+              Отправить на одобрение
+            </button>
+            <button
+              @click="approvePost"
+              class="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              v-if="
+                !this.creation &&
+                this.content.is_approved === 'WAITING' &&
+                mystore.auth.permissions.some(
+                  (obj) => obj.name === 'reviewer' || obj.name === 'admin' || obj.name === 'owner'
+                )
+              "
+            >
+              Одобрить
+            </button>
           </div>
         </form>
       </div>
@@ -192,11 +217,13 @@ export default defineComponent({
       areaContent: '',
       time: '',
       date: '',
-      mystore: null
+      mystore: null,
+      canEdit: false
     }
   },
   computed: {
     buttonText() {
+      console.log(this.content.is_approved)
       return this.creation ? 'Создать пост' : 'Сохранить пост'
     }
   },
@@ -204,18 +231,28 @@ export default defineComponent({
     this.mystore = store
   },
   methods: {
-    addChannel() {
-      api
-        .addPost(this.id, this.areaContent)
-        .then(() => {
-          api.getPosts(this.id).then((data) => {
-            store.data.posts = data
+    addPost() {
+      if (this.creation) {
+        api
+          .addPost(this.id, this.areaContent)
+          .then(() => {
+            api.getPosts(this.id).then((data) => {
+              store.data.posts = [...data].reverse()
+            })
+            this.closeModal()
           })
-          this.closeModal()
+          .catch((e) => {
+            this.text = e
+          })
+      } else {
+        let content = this.areaContent === '' ? this.content.content  : this.areaContent
+        api.patchPost(this.id, this.post_id, {content: content, is_approved: this.content.is_approved}).then(() => {
+        api.getPosts(this.id).then((data) => {
+          store.data.posts = [...data].reverse()
         })
-        .catch((e) => {
-          this.text = e
-        })
+      })
+      this.closeModal()
+      }
     },
     schedulePost() {
       console.log(this.date, this.time)
@@ -223,7 +260,7 @@ export default defineComponent({
         .schedulePost(this.id, this.convertToISODateTime(this.date, this.time), this.post_id)
         .then(() => {
           api.getPosts(this.id).then((data) => {
-            store.data.posts = data
+            store.data.posts = [...data].reverse()
           })
           this.closeModal()
         })
@@ -236,6 +273,14 @@ export default defineComponent({
       const isoDateTimeString = date.toISOString()
 
       return isoDateTimeString
+    },
+    sendToReview() {
+      api.patchPost(this.id, this.post_id, { is_approved: 'WAITING' }).then(() => {
+        api.getPosts(this.id).then((data) => {
+          store.data.posts = [...data].reverse()
+        })
+      })
+      this.closeModal()
     }
   }
 })
