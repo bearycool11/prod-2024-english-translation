@@ -2,7 +2,7 @@ import datetime
 import enum
 from typing import Optional
 
-from sqlalchemy import Column, BigInteger, Table, ForeignKey, Integer, UniqueConstraint
+from sqlalchemy import Column, BigInteger, Table, ForeignKey, Integer, UniqueConstraint, DateTime, func
 from sqlalchemy.dialects.postgresql import JSON
 from sqlmodel import SQLModel, Field, Relationship
 
@@ -48,6 +48,7 @@ class DBPost(SQLModel, table=True):
     planned_time: Optional[datetime.datetime]
     sent_status: SentStatus = Field(default=SentStatus.NOT_READY)
     telegram_message_id: Optional[int] = Field(sa_column=Column(BigInteger, default=None, nullable=True))
+    updated_at: datetime.datetime = Field(sa_column=Column(DateTime, default=func.now(), onupdate=func.now()))
 
     user: DBUser = Relationship(back_populates="posts")
     tag_bindings: list["DBTag"] = Relationship(back_populates="post", sa_relationship_kwargs={"lazy": "dynamic"})

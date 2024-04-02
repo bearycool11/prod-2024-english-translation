@@ -155,6 +155,7 @@ class Post(BaseModel):
     sent_status: SentStatus
     channels: list[Channel]
     tags: list[str]
+    updated_at: datetime.datetime
 
 
 class GetPostsResponse(BaseModel):
