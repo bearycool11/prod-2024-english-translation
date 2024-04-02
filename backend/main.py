@@ -17,7 +17,7 @@ from models import StatusResponse, AuthSignInPostResponse, AuthSignInPostRequest
     AddBotPostResponse, AddBotPostRequest, ListBotGetResponse, Bot, AddUserPostRequest, UserPostResponse, \
     DeleteUserResponse, DeleteUserRequest, AddChannelPostRequest, GetChannelsResponse, Channel, \
     DeleteChannelRequest, DeleteChannelResponse, GetPostsResponse, PrivateSetPostStatusRequest, Post, \
-    AddNewPostRequest, AddNewPostResponse, EditPostResponse, EditPostRequest, ScheduleTimeRequest, PostIdResponse
+    AddNewPostRequest, AddNewPostResponse, EditPostResponse, EditPostRequest, ScheduleTimeRequest, PostIdResponse, DeletePostRequest, DeletePostResponse
 from tools.auth import create_access_token, get_current_user
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -529,6 +529,32 @@ def add_new_post(
     post = Post(**db_model.dict(), created_by_name=db_model.user.name,
                 channels=[Channel(**j.dict()) for j in db_model.channels], tags=[k.tag for k in db_model.tag_bindings])
     return AddNewPostResponse(post=post)
+
+@router.delete(
+    '/organizations/{organization_id}/posts',
+    response_model=Union[DeletePostResponse, ErrorResponse],
+    responses={
+        '200': {'model': DeletePostResponse},
+        '400': {'model': ErrorResponse},
+        '401': {'model': ErrorResponse},
+        '403': {'model': ErrorResponse}
+    }
+)
+def add_new_post(
+        organization_id: int,
+        response: Response, body: DeletePostRequest, db_session: Session = Depends(get_session),
+        current_user: DBUser = Depends(get_current_user)
+) -> Union[DeletePostResponse, ErrorResponse]:
+    if current_user.organization_bindings.join(DBPermission).filter(
+            DBOrganizationUser.organization_id == organization_id, DBPermission.level.in_([4, 5])).count() == 0:
+        response.status_code = 403
+        return ErrorResponse(reason="Don\'t have required permissions")
+    post = db_session.query(DBPost).filter(DBPost.organization_id == organization_id, DBPost.id == body.id)
+    if post.first() is None:
+        return ErrorResponse(reason="No such post")
+    post.delete()
+    db_session.commit()
+    return DeletePostResponse(**body.dict())
 
 
 @router.get(

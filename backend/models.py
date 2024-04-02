@@ -188,3 +188,11 @@ class ScheduleTimeRequest(BaseModel):
 
 class PostIdResponse(BaseModel):
     id: int
+
+
+class DeletePostRequest(BaseModel):
+    id: int
+
+
+class DeletePostResponse(BaseModel):
+    id: int
