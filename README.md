@@ -1,7 +1,7 @@
 <br />
 <p align="center">
   <a href="https://github.com/Central-University-IT-prod/PROD-yet-another-common">
-    <img src="images/logo.png" alt="Logo" width="1369" height="250">
+    <img src="images/logo.png" alt="Logo" width="830" height="200">
   </a>
 
   <h1 align="center">Yet Another SMM</h1>
