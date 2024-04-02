@@ -19,18 +19,16 @@
           @click="openModal(index)"
           class="p-6 min-w-sm w-80 bg-white border cursor-pointer border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 max-w-md"
         >
-          <div class="flex items-center justify-between">
-            <h5
-              class="mb-2 mr-2 text-lg font-bold text-wrap max-w-md truncate tracking-tight text-gray-900 dark:text-white"
-            >
-              {{ post.content }}
-            </h5>
-            <div class="p-2 bg-blue-100 rounded-md mb-2">{{ post.is_approved }}</div>
-          </div>
-          <div class="flex justify-between items-center">
+          <h5
+            class="mb-2 mr-2 text-lg text-left font-bold text-wrap max-w-md truncate tracking-tight text-gray-900 dark:text-white"
+          >
+            {{ post.content }}
+          </h5>
+          <div class="flex gap-1 mt-auto flex-wrap">
             <div class="flex">
-              <p class="mr-2 text-wrap">{{ date(post.planned_time) }}</p>
+              <p class="text-wrap">{{ date(post.planned_time) }}</p>
             </div>
+            <div class="p-2 bg-blue-100 rounded-md">{{ post.is_approved }}</div>
             <div class="p-2 bg-blue-100 rounded-md">{{ post.sent_status }}</div>
           </div>
         </button>
