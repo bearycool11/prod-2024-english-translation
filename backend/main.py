@@ -694,7 +694,7 @@ def schedule_post(organization_id: int, post_id: int, response: Response, body: 
     if post_model.is_approved != Status.APPROVED or post_model.sent_status != SentStatus.NOT_READY:
         response.status_code = 400
         return ErrorResponse(reason="Post must be approved")
-    if post_model.organization.bots.count() == 0:
+    if len(post_model.organization.bots) == 0:
         response.status_code = 400
         return ErrorResponse(reason="Organization has not any bots")
     post_model.planned_time = body.time
