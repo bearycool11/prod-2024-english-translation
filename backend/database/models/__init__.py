@@ -71,7 +71,7 @@ class DBChannel(SQLModel, table=True):
     __tablename__ = "channels"
 
     id: int = Field(sa_column=Column(BigInteger, primary_key=True, unique=True))
-    bot_id: int = Field(foreign_key="organization_bots.bot_id")
+    bot_id: int = Field(foreign_key="organization_bots.bot_id", primary_key=True)
     name: str
 
     posts: list[DBPost] = Relationship(sa_relationship_kwargs={"secondary": "post_channel_bindings",

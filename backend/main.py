@@ -456,7 +456,7 @@ def add_channel_to_organization(
                                                   DBOrganizationBot.organization_id == organization_id).count() == 0:
         response.status_code = 403
         return ErrorResponse(reason="Don\'t have required permissions")
-    if db_session.query(DBChannel).filter(DBChannel.id == body.id).count() != 0:
+    if db_session.query(DBChannel).filter(DBChannel.id == body.id, DBChannel.bot_id == body.bot_id).count() != 0:
         response.status_code = 409
         return ErrorResponse(reason="Channel already exists")
     db_model = DBChannel(**body.dict())
