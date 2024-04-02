@@ -5,7 +5,7 @@ services:
     environment:
       POSTGRES_DB: "smm_ya_database"
       POSTGRES_USER: "root"
-      POSTGRES_PASSWORD: "root"
+      POSTGRES_PASSWORD: "very_long_password"
     container_name: SMM-ya-database
     ports:
       - "5433:5432"
@@ -37,7 +37,7 @@ services:
     depends_on:
       - smm_ya_database
     environment:
-      - POSTGRES_CONN=postgresql://root:root@smm_ya_database:5432/smm_ya_database
+      - POSTGRES_CONN=postgresql://root:very_long_password@smm_ya_database:5432/smm_ya_database
       - JWT_SECRET_KEY=f3e19eccfafe1ada7e9ebafc939c0f11d78d623f24c63fb797b7fee84783795f
     ports:
       - "5437:5437"
