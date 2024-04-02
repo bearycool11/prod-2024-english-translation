@@ -70,8 +70,9 @@ class DBPermission(SQLModel, table=True):
 class DBChannel(SQLModel, table=True):
     __tablename__ = "channels"
 
-    id: int = Field(sa_column=Column(BigInteger, primary_key=True, unique=True))
-    bot_id: int = Field(foreign_key="organization_bots.bot_id", primary_key=True)
+    id: int = Field(primary_key=True, default=None, unique=True)
+    telegram_id: int = Field(sa_column=Column(BigInteger, nullable=False))
+    bot_id: int = Field(foreign_key="organization_bots.bot_id")
     name: str
 
     posts: list[DBPost] = Relationship(sa_relationship_kwargs={"secondary": "post_channel_bindings",
@@ -138,6 +139,6 @@ post_channel_bindings = Table(
     "post_channel_bindings",
     SQLModel.metadata,
     Column("post_id", Integer, ForeignKey("posts.id"), primary_key=True),
-    Column("channel_id", BigInteger, ForeignKey("channels.id"), primary_key=True),
+    Column("channel_id", Integer, ForeignKey("channels.id"), primary_key=True),
     UniqueConstraint('post_id', 'channel_id', name='_post_channel_bindings_uc'),
 )

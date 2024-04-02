@@ -15,7 +15,7 @@ from models import StatusResponse, AuthSignInPostResponse, AuthSignInPostRequest
     AuthRegisterPostRequest, UserProfile, Organization, OrganizationCreatePostResponse, OrganizationCreatePostRequest, \
     UserOrganizationsGetResponse, OrganizationUsersGetResponse, OrganizationUser, UserPublicProfile, UserRight, \
     AddBotPostResponse, AddBotPostRequest, ListBotGetResponse, Bot, AddUserPostRequest, UserPostResponse, \
-    DeleteUserResponse, DeleteUserRequest, AddChannelPostResponse, AddChannelPostRequest, GetChannelsResponse, Channel, \
+    DeleteUserResponse, DeleteUserRequest, AddChannelPostRequest, GetChannelsResponse, Channel, \
     DeleteChannelRequest, DeleteChannelResponse, GetPostsResponse, PrivateSetPostStatusRequest, Post, \
     AddNewPostRequest, AddNewPostResponse, EditPostResponse, EditPostRequest, ScheduleTimeRequest, PostIdResponse
 from tools.auth import create_access_token, get_current_user
@@ -434,9 +434,9 @@ def get_organization_channels(
 
 @router.post(
     '/organizations/{organization_id}/channels',
-    response_model=Union[AddChannelPostResponse, ErrorResponse],
+    response_model=Union[Channel, ErrorResponse],
     responses={
-        '200': {'model': AddChannelPostResponse},
+        '200': {'model': Channel},
         '401': {'model': ErrorResponse},
         '403': {'model': ErrorResponse},
         '404': {'model': ErrorResponse},
@@ -447,7 +447,7 @@ def add_channel_to_organization(
         organization_id: int,
         response: Response, body: AddChannelPostRequest, db_session: Session = Depends(get_session),
         current_user=Depends(get_current_user)
-) -> Union[AddChannelPostResponse, ErrorResponse]:
+) -> Union[Channel, ErrorResponse]:
     if current_user.organization_bindings.join(DBPermission).filter(
             DBOrganizationUser.organization_id == organization_id, DBPermission.level >= 4).count() == 0:
         response.status_code = 403
@@ -456,20 +456,20 @@ def add_channel_to_organization(
                                                   DBOrganizationBot.organization_id == organization_id).count() == 0:
         response.status_code = 403
         return ErrorResponse(reason="Don\'t have required permissions")
-    if db_session.query(DBChannel).filter(DBChannel.id == body.id, DBChannel.bot_id == body.bot_id).count() != 0:
+    if db_session.query(DBChannel).filter(DBChannel.telegram_id == body.telegram_id, DBChannel.bot_id == body.bot_id).count() != 0:
         response.status_code = 409
         return ErrorResponse(reason="Channel already exists")
     db_model = DBChannel(**body.dict())
     token = db_session.query(DBOrganizationBot).filter(DBOrganizationBot.bot_id == body.bot_id,
                                                        DBOrganizationBot.organization_id == organization_id).first().bot_token
-    channel_info = r.get(f'https://api.telegram.org/bot{token}/getChat?chat_id={body.id}')
+    channel_info = r.get(f'https://api.telegram.org/bot{token}/getChat?chat_id={body.telegram_id}')
     if channel_info.status_code != 200:
         response.status_code = 404
         return ErrorResponse(reason="Channel not found")
     db_model.name = channel_info.json()['result']['title']
     db_session.add(db_model)
     db_session.commit()
-    return AddChannelPostResponse(**db_model.dict())
+    return Channel(**db_model.dict())
 
 
 @router.delete(
@@ -711,7 +711,7 @@ def schedule_post(organization_id: int, post_id: int, response: Response, body: 
     post_model.sent_status = SentStatus.WAITING
     db_session.add(post_model)
     for channel in post_model.channels:
-        task = DBTask(handler="send_message", arguments={"bot_token": channel.bot.bot_token, "channel_id": channel.id,
+        task = DBTask(handler="send_message", arguments={"bot_token": channel.bot.bot_token, "channel_id": channel.telegram_id,
                                                          "message_text": post_model.content, "post_id": post_model.id},
                       planned_time=body.time)
         db_session.add(task)
