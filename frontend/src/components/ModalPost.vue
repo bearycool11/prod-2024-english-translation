@@ -18,11 +18,29 @@
             <button
               @click="deletePost"
               v-if="
-                mystore.auth.permissions.some((obj) => obj.name === 'admin' || obj.name === 'owner')
+                mystore.auth.permissions.some(
+                  (obj) => obj.name === 'admin' || obj.name === 'owner'
+                ) && !this.creation
               "
-              class="mb-2 z-40 bg-red-100 p-[4px] px-2 hover:bg-red-200 rounded flex text-red-600"
+              class="mb-2 z-40 mr-4 bg-red-100 p-[4px] px-2 hover:bg-red-200 rounded-lg flex text-red-600"
             >
-              Удалить
+              <svg
+                class="w-6 h-6 text-gray-800 dark:text-white"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke="rgb(220 38 38)"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z"
+                />
+              </svg>
             </button>
             <div>
               <button

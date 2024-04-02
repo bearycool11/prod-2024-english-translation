@@ -106,6 +106,6 @@ const date = (utcIsoString) => {
 
   const formattedLocalTime = `${String(localTime.getDate()).padStart(2, '0')}.${String(localTime.getMonth() + 1).padStart(2, '0')}.${localTime.getFullYear()} ${String(localTime.getHours()).padStart(2, '0')}:${String(localTime.getMinutes()).padStart(2, '0')}`
 
-  return 'Запланирован' + formattedLocalTime
+  return 'Запланирован ' + formattedLocalTime
 }
 </script>
