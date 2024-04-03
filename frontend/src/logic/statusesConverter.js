@@ -9,7 +9,7 @@ export default function convertStatuses(permission) {
     case 'OPEN':
       return 'ОТКРЫТ'
     case 'NOT_READY':
-      return 'НЕ ГОТОВ'
+      return 'НЕ ОТЛОЖЕН'
     case 'SENT_OK':
       return 'ОТПРАВЛЕН'
   }

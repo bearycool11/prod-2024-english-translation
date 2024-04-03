@@ -5,7 +5,7 @@
     <h3 class="mb-5 text-lg font-bold text-gray-500 dark:text-gray-400">#{{ props.post.id }}</h3>
     <div
       v-if="!isPostPublic"
-      class="mb-2 text-lg p-3  border-gray-300 border-[1px] rounded-md font-normal text-gray-500 dark:text-gray-400"
+      class="mb-2 text-lg p-3 border-gray-300 border-[1px] rounded-md font-normal text-gray-500 dark:text-gray-400"
       role="alert"
     >
       {{ props.post.content }}
@@ -23,8 +23,12 @@
         <p class="text-wrap text-left dark:text-neutral-200">{{ date(post.planned_time) }}</p>
       </div>
       <div class="flex gap-1 mt-1 flex-wrap flex-col">
-        <div class="p-2 bg-blue-100  dark:bg-blue-500 dark:text-white rounded-md">{{ convertStatuses(props.post.is_approved) }}</div>
-        <div class="p-2 bg-blue-100  dark:bg-blue-500 dark:text-white rounded-md">{{convertStatuses(props.post.sent_status) }}</div>
+        <div class="p-2 bg-blue-100 dark:bg-blue-500 dark:text-white rounded-md">
+          {{ convertStatuses(props.post.is_approved) }}
+        </div>
+        <div class="p-2 bg-blue-100 dark:bg-blue-500 dark:text-white rounded-md">
+          {{ convertStatuses(props.post.sent_status) }}
+        </div>
       </div>
     </div>
   </div>
@@ -55,20 +59,28 @@ const load = () => {
     script.src = 'https://telegram.org/js/telegram-widget.js?22'
     script.setAttribute('data-telegram-post', `${chat_username}/${telegram_message_id}`)
     script.setAttribute('data-width', '100%')
-    if (localStorage.getItem('vueuse-color-scheme') !== 'light') {
+    if (localStorage.getItem('vueuse-color-scheme') === 'light') {
+      script.setAttribute('data-light', 1)
+    }
+    if (localStorage.getItem('vueuse-color-scheme') === 'dark') {
       script.setAttribute('data-dark', 1)
+    }
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      script.setAttribute('data-dark', 1)
+    } else {
+      script.setAttribute('data-light', 1)
     }
     script.onload = resolve
 
-    document.getElementById(`${props.post.id}-post`).append(script);
+    document.getElementById(`${props.post.id}-post`).append(script)
   })
 }
 
 onMounted(() => {
   if (!!props.post?.sent_infos?.find(({ chat_username }) => !!chat_username)) {
-    load();
+    load()
   }
-});
+})
 
 const date = (utcIsoString) => {
   if (!utcIsoString) {
