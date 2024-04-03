@@ -50,7 +50,11 @@ B2B-продукт: SMM-платформа для вашей команды с �
   - SQLAlchemy
 - Frontend:
   - Vue.JS
+  - Tailwind CSS
   - Flowbite
 - Mobile:
   - Kotlin
   - Android Jetpack
+- Other:
+  - Nginx
+  - Docker
