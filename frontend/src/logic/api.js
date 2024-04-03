@@ -267,7 +267,7 @@ class Api {
         if (data.reason) {
           throw 'Вы не можете добавить пост'
         }
-        return data.rights
+        return data
       })
       .catch(() => {
         throw 'Вы не можете добавить пост'

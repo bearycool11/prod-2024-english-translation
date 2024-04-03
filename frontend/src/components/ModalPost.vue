@@ -18,11 +18,9 @@
             <button
               @click="deletePost"
               v-if="
-                
                 this.mystore.auth.permissions.some(
                   (obj) => obj.name === 'admin' || obj.name === 'owner'
-                ) &&
-                !this.creation
+                ) && !this.creation
               "
               class="mb-2 z-40 mr-4 bg-red-100 p-[4px] px-2 hover:bg-red-200 rounded-lg flex text-red-600"
             >
@@ -178,9 +176,9 @@
             <div
               class="col-span-2"
               v-if="
-                (!this.creation &&
+                !this.creation &&
                 this.content.is_approved === 'APPROVED' &&
-                this.content.sent_status !== 'WAITING') 
+                this.content.sent_status !== 'WAITING'
               "
             >
               <label
@@ -355,23 +353,24 @@
                 this.content.sent_status !== 'WAITING' &&
                 this.mystore.auth.permissions.some(
                   (obj) => obj.name === 'reviewer' || obj.name === 'admin' || obj.name === 'owner'
-                ) && this.channels?.length > 0
+                ) &&
+                this.channels?.length > 0
               "
               @click="schedulePost"
               type="submit"
-              class="text-white inline-flex mb-2  items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              class="text-white inline-flex mb-2 items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             >
               Запланировать
             </button>
             <button
               @click="sendToReview"
-              class="text-white inline-flex mb-2  items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              class="text-white inline-flex mb-2 items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
               v-if="
-                !this.creation  && 
+                !this.creation &&
                 this.content.is_approved === 'OPEN' &&
                 mystore.auth.permissions.some(
                   (obj) => obj.name === 'editor' || obj.name === 'admin' || obj.name === 'owner'
-                ) 
+                )
               "
             >
               Отправить на одобрение
@@ -388,7 +387,7 @@
             >
               <button
                 @click="approvePost"
-                class="text-white mr-2 mb-2  inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                class="text-white mr-2 mb-2 inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
               >
                 Одобрить
               </button>
@@ -456,7 +455,8 @@ export default defineComponent({
       newComment: '',
       showCommentArea: false,
       tag: '',
-      tags: JSON.parse(JSON.stringify(this.$props?.tags) || '[]') || []
+      tags: JSON.parse(JSON.stringify(this.$props?.tags) || '[]') || [],
+      newAddedPostId: ''
     }
   },
   computed: {
@@ -497,18 +497,18 @@ export default defineComponent({
       })
     },
     async addPost() {
-      await api.addTagsToPost(this.id, this.post_id, this.tags).then(() => {
-        const newPosts = [...store.data.posts]
-        const targetIndex = store.data.posts.indexOf(({ post_id }) => post_id === this.post_id)
-
-        newPosts[targetIndex] = { ...newPosts[targetIndex], tags: this.tags }
-        store.data.posts = newPosts
-      })
-
       if (this.creation) {
         api
           .addPost(this.id, this.areaContent, { channels: this.myId })
-          .then(() => {
+          .then((data) => {
+            console.log(data.post)
+            api.addTagsToPost(this.id, data.post.id, this.tags).then(() => {
+          const newPosts = [...store.data.posts]
+          const targetIndex = store.data.posts.indexOf(({ post_id }) => post_id === this.post_id)
+
+          newPosts[targetIndex] = { ...newPosts[targetIndex], tags: this.tags }
+          store.data.posts = newPosts
+        })
             api.getPosts(this.id).then((data) => {
               store.data.posts = data
             })
@@ -519,7 +519,15 @@ export default defineComponent({
           .catch((e) => {
             this.text = e
           })
+        
       } else {
+        await api.addTagsToPost(this.id, this.post_id, this.tags).then(() => {
+          const newPosts = [...store.data.posts]
+          const targetIndex = store.data.posts.indexOf(({ post_id }) => post_id === this.post_id)
+
+          newPosts[targetIndex] = { ...newPosts[targetIndex], tags: this.tags }
+          store.data.posts = newPosts
+        })
         let content = this.areaContent === '' ? this.content.content : this.areaContent
         api
           .patchPost(this.id, this.post_id, {
@@ -565,7 +573,11 @@ export default defineComponent({
     },
     approvePost() {
       api
-        .patchPost(this.id, this.post_id, { is_approved: 'APPROVED', comment: this.newComment, channels: this.myId})
+        .patchPost(this.id, this.post_id, {
+          is_approved: 'APPROVED',
+          comment: this.newComment,
+          channels: this.myId
+        })
         .then(() => {
           api.getPosts(this.id).then((data) => {
             store.data.posts = data
@@ -576,7 +588,11 @@ export default defineComponent({
     rejectPost() {
       if (this.showCommentArea) {
         api
-          .patchPost(this.id, this.post_id, { is_approved: 'REJECTED', comment: this.newComment, channels: this.myId })
+          .patchPost(this.id, this.post_id, {
+            is_approved: 'REJECTED',
+            comment: this.newComment,
+            channels: this.myId
+          })
           .then(() => {
             api.getPosts(this.id).then((data) => {
               store.data.posts = data
