@@ -419,9 +419,6 @@ def delete_channel_from_organization(
         response.status_code = 404
         return ErrorResponse(reason="No such channel")
     channel_to_delete = db_session.query(DBChannel).filter(DBChannel.id == body.id).first()
-    for post in channel_to_delete.posts:
-        for tag in post.tag_bindings:
-            db_session.delete(tag)
     channel_to_delete.posts = []
     channel_to_delete.sent_infos = []
     db_session.delete(channel_to_delete)
