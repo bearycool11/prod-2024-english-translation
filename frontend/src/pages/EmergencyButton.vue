@@ -11,13 +11,13 @@
     <div class="flex mt-8 flex-wrap items-center">
       <button
         @click="callEmergency"
-        class="dark:text-white mx-4 mt-2 bg-red-200 text-red-600 p-2 rounded-md hover:bg-red-300"
+        class=" mx-4 mt-2 bg-red-200 text-red-600 p-2 rounded-md hover:bg-red-300"
       >
         Заблокировать отложенные посты
       </button>
       <button
         @click="recallEmergency"
-        class="dark:text-white mx-4 mt-2 bg-red-200 text-red-600 p-2 rounded-md hover:bg-red-300"
+        class="mx-4 mt-2 bg-red-200 text-red-600 p-2 rounded-md hover:bg-red-300"
       >
         Разблокировать отложенные посты
       </button>

@@ -44,10 +44,12 @@
     </div>
   </div>
   <ModalAddChannels
+  v-if="isShowModal"
     :isShown="isShowModal"
     :closeModal="closeModal"
     :id="props.id"
     :botId="store.auth.bot_id"
+    :bot_token="store.data.bots[0]?.bot_token"
   />
 </template>
 <script setup>
@@ -73,7 +75,7 @@ onMounted(() => {
       store.data.canAddBots = true
       return
     }
-    store.auth.bot_id = store.data.bots[0]?.bot_id
+    store.auth.bot_id = store.data.bots[0]?.bot_id 
   })
 
   api.getChannels(props.id).then((channels) => {

@@ -5,12 +5,12 @@
     <h3 class="mb-5 text-lg font-bold text-gray-500 dark:text-gray-400">#{{ props.post.id }}</h3>
     <div
       v-if="!isPostPublic"
-      class="mb-2 text-lg p-3 border-gray-300 border-[1px] rounded-md font-normal text-gray-500 dark:text-gray-400"
+      class="mb-2 text-lg p-3  border-gray-300 border-[1px] rounded-md font-normal text-gray-500 dark:text-gray-400"
       role="alert"
     >
       {{ props.post.content }}
     </div>
-    <div v-if="isPostPublic" class="pb-5" :id="`${props.post.id}-post`"></div>
+    <div v-if="isPostPublic" class="pb-5 md:flex" :id="`${props.post.id}-post`"></div>
     <div
       v-if="!isPostPublic"
       class="mb-2 p-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400"

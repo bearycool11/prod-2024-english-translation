@@ -193,10 +193,15 @@ class Api {
       })
   }
 
-  addChannels(id, ch_id, bot_id) {
+  async addChannels(id, ch_id, bot_id, { chat_id, bot_token }) {
+    const url = `https://api.telegram.org/bot${bot_token}/getChat?chat_id=${chat_id}`
+    console.log(url)
+    const data = await fetch(url)
+
+    let json = await data.json()
     return this.client
       .post(`${import.meta.env.VITE_BACKEND_URL}/organizations/${id}/channels`, {
-        telegram_id: ch_id,
+        telegram_id: json.result.id,
         bot_id: bot_id
       })
       .then(({ data }) => {

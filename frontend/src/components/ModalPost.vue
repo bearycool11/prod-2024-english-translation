@@ -18,7 +18,7 @@
             <button
               @click="deletePost"
               v-if="
-                this.content.sent_status !== 'WAITING' &&
+                
                 this.mystore.auth.permissions.some(
                   (obj) => obj.name === 'admin' || obj.name === 'owner'
                 ) &&
@@ -178,9 +178,9 @@
             <div
               class="col-span-2"
               v-if="
-                !this.creation &&
+                (!this.creation &&
                 this.content.is_approved === 'APPROVED' &&
-                this.content.sent_status !== 'WAITING'
+                this.content.sent_status !== 'WAITING') 
               "
             >
               <label
@@ -331,7 +331,7 @@
               "
               @click="addPost"
               type="submit"
-              class="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              class="text-white mr-2 mb-2 inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             >
               <svg
                 class="me-1 -ms-1 w-5 h-5"
@@ -355,23 +355,23 @@
                 this.content.sent_status !== 'WAITING' &&
                 this.mystore.auth.permissions.some(
                   (obj) => obj.name === 'reviewer' || obj.name === 'admin' || obj.name === 'owner'
-                )
+                ) && this.channels?.length > 0
               "
               @click="schedulePost"
               type="submit"
-              class="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              class="text-white inline-flex mb-2  items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             >
               Запланировать
             </button>
             <button
               @click="sendToReview"
-              class="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              class="text-white inline-flex mb-2  items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
               v-if="
-                !this.creation &&
+                !this.creation  && 
                 this.content.is_approved === 'OPEN' &&
                 mystore.auth.permissions.some(
                   (obj) => obj.name === 'editor' || obj.name === 'admin' || obj.name === 'owner'
-                )
+                ) 
               "
             >
               Отправить на одобрение
@@ -388,13 +388,13 @@
             >
               <button
                 @click="approvePost"
-                class="text-white mr-2 inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                class="text-white mr-2 mb-2  inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
               >
                 Одобрить
               </button>
               <button
                 @click="rejectPost"
-                class="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                class="text-white inline-flex mb-2 items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
               >
                 Отклонить
               </button>
@@ -565,7 +565,7 @@ export default defineComponent({
     },
     approvePost() {
       api
-        .patchPost(this.id, this.post_id, { is_approved: 'APPROVED', comment: this.newComment })
+        .patchPost(this.id, this.post_id, { is_approved: 'APPROVED', comment: this.newComment, channels: this.myId})
         .then(() => {
           api.getPosts(this.id).then((data) => {
             store.data.posts = data
@@ -576,7 +576,7 @@ export default defineComponent({
     rejectPost() {
       if (this.showCommentArea) {
         api
-          .patchPost(this.id, this.post_id, { is_approved: 'REJECTED', comment: this.newComment })
+          .patchPost(this.id, this.post_id, { is_approved: 'REJECTED', comment: this.newComment, channels: this.myId })
           .then(() => {
             api.getPosts(this.id).then((data) => {
               store.data.posts = data
