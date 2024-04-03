@@ -59,7 +59,10 @@ import ModalAddUser from '@/components/ModalAddUser.vue'
 
 const isShowModal = ref()
 const allowEdit = computed(
-  () => (user) => store.auth.id !== user.user.id && user.rights.some((obj) => obj.name !== 'admin' && obj.name !== 'owner') || (store.auth.permissions.some((obj) => obj.name === 'owner' ) && store.auth.id !== user.user.id  )
+  () => (user) =>
+    (store.auth.id !== user.user.id &&
+      user.rights.some((obj) => obj.name !== 'admin' && obj.name !== 'owner')) ||
+    (store.auth.permissions.some((obj) => obj.name === 'owner') && store.auth.id !== user.user.id)
 )
 console.log(allowEdit)
 const state = reactive({

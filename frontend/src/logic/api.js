@@ -5,9 +5,9 @@ import { useToast } from 'vue-toast-notification'
 import.meta.env.VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL ?? '/api'
 
 function compareISOStrings(a, b) {
-  if (a > b) return -1;
-  if (a < b) return 1;
-  return 0;
+  if (a > b) return -1
+  if (a < b) return 1
+  return 0
 }
 const $toast = useToast()
 
@@ -237,7 +237,9 @@ class Api {
         if (data.reason) {
           return null
         }
-        return [...data.posts.sort((a, b) => compareISOStrings(a.update_time, b.update_time))].reverse();
+        return [
+          ...data.posts.sort((a, b) => compareISOStrings(a.update_time, b.update_time))
+        ].reverse()
       })
   }
   getMyPermissions(id) {
@@ -250,9 +252,12 @@ class Api {
         return data.rights
       })
   }
-  addPost(id, content, {channels}) {
+  addPost(id, content, { channels }) {
     return this.client
-      .post(`${import.meta.env.VITE_BACKEND_URL}/organizations/${id}/posts`, { content: content, channels: channels })
+      .post(`${import.meta.env.VITE_BACKEND_URL}/organizations/${id}/posts`, {
+        content: content,
+        channels: channels
+      })
       .then(({ data }) => {
         if (data.reason) {
           throw 'Вы не можете добавить пост'
@@ -295,8 +300,12 @@ class Api {
       })
   }
 
-  patchPost(id, post_id, {content = false, is_approved = false, comment = false, channels =false}) {
-    let data = {id: post_id}
+  patchPost(
+    id,
+    post_id,
+    { content = false, is_approved = false, comment = false, channels = false }
+  ) {
+    let data = { id: post_id }
 
     if (content) {
       data.content = content
@@ -327,9 +336,10 @@ class Api {
 
   deletePosts(id, post_id) {
     return this.client
-      .delete(`${import.meta.env.VITE_BACKEND_URL}/organizations/${id}/posts`, {data:{id: post_id}})
+      .delete(`${import.meta.env.VITE_BACKEND_URL}/organizations/${id}/posts`, {
+        data: { id: post_id }
+      })
       .then(({ data }) => {
-       
         return data
       })
       .catch(() => {
@@ -341,7 +351,6 @@ class Api {
     return this.client
       .post(`${import.meta.env.VITE_BACKEND_URL}/organizations/${id}/block_tasks`)
       .then(({ data }) => {
-       
         return data
       })
       .catch(() => {
@@ -353,7 +362,6 @@ class Api {
     return this.client
       .post(`${import.meta.env.VITE_BACKEND_URL}/organizations/${id}/unblock_tasks`)
       .then(({ data }) => {
-       
         return data
       })
       .catch(() => {
@@ -361,6 +369,5 @@ class Api {
       })
   }
 }
-
 
 export const api = new Api()

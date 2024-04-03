@@ -18,10 +18,11 @@
             <button
               @click="deletePost"
               v-if="
-                this.content.sent_status !== 'WAITING' && 
+                this.content.sent_status !== 'WAITING' &&
                 this.mystore.auth.permissions.some(
                   (obj) => obj.name === 'admin' || obj.name === 'owner'
-                ) && !this.creation
+                ) &&
+                !this.creation
               "
               class="mb-2 z-40 mr-4 bg-red-100 p-[4px] px-2 hover:bg-red-200 rounded-lg flex text-red-600"
             >
@@ -246,8 +247,8 @@
           <div class="flex justify-between flex-wrap">
             <button
               v-if="
-              this.content.sent_status !== 'WAITING' && 
-                (this.content.is_approved !== 'APPROVED') &&
+                this.content.sent_status !== 'WAITING' &&
+                this.content.is_approved !== 'APPROVED' &&
                 this.mystore.auth.permissions.some(
                   (obj) => obj.name === 'editor' || obj.name === 'owner' || obj.name === 'admin'
                 )
@@ -270,7 +271,7 @@
               </svg>
               {{ buttonText }}
             </button>
-            
+
             <button
               v-if="
                 !this.creation &&

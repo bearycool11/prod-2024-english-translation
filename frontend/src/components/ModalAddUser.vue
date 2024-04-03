@@ -63,7 +63,7 @@
               />
             </div>
           </div>
-          
+
           <div v-for="right in rights" :key="right" class="flex items-center mb-4">
             <input
               :id="right"
@@ -121,31 +121,28 @@ export default defineComponent({
     isShown: Boolean,
     closeModal: Function,
     id: String,
-    initialUser: Object,
-    
+    initialUser: Object
   },
   data() {
     return {
       permissions: this.$props.initialUser?.rights || ['viewer'],
       login: this.$props.initialUser?.user?.login,
-      rights: ['viewer', 'editor', 'reviewer',],
-      mystore: null,
+      rights: ['viewer', 'editor', 'reviewer'],
+      mystore: null
     }
   },
-  beforeMount(){
+  beforeMount() {
     this.mystore = store
     // console.log(this.mystore.auth.permissions.some((obj) => obj.name === 'owner' ))
     // if ( this.mystore.auth.permissions.some((obj) => obj.name === 'owner' )) {
     //   this.rights.push('admin')
     // }
-
   },
   mounted() {
-    console.log(this.mystore.auth.permissions.some((obj) => obj.name === 'owner' ))
-    if ( this.mystore.auth.permissions.some((obj) => obj.name === 'owner' )) {
+    console.log(this.mystore.auth.permissions.some((obj) => obj.name === 'owner'))
+    if (this.mystore.auth.permissions.some((obj) => obj.name === 'owner')) {
       this.rights.push('admin')
     }
-
   },
 
   methods: {

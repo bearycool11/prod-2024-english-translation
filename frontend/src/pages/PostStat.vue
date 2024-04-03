@@ -5,8 +5,7 @@
     >
       Пост
     </h1>
-    <div id='widget_login'>
-    </div>
+    <div id="widget_login"></div>
   </div>
 </template>
 
@@ -18,5 +17,5 @@ const props = defineProps({
   post: {
     type: String
   }
-});
+})
 </script>
