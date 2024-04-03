@@ -73,8 +73,8 @@
         <!-- Modal body -->
 
         <form :onsubmit="(e) => e.preventDefault()" class="p-4 md:p-5">
-          <div class="grid gap-4 mb-4 grid-cols-2">
-            <div class="col-span-2">
+          <div class="grid gap-4 mb-4 grid-cols-1">
+            <div class="col-span-2 max-w-full">
               <div class="mb-2 focus:outline-0" v-if="this.content.is_approved === 'REJECTED'">
                 <div
                   class="bg-red-100 resize-none focus:outline-0 outline-0 focus:shadow-outline border-0 border-gray-200 text-red-600 text-sm rounded-md block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
@@ -102,6 +102,79 @@
               />
               {{ text }}
             </div>
+            <form
+              class="flex gap-2"
+              :onsubmit="
+                (e) => {
+                  e.preventDefault()
+                  onTagAdd()
+                }
+              "
+            >
+              <input
+                type="text"
+                name="name"
+                class="bg-gray-50 flex-1 w-full border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                placeholder="Тэг"
+                v-model="this.tag"
+              />
+              <button
+                @click="onTagAdd"
+                class="flex items-center justify-between text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-2 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                type="button"
+              >
+                <svg
+                  class="w-6 h-6 text-gray-800 dark:text-white"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke="#FFF"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M5 12h14m-7 7V5"
+                  />
+                </svg>
+              </button>
+            </form>
+            <br />
+            <div class="flex grid-2 overflow-scroll max-w-full">
+              <span
+                v-for="tag of this.tags"
+                class="inline-flex items-center px-2 py-1 me-2 text-sm font-medium text-blue-800 bg-blue-100 rounded dark:bg-blue-900 dark:text-blue-300"
+              >
+                {{ tag }}
+                <button
+                  type="button"
+                  class="inline-flex items-center p-1 ms-2 text-sm text-blue-400 bg-transparent rounded-sm hover:bg-blue-200 hover:text-blue-900 dark:hover:bg-blue-800 dark:hover:text-blue-300"
+                  data-dismiss-target="#badge-dismiss-default"
+                  aria-label="Remove"
+                  @click="() => deleteTag(tag)"
+                >
+                  <svg
+                    class="w-2 h-2"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 14 14"
+                  >
+                    <path
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
+                    />
+                  </svg>
+                  <span class="sr-only">Remove badge</span>
+                </button>
+              </span>
+            </div>
             <div
               class="col-span-2"
               v-if="
@@ -110,9 +183,12 @@
                 this.content.sent_status !== 'WAITING'
               "
             >
-              <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >Запланировать</label
+              <label
+                for="name"
+                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
               >
+                Запланировать
+              </label>
               <div class="flex gap-2">
                 <div class="relative max-w-sm">
                   <div
@@ -209,9 +285,9 @@
             </div>
           </div>
           <div v-else>
-            <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-              >Каналы</label
-            >
+            <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+              Каналы
+            </label>
             <div v-for="channel in channels" :key="channel.id" class="flex items-center mb-4">
               <input
                 :id="channel"
@@ -244,7 +320,7 @@
             </div>
           </div>
 
-          <div class="flex justify-between flex-wrap">
+          <div class="flex justify-between gap-2 flex-wrap">
             <button
               v-if="
                 this.content.sent_status !== 'WAITING' &&
@@ -255,7 +331,7 @@
               "
               @click="addPost"
               type="submit"
-              class="text-white mr-2 inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              class="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             >
               <svg
                 class="me-1 -ms-1 w-5 h-5"
@@ -347,7 +423,6 @@
       </div>
     </div>
   </div>
-  {{ post_id }}
 </template>
 <script>
 import { defineComponent } from 'vue'
@@ -363,7 +438,8 @@ export default defineComponent({
     creation: Boolean,
     id: String,
     post_id: Number,
-    channels: Object
+    channels: Object,
+    tags: Array
   },
   data() {
     return {
@@ -378,7 +454,9 @@ export default defineComponent({
       myId: [],
       passId: [],
       newComment: '',
-      showCommentArea: false
+      showCommentArea: false,
+      tag: '',
+      tags: JSON.parse(JSON.stringify(this.$props?.tags) || '[]') || []
     }
   },
   computed: {
@@ -402,13 +480,31 @@ export default defineComponent({
         return id !== chid
       })
     },
+    onTagAdd() {
+      if (!this.tag || this.tags.includes(this.tag)) {
+        return
+      }
+
+      this.tags.push(this.tag)
+      this.tag = ''
+    },
+    deleteTag(tag) {
+      this.tags = [...this.tags].filter((targetTag) => tag !== targetTag)
+    },
     isChecked2(chid) {
       return this.passId.find((id) => {
         return id === chid
       })
     },
-    addPost() {
-      console.log(this.myId)
+    async addPost() {
+      await api.addTagsToPost(this.id, this.post_id, this.tags).then(() => {
+        const newPosts = [...store.data.posts]
+        const targetIndex = store.data.posts.indexOf(({ post_id }) => post_id === this.post_id)
+
+        newPosts[targetIndex] = { ...newPosts[targetIndex], tags: this.tags }
+        store.data.posts = newPosts
+      })
+
       if (this.creation) {
         api
           .addPost(this.id, this.areaContent, { channels: this.myId })

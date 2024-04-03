@@ -1,18 +1,13 @@
 <template>
-  <div class="flex mt-24 w-full">
-    <div class="fixed dark:bg-gray-800 w-screen"></div>
-    <div class="w-full px-4 dark:bg-gray-800 shrink flex">
-      <div class="flex dark:bg-gray-800">
-        <div class="flex flex-col items-center justify-between">
-          <h1
-            class="text-3xl mb-6 font-bold leading-tight tracking-tight text-gray-900 dark:text-white"
-          >
-            История постов
-          </h1>
-          <div class="grid grid-cols-1 gap-2 w-full mb-4 max-w-2xl lg:w-screen">
-            <history-post v-for="(post, index) in state.posts" :key="index" :post="post" />
-          </div>
-        </div>
+  <div class="flex mt-17 w-full">
+    <div class="w-full px-4">
+      <h1
+        class="text-3xl mb-6 font-bold leading-tight tracking-tight text-gray-900 dark:text-white"
+      >
+        История постов
+      </h1>
+      <div class="grid grid-cols-1 gap-2 w-full mb-4 max-w-2xl">
+        <history-post v-for="(post, index) in state.posts" :key="index" :post="post" />
       </div>
     </div>
   </div>
@@ -20,7 +15,7 @@
 <script setup>
 import { onMounted, reactive } from 'vue'
 import { api } from '@/logic/api.js'
-//import { store } from '@/store/index.js'
+import { store } from '@/store/index.js'
 import HistoryPost from '@/components/HistoryPost.vue'
 
 const state = reactive({

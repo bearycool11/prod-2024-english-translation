@@ -59,15 +59,15 @@ const load = () => {
     }
     script.onload = resolve
 
-    document.getElementById(`${props.post.id}-post`).append(script)
+    document.getElementById(`${props.post.id}-post`).append(script);
   })
 }
 
 onMounted(() => {
   if (!!props.post?.sent_infos?.find(({ chat_username }) => !!chat_username)) {
-    load()
+    load();
   }
-})
+});
 
 const date = (isoString) => {
   // Check if the input is null
@@ -93,5 +93,5 @@ const date = (isoString) => {
 
   // Return the formatted date with the timezone included
   return 'Запланирован ' + dayMonthYear + ' ' + timeWithTimezone
-}
+};
 </script>

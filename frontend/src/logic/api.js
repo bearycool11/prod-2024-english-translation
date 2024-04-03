@@ -334,6 +334,22 @@ class Api {
       })
   }
 
+  addTagsToPost(id, post_id, tags) {
+    return this.client
+      .patch(`${import.meta.env.VITE_BACKEND_URL}/organizations/${id}/posts`, { id: post_id, tags })
+      .then(({ data }) => {
+        console.log(data)
+        if (data.reason) {
+          throw 'Не удалось получить посты'
+        }
+
+        return data.posts
+      })
+      .catch(() => {
+        throw 'Не удалось получить посты'
+      })
+  }
+
   deletePosts(id, post_id) {
     return this.client
       .delete(`${import.meta.env.VITE_BACKEND_URL}/organizations/${id}/posts`, {

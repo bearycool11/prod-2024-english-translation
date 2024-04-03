@@ -1,5 +1,5 @@
 <template>
-  <div class="flex mt-20 w-full h-screen overflow-y-auto">
+  <div class="flex flex-col w-full h-screen overflow-x-hidden">
     <div class="w-full px-4">
       <button
         v-if="
@@ -12,12 +12,36 @@
       >
         Добавить пост
       </button>
-      <div class="grid md:grid-cols-3 max-h-80 sm:grid-cols-2 gap-2 w-full mb-4">
+      <div
+        class="overflow-x-hidden"
+      >
+        <div class="flex py-4 overflow-scroll">
+          <button
+            @click="() => state.targetTag = 'all'"
+            type="button"
+            :class="{ 'ml-1 ring-4 outline-none ring-blue-300 dark:ring-blue-800': state.targetTag === 'all' }"
+            class="text-blue-700 hover:text-white border border-blue-600 bg-white hover:bg-blue-700 rounded-full text-base font-medium px-5 py-2.5 text-center me-3 mb-3 dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:hover:bg-blue-500 dark:bg-gray-900"
+          >
+            Все
+          </button>
+          <button
+            v-for="tag of tags"
+            type="button"
+            :key="tag"
+            @click="() => state.targetTag = tag"
+            :class="{ 'ring-4 outline-none ring-blue-300 dark:ring-gray-800': state.targetTag === tag }"
+            class="text-gray-900 border border-white hover:border-gray-200 dark:border-gray-900 dark:bg-gray-900 dark:hover:border-gray-700 bg-white rounded-full text-base font-medium px-5 py-2.5 text-center me-3 mb-3 dark:text-white"
+          >
+            {{ tag }}
+          </button>
+        </div>
+      </div>
+      <div class="grid max-h-80 sm:grid-cols-2 gap-2 w-full mb-4">
         <button
-          v-for="(post, index) in store.data.posts"
+          v-for="(post, index) in targetPosts"
           :key="index"
           @click="openModal(index)"
-          class="p-6 min-w-sm bg-white border cursor-pointer border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 max-w-md"
+          class="p-6 bg-white border cursor-pointer border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 max-w-full"
         >
           <section class="flex flex-col h-full">
             <h3 class="mb-5 text-lg font-bold text-gray-500 dark:text-gray-400">#{{ post.id }}</h3>
@@ -38,6 +62,14 @@
                 <div class="p-2 bg-blue-100 rounded-md">{{ post.sent_status }}</div>
               </div>
             </div>
+            <div class="flex mt-2 gap-1 max-w-full overflow-scroll">
+              <span
+                v-for="tag of post.tags"
+                class="inline-flex items-center px-2 py-1 text-sm font-medium text-blue-800 bg-blue-100 rounded dark:bg-blue-900 dark:text-blue-300"
+              >
+                {{ tag }}
+              </span>
+            </div>
           </section>
         </button>
       </div>
@@ -51,11 +83,12 @@
     :id="props.id"
     :post_id="state.targetPost.id"
     :channels="store.data.channels"
+    :tags="state.targetPost.tags"
     v-if="state.isShowModal"
   />
 </template>
 <script setup>
-import { onMounted, reactive } from 'vue'
+import { computed, onMounted, reactive } from 'vue'
 import { api } from '@/logic/api.js'
 import ModalPost from '@/components/ModalPost.vue'
 import { store } from '@/store/index.js'
@@ -63,7 +96,20 @@ import { store } from '@/store/index.js'
 const state = reactive({
   isShowModal: false,
   targetPost: {},
-  creation: false
+  creation: false,
+  targetTag: 'all'
+})
+
+const tags = computed(() => {
+  return [...new Set(store.data.posts.map(({ tags }) => tags).flat(2))]
+})
+
+const targetPosts = computed(() => {
+  if (state.targetTag === 'all') {
+    return store.data.posts;
+  }
+
+  return store.data.posts.filter((post) => post.tags.includes(state.targetTag))
 })
 
 function openModal(index) {
