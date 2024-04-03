@@ -81,7 +81,7 @@ onMounted(() => {
   api.getChannels(props.id).then((channels) => {
     store.data.channels = channels
   })
-  console.log(store.data.channels)
+ 
 })
 function closeModal() {
   isShowModal.value = false
@@ -94,7 +94,7 @@ const props = defineProps({
 })
 
 function deleteChannel(ch_id) {
-  console.log(ch_id)
+
   api.deleteChannels(props.id, ch_id).then(() => {
     api.getChannels(props.id).then((channels) => {
       store.data.channels = channels

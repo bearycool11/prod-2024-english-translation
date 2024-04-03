@@ -103,7 +103,6 @@ export default defineComponent({
 
   methods: {
     async addChannel() {
-      console.log(this.store)
       api
         .addChannels(this.id, this.ch_id, this.botId, {bot_token: this.bot_token, chat_id:this.ch_id})
         .then(() => {

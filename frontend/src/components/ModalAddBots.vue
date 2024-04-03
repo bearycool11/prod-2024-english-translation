@@ -105,7 +105,6 @@ export default defineComponent({
       api
         .createOrganizationBots(this.id, this.token)
         .then((data) => {
-          console.log(data)
           api.getOrganizationBots(this.id).then((bots) => {
             store.data.bots = bots
           })

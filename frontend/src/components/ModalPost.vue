@@ -300,7 +300,7 @@
                   }
                 "
                 :disabled="
-                  this.content.sent_status === 'WAITING' ||
+                  this.content.sent_status === 'WAITING' || this.content.is_approved === 'WAITING'||
                   this.content.is_approved === 'APPROVED' ||
                   !this.mystore.auth.permissions.some(
                     (obj) => obj.name === 'admin' || obj.name === 'editor' || obj.name === 'owner'
@@ -461,7 +461,7 @@ export default defineComponent({
   },
   computed: {
     buttonText() {
-      console.log(this.content.is_approved)
+     
       if (this.content.is_approved === 'APPROVED') {
         return 'В редактирование'
       }
@@ -501,7 +501,7 @@ export default defineComponent({
         api
           .addPost(this.id, this.areaContent, { channels: this.myId })
           .then((data) => {
-            console.log(data.post)
+           
             api.addTagsToPost(this.id, data.post.id, this.tags).then(() => {
           const newPosts = [...store.data.posts]
           const targetIndex = store.data.posts.indexOf(({ post_id }) => post_id === this.post_id)
@@ -576,7 +576,6 @@ export default defineComponent({
         .patchPost(this.id, this.post_id, {
           is_approved: 'APPROVED',
           comment: this.newComment,
-          channels: this.myId
         })
         .then(() => {
           api.getPosts(this.id).then((data) => {

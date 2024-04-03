@@ -195,7 +195,7 @@ class Api {
 
   async addChannels(id, ch_id, bot_id, { chat_id, bot_token }) {
     const url = `https://api.telegram.org/bot${bot_token}/getChat?chat_id=${chat_id}`
-    console.log(url)
+   
     const data = await fetch(url)
 
     let json = await data.json()
@@ -343,7 +343,7 @@ class Api {
     return this.client
       .patch(`${import.meta.env.VITE_BACKEND_URL}/organizations/${id}/posts`, { id: post_id, tags })
       .then(({ data }) => {
-        console.log(data)
+       
         if (data.reason) {
           throw 'Не удалось получить посты'
         }

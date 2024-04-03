@@ -83,7 +83,7 @@ function deleteBot() {
 onMounted(() => {
   api.getOrganizationBots(props.id).then((data) => {
     store.data.bots = data
-    console.log(store.data.bots.length === 0)
+   
     if (store.data.bots.length === 0) {
       store.data.canAddBots = true
     }

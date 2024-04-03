@@ -134,13 +134,9 @@ export default defineComponent({
   },
   beforeMount() {
     this.mystore = store
-    // console.log(this.mystore.auth.permissions.some((obj) => obj.name === 'owner' ))
-    // if ( this.mystore.auth.permissions.some((obj) => obj.name === 'owner' )) {
-    //   this.rights.push('admin')
-    // }
   },
   mounted() {
-    console.log(this.mystore.auth.permissions.some((obj) => obj.name === 'owner'))
+
     if (this.mystore.auth.permissions.some((obj) => obj.name === 'owner')) {
       this.rights.push('admin')
     }
@@ -166,8 +162,7 @@ export default defineComponent({
     },
     async addUser() {
       if (!!this.$props.initialUser?.user?.login) {
-        console.log(this.permissions)
-
+       
         await api
           .updateUser(this.id, {
             login: this.login,
