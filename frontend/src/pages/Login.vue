@@ -64,7 +64,7 @@ watch(store.auth, async () => {
 </script>
 
 <template>
-  <section class="bg-gray-50 dark:bg-gray-900">
+  <section class="bg-gray-50 dark:bg-gray-900 h-screen">
     <div
       v-if="store.auth.isLoading"
       role="status"

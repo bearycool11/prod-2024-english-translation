@@ -282,7 +282,7 @@ class Api {
           throw 'Не удалось получить посты'
         }
 
-        return data.posts
+        return [...data.posts.sort((a, b) => compareISOStrings(a.planned_time, b.planned_time))]
       })
       .catch(() => {
         throw 'Не удалось получить посты'

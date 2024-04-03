@@ -20,7 +20,7 @@
             @click="() => state.targetTag = 'all'"
             type="button"
             :class="{ 'ml-1 ring-4 outline-none ring-blue-300 dark:ring-blue-800': state.targetTag === 'all' }"
-            class="text-blue-700 hover:text-white border border-blue-600 bg-white hover:bg-blue-700 rounded-full text-base font-medium px-5 py-2.5 text-center me-3 mb-3 dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:hover:bg-blue-500 dark:bg-gray-900"
+            class="text-blue-700 hover:text-white border border-blue-600 bg-white hover:bg-blue-700 rounded-full text-base font-medium px-4  text-center me-3 mb-3 dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:hover:bg-blue-500 dark:bg-gray-900"
           >
             Все
           </button>
@@ -41,10 +41,10 @@
           v-for="(post, index) in targetPosts"
           :key="index"
           @click="openModal(index)"
-          class="p-6 bg-white border cursor-pointer border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 max-w-full"
+          class="p-6 bg-white border cursor-pointer focus:bg-neutral-100 hover:bg-neutral-100 dark:focus:bg-gray-700 dark:hover:bg-gray-700 border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 max-w-full"
         >
           <section class="flex flex-col h-full">
-            <h3 class="mb-5 text-lg font-bold text-gray-500 dark:text-gray-400">#{{ post.id }}</h3>
+            <h3 class="mb-2 text-lg font-bold text-gray-500 dark:text-gray-400">#{{ post.id }}</h3>
             <div class="flex items-center justify-between">
               <h5
                 class="mb-2 mr-2 text-lg text-left font-bold text-wrap max-w-md truncate tracking-tight text-gray-900 dark:text-white"
@@ -62,10 +62,10 @@
                 <div class="p-2 bg-blue-100 rounded-md">{{ post.sent_status }}</div>
               </div>
             </div>
-            <div class="flex mt-2 gap-1 max-w-full overflow-scroll">
+            <div class="flex mt-2 ml-1 gap-1 max-w-full overflow-scroll">
               <span
                 v-for="tag of post.tags"
-                class="inline-flex items-center px-2 py-1 text-sm font-medium text-blue-800 bg-blue-100 rounded dark:bg-blue-900 dark:text-blue-300"
+                class="inline-flex items-center px-2 py-1 text-sm font-medium text-blue-800 bg-blue-200 rounded dark:bg-blue-900 dark:text-blue-300"
               >
                 {{ tag }}
               </span>

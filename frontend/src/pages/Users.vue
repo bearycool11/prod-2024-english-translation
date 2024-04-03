@@ -13,19 +13,23 @@
         class="w-full flex flex-col p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700"
       >
         <div class="flex flex-col h-full">
+          <div class="flex justify-between">
           <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-            name: {{ user.user.name }}
+            {{ user.user.name }}
           </h3>
-          <h3 class="text-lg mb-2 font-semibold text-gray-900 dark:text-white">
-            id: {{ user.user.id }}
+          <h3 class="text-lg mb-2 font-semibold text-gray-500 dark:text-neutral-400">
+            {{ user.user.id }}
           </h3>
+        </div>
+        <div class="flex flex-wrap mb-4">
           <h3
             v-for="(right, index) in user.rights"
-            class="text-lg font-semibold text-gray-900 dark:text-white"
+            class="text-md mx-2 font-normal text-gray-900 dark:text-white"
             :key="index"
           >
-            {{ right.name || right }}
+            {{ convertPermissions(right.name) || convertPermissions(right) }}
           </h3>
+        </div>
           <button
             v-if="allowEdit(user)"
             @click="() => toggleModal(user)"
@@ -56,6 +60,7 @@ import { onMounted, reactive, ref, computed } from 'vue'
 import { api } from '@/logic/api.js'
 import { store } from '@/store/index.js'
 import ModalAddUser from '@/components/ModalAddUser.vue'
+import convertPermissions  from '../logic/converter.js'
 
 const isShowModal = ref()
 const allowEdit = computed(

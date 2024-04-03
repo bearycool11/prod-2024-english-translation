@@ -92,6 +92,6 @@ const date = (isoString) => {
   const [dayMonthYear, timeWithTimezone] = formattedDate.split(', ')
 
   // Return the formatted date with the timezone included
-  return 'Запланирован ' + dayMonthYear + ' ' + timeWithTimezone
+  return 'Опубликован ' + dayMonthYear + ' ' + timeWithTimezone
 };
 </script>
