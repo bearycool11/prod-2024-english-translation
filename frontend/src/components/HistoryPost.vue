@@ -2,15 +2,20 @@
   <div
     class="p-6 flex flex-col h-full w-full bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700"
   >
-    <h3 class="mb-5 text-lg font-bold text-gray-500 dark:text-gray-400">
-      #{{ props.post.id }}
-    </h3>
-    <div v-if="!isPostPublic" class="mb-2 text-lg p-3 border-gray-300 border-[1px] rounded-md font-normal text-gray-500 dark:text-gray-400" role="alert">
+    <h3 class="mb-5 text-lg font-bold text-gray-500 dark:text-gray-400">#{{ props.post.id }}</h3>
+    <div
+      v-if="!isPostPublic"
+      class="mb-2 text-lg p-3 border-gray-300 border-[1px] rounded-md font-normal text-gray-500 dark:text-gray-400"
+      role="alert"
+    >
       {{ props.post.content }}
     </div>
-    <div v-if="isPostPublic" class="pb-5" :id="`${props.post.id}-post`">
-    </div>
-    <div v-if="!isPostPublic" class="mb-2 p-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
+    <div v-if="isPostPublic" class="pb-5" :id="`${props.post.id}-post`"></div>
+    <div
+      v-if="!isPostPublic"
+      class="mb-2 p-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400"
+      role="alert"
+    >
       <span class="font-medium">Пост в приватном канале</span>
     </div>
     <div class="flex gap-1 mt-auto flex-wrap flex-col">
@@ -26,7 +31,7 @@
 </template>
 
 <script setup>
-import {computed, onMounted} from "vue";
+import { computed, onMounted } from 'vue'
 
 const props = defineProps({
   post: {
@@ -35,27 +40,34 @@ const props = defineProps({
   }
 })
 
-const isPostPublic = computed(() => !!props.post?.sent_infos?.find(({ chat_username }) => !!chat_username));
+const isPostPublic = computed(
+  () => !!props.post?.sent_infos?.find(({ chat_username }) => !!chat_username)
+)
 
 const load = () => {
   return new Promise((resolve) => {
-    const { chat_username, telegram_message_id } = props.post?.sent_infos?.find(({ chat_username }) => !!chat_username);
+    const { chat_username, telegram_message_id } = props.post?.sent_infos?.find(
+      ({ chat_username }) => !!chat_username
+    )
 
-    const script = document.createElement('script');
-    script.src = "https://telegram.org/js/telegram-widget.js?22";
-    script.setAttribute('data-telegram-post', `${chat_username}/${telegram_message_id}`);
-    script.setAttribute('data-width', "100%");
-    script.onload = resolve;
+    const script = document.createElement('script')
+    script.src = 'https://telegram.org/js/telegram-widget.js?22'
+    script.setAttribute('data-telegram-post', `${chat_username}/${telegram_message_id}`)
+    script.setAttribute('data-width', '100%')
+    if (localStorage.getItem('vueuse-color-scheme') !== 'light') {
+      script.setAttribute('data-dark', 1)
+    }
+    script.onload = resolve
 
-    document.getElementById(`${props.post.id}-post`).append(script);
+    document.getElementById(`${props.post.id}-post`).append(script)
   })
 }
 
 onMounted(() => {
   if (!!props.post?.sent_infos?.find(({ chat_username }) => !!chat_username)) {
-    load();
+    load()
   }
-});
+})
 
 const date = (isoString) => {
   // Check if the input is null
@@ -81,5 +93,5 @@ const date = (isoString) => {
 
   // Return the formatted date with the timezone included
   return 'Запланирован ' + dayMonthYear + ' ' + timeWithTimezone
-};
+}
 </script>

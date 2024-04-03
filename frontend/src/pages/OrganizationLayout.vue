@@ -186,7 +186,7 @@
       </div>
     </div>
   </aside>
-  <div lass="mt-20 w-full dark:bg-gray-800 shrink  h-screen"><RouterView /></div>
+  <nav class="w-screen dark:bg-gray-800 shrink"><RouterView /></nav>
 </template>
 
 <script setup>

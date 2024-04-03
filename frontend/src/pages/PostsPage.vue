@@ -32,7 +32,7 @@
             </div>
             <div class="flex gap-1 mt-auto flex-wrap">
               <div class="flex">
-                <p class="text-wrap text-left">{{ date(post.planned_time) }}</p>
+                <p class="text-wrap text-left dark:text-white">{{ date(post.planned_time) }}</p>
               </div>
 
               <div class="flex gap-1 mt-1 flex-wrap">

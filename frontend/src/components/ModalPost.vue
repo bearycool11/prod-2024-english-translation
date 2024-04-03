@@ -440,7 +440,6 @@ export default defineComponent({
       }
     },
     schedulePost() {
-      console.log(this.date, this.time)
       api
         .schedulePost(this.id, this.convertToISODateTime(this.date, this.time), this.post_id)
         .then(() => {
