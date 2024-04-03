@@ -489,6 +489,7 @@ def delete_post(
     if post is None:
         return ErrorResponse(reason="No such post")
     post.channels = []
+    post.tags = []
     db_session.delete(post)
     db_session.commit()
     return DeletePostResponse(**body.dict())
