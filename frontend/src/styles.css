@@ -6,3 +6,7 @@
   filter: brightness(0.8);
   pointer-events: none;
 }
+
+body, html {
+  overflow: hidden
+}
