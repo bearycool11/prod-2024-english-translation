@@ -420,6 +420,7 @@ def delete_channel_from_organization(
         return ErrorResponse(reason="No such channel")
     channel_to_delete = db_session.query(DBChannel).filter(DBChannel.id == body.id).first()
     channel_to_delete.posts = []
+    channel_to_delete.sent_infos = []
     db_session.delete(channel_to_delete)
     db_session.commit()
     return DeleteChannelResponse(id=body.id)
