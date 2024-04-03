@@ -83,6 +83,7 @@ class DBChannel(SQLModel, table=True):
                                                                "lazy": "dynamic"})
     bot: "DBOrganizationBot" = Relationship(
         sa_relationship_kwargs={"primaryjoin": "DBOrganizationBot.bot_id==DBChannel.bot_id"})
+    sent_infos: list["DBSentPostInfo"] = Relationship()
 
 
 class DBOrganizationUser(SQLModel, table=True):
@@ -147,6 +148,7 @@ class DBSentPostInfo(SQLModel, table=True):
     chat_username: Optional[str] = Field(nullable=True)
 
     post: DBPost = Relationship(back_populates="sent_infos")
+    channel: DBChannel = Relationship(back_populates="sent_infos")
 
 
 class DBOrganizationStopToggle(SQLModel, table=True):
