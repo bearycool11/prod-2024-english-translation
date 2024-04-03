@@ -1,6 +1,7 @@
 import { reactive } from 'vue'
 
 export const store = reactive({
+  isIOS: Boolean(import.meta.env.VITE_IOS),
   auth: {
     isAuth: false,
     isLoading: true,
