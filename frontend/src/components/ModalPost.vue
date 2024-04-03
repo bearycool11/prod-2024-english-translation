@@ -84,6 +84,7 @@
                 >Содержание</label
               >
               <textarea
+                v-if="!this.creation"
                 :readonly="
                   !mystore.auth.permissions.some(
                     (obj) => obj.name === 'editor' || obj.name === 'admin' || obj.name === 'owner'
@@ -97,6 +98,21 @@
                 required
                 :value="content.content"
                 @input="(event) => (areaContent = event.target.value)"
+              />
+              <textarea
+                v-else
+                :readonly="
+                  !mystore.auth.permissions.some(
+                    (obj) => obj.name === 'editor' || obj.name === 'admin' || obj.name === 'owner'
+                  ) || this.content.is_approved === 'APPROVED'
+                "
+                type="text"
+                name="name"
+                id="name"
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                placeholder="Содержание поста"
+                required
+                v-model="areaContent"
               />
               {{ text }}
             </div>
@@ -112,7 +128,7 @@
               <input
                 type="text"
                 name="name"
-                class="bg-gray-50 flex-1 w-full border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                class="bg-gray-50 flex-1 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                 placeholder="Тэг"
                 v-model="this.tag"
               />
@@ -300,7 +316,8 @@
                   }
                 "
                 :disabled="
-                  this.content.sent_status === 'WAITING' || this.content.is_approved === 'WAITING'||
+                  this.content.sent_status === 'WAITING' ||
+                  this.content.is_approved === 'WAITING' ||
                   this.content.is_approved === 'APPROVED' ||
                   !this.mystore.auth.permissions.some(
                     (obj) => obj.name === 'admin' || obj.name === 'editor' || obj.name === 'owner'
@@ -461,7 +478,6 @@ export default defineComponent({
   },
   computed: {
     buttonText() {
-     
       if (this.content.is_approved === 'APPROVED') {
         return 'В редактирование'
       }
@@ -481,6 +497,7 @@ export default defineComponent({
       })
     },
     onTagAdd() {
+      console.log(1)
       if (!this.tag || this.tags.includes(this.tag)) {
         return
       }
@@ -501,17 +518,20 @@ export default defineComponent({
         api
           .addPost(this.id, this.areaContent, { channels: this.myId })
           .then((data) => {
-           
             api.addTagsToPost(this.id, data.post.id, this.tags).then(() => {
-          const newPosts = [...store.data.posts]
-          const targetIndex = store.data.posts.indexOf(({ post_id }) => post_id === this.post_id)
+              const newPosts = [...store.data.posts]
+              const targetIndex = store.data.posts.indexOf(
+                ({ post_id }) => post_id === this.post_id
+              )
 
-          newPosts[targetIndex] = { ...newPosts[targetIndex], tags: this.tags }
-          store.data.posts = newPosts
-        })
-            api.getPosts(this.id).then((data) => {
+              newPosts[targetIndex] = { ...newPosts[targetIndex], tags: this.tags }
+              store.data.posts = newPosts
+            }).then(
+              api.getPosts(this.id).then((data) => {
               store.data.posts = data
             })
+            )
+           
             this.closeModal()
             this.myId = []
             this.mychannels = [...this.$props.channels]
@@ -519,7 +539,6 @@ export default defineComponent({
           .catch((e) => {
             this.text = e
           })
-        
       } else {
         await api.addTagsToPost(this.id, this.post_id, this.tags).then(() => {
           const newPosts = [...store.data.posts]
@@ -575,7 +594,7 @@ export default defineComponent({
       api
         .patchPost(this.id, this.post_id, {
           is_approved: 'APPROVED',
-          comment: this.newComment,
+          comment: this.newComment
         })
         .then(() => {
           api.getPosts(this.id).then((data) => {
