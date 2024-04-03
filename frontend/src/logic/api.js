@@ -244,7 +244,7 @@ class Api {
         }
         return [
           ...data.posts.sort((a, b) => compareISOStrings(a.update_time, b.update_time))
-        ].reverse()
+        ]
       })
   }
   getMyPermissions(id) {

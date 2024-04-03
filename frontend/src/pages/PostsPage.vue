@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col w-full h-screen overflow-x-hidden">
-    <div class="w-full px-4">
+    <div class="w-full px-4 mt-16">
       <button
         v-if="
           store.auth.permissions.some(
@@ -52,20 +52,21 @@
                 {{ post.content }}
               </h5>
             </div>
-            <div class="flex gap-1 mt-auto flex-wrap">
-              <div class="flex">
-                <p class="text-wrap text-left dark:text-white">{{ date(post.planned_time) }}</p>
+            <div class="flex">
+                <p class="text-wrap text-left mb-2 dark:text-white">{{ date(post.planned_time) }}</p>
               </div>
-
-              <div class="flex gap-1 mt-1 flex-wrap">
-                <div class="p-2 bg-blue-100 rounded-md">{{ post.is_approved }}</div>
-                <div class="p-2 bg-blue-100 rounded-md">{{ post.sent_status }}</div>
+            <div class="flex gap-1 mt-auto">
+        
+              <div class="flex gap-1 mt-1 flex-wrap  ">
+                <div class="p-2 bg-blue-100 dark:bg-blue-400 rounded-md">{{ convertStatuses(post.is_approved) }}</div>
+                <div class="p-2 bg-blue-100 dark:bg-blue-400 rounded-md">{{ convertStatuses(post.sent_status) }}</div>
               </div>
             </div>
             <div class="flex mt-2 ml-1 gap-1 max-w-full overflow-scroll">
               <span
                 v-for="tag of post.tags"
-                class="inline-flex items-center px-2 py-1 text-sm font-medium text-blue-800 bg-blue-200 rounded dark:bg-blue-900 dark:text-blue-300"
+                class="inline-flex items-center px-2 py-1 text-sm font-medium text-blue-800 bg-blue-200 rounded dark:bg-blue-900 dark:text-blue-600"
+                :key="tag"
               >
                 {{ tag }}
               </span>
@@ -92,6 +93,8 @@ import { computed, onMounted, reactive } from 'vue'
 import { api } from '@/logic/api.js'
 import ModalPost from '@/components/ModalPost.vue'
 import { store } from '@/store/index.js'
+import convertStatuses from '../logic/statusesConverter.js'
+
 
 const state = reactive({
   isShowModal: false,

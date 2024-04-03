@@ -23,8 +23,8 @@
         <p class="text-wrap text-left dark:text-neutral-200">{{ date(post.planned_time) }}</p>
       </div>
       <div class="flex gap-1 mt-1 flex-wrap flex-col">
-        <div class="p-2 bg-blue-100 rounded-md">{{ props.post.is_approved }}</div>
-        <div class="p-2 bg-blue-100 rounded-md">{{ props.post.sent_status }}</div>
+        <div class="p-2 bg-blue-100  dark:bg-blue-500 dark:text-white rounded-md">{{ convertStatuses(props.post.is_approved) }}</div>
+        <div class="p-2 bg-blue-100  dark:bg-blue-500 dark:text-white rounded-md">{{convertStatuses(props.post.sent_status) }}</div>
       </div>
     </div>
   </div>
@@ -32,6 +32,7 @@
 
 <script setup>
 import { computed, onMounted } from 'vue'
+import convertStatuses from '../logic/statusesConverter.js'
 
 const props = defineProps({
   post: {
@@ -69,29 +70,18 @@ onMounted(() => {
   }
 });
 
-const date = (isoString) => {
-  // Check if the input is null
-  if (isoString === null) {
+const date = (utcIsoString) => {
+  if (!utcIsoString) {
     return ''
   }
 
-  // Parse the ISO string into a Date object
-  const date = new Date(isoString)
+  const londonTime = new Date(utcIsoString)
 
-  // Format the date according to the current locale and timezone
-  const formattedDate = new Intl.DateTimeFormat('ru-RU', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    timeZoneName: 'short'
-  }).format(date)
+  const localTimezoneOffset = new Date().getTimezoneOffset()
+  const localTime = new Date(londonTime.getTime() - localTimezoneOffset * 60000)
 
-  // Extract the formatted date and time parts
-  const [dayMonthYear, timeWithTimezone] = formattedDate.split(', ')
+  const formattedLocalTime = `${String(localTime.getDate()).padStart(2, '0')}.${String(localTime.getMonth() + 1).padStart(2, '0')}.${localTime.getFullYear()} ${String(localTime.getHours()).padStart(2, '0')}:${String(localTime.getMinutes()).padStart(2, '0')}`
 
-  // Return the formatted date with the timezone included
-  return 'Опубликован ' + dayMonthYear + ' ' + timeWithTimezone
-};
+  return 'Опубликован ' + formattedLocalTime
+}
 </script>
