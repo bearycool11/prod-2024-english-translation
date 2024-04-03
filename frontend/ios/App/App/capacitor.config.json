@@ -1,0 +1,11 @@
+{
+	"appId": "com.smmya.app",
+	"appName": "smmya",
+	"webDir": "dist",
+	"ios": {
+		"contentInset": "always"
+	},
+	"server": {
+		"androidScheme": "https"
+	}
+}
