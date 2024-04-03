@@ -4,7 +4,7 @@ from sqlmodel import SQLModel
 
 import config
 
-engine = create_engine(config.database_url, echo=True)
+engine = create_engine(config.database_url, echo=False)
 session_maker = sessionmaker(engine, expire_on_commit=False)
 
 
